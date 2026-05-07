@@ -241,6 +241,326 @@
   }
 }
 
+/* ── Cassette — music notes & mini-player ────────────────────────────────────── */
+
+@keyframes cassette-note-rise {
+  0%   {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0deg) scale(0.55);
+    filter: blur(1.5px);
+  }
+  10%  {
+    opacity: 1;
+    transform: translate(0, -6px) rotate(calc(var(--note-spin) * 0.15)) scale(1.12);
+    filter: blur(0px);
+  }
+  62%  {
+    opacity: 0.9;
+    transform: translate(calc(var(--note-drift) * 0.58), -58px) rotate(calc(var(--note-spin) * 0.72)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--note-drift), -112px) rotate(var(--note-spin)) scale(0.65);
+    filter: blur(2.5px);
+  }
+}
+
+.cassette-note {
+  position: fixed;
+  font-family: serif;
+  /* color is set inline per note */
+  text-shadow:
+    0 0 6px currentColor,
+    0 0 18px rgba(255, 255, 255, 0.25);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 99998;
+  opacity: 0;
+  line-height: 1;
+  animation: cassette-note-rise forwards;
+  animation-timing-function: cubic-bezier(0.22, 0.1, 0.32, 1);
+}
+
+/* Pulsing glow on the cassette while it's playing */
+@keyframes cassette-playing-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(167, 139, 250, 0.5)); }
+  50%       { filter: drop-shadow(0 0 12px rgba(244, 114, 182, 0.7)) drop-shadow(0 0 6px rgba(167, 139, 250, 0.5)); }
+}
+.cassette-playing {
+  animation: cassette-playing-glow 1.8s ease-in-out infinite;
+}
+
+/* ── Spotify mini-player widget ──────────────────────────────────────────────── */
+
+@keyframes cassette-player-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.cassette-player {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  width: 300px;
+  background: #111;
+  border: 1px solid rgba(29, 185, 84, 0.2);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(29, 185, 84, 0.06),
+    0 16px 48px rgba(0, 0, 0, 0.7),
+    0 0 32px rgba(29, 185, 84, 0.08);
+  z-index: 99997;
+  animation: cassette-player-in 0.3s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+  font-family: 'Author', 'Inter', sans-serif;
+}
+
+.cassette-player-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cassette-player-now {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(244, 244, 248, 0.7);
+  text-transform: uppercase;
+  flex: 1;
+}
+
+.cassette-player-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #1DB954;
+  box-shadow: 0 0 6px #1DB954;
+  animation: cassette-playing-glow 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.cassette-player-brand {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #1DB954;
+  letter-spacing: 0.04em;
+}
+
+.cassette-player-stop {
+  background: none;
+  border: none;
+  color: rgba(244, 244, 248, 0.35);
+  font-size: 10px;
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: 5px;
+  transition: color 0.15s, background 0.15s;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.cassette-player-stop:hover {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.1);
+}
+
+.cassette-player-frame {
+  display: block;
+  width: 100%;
+  height: 152px;
+  border: none;
+  background: #000;
+}
+
+.cassette-player-placeholder {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(244, 244, 248, 0.35);
+  padding: 12px;
+  line-height: 1.5;
+}
+.cassette-player-placeholder code {
+  font-family: monospace;
+  font-size: 10px;
+  color: #1DB954;
+  background: rgba(29, 185, 84, 0.1);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* ── Spotify Modal ───────────────────────────────────────────────────────────── */
+
+@keyframes spotify-modal-in {
+  0%   { opacity: 0; transform: scale(0.88) translateY(12px); }
+  100% { opacity: 1; transform: scale(1)    translateY(0); }
+}
+@keyframes spotify-disc-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.spotify-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100000;
+}
+
+.spotify-modal {
+  background: #121212;
+  border: 1px solid rgba(29, 185, 84, 0.18);
+  border-radius: 16px;
+  padding: 28px 28px 24px;
+  width: min(340px, 92vw);
+  box-shadow:
+    0 0 0 1px rgba(29, 185, 84, 0.08),
+    0 24px 64px rgba(0, 0, 0, 0.72),
+    0 0 40px rgba(29, 185, 84, 0.06);
+  animation: spotify-modal-in 0.26s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+  font-family: 'Author', 'Inter', sans-serif;
+  color: #f4f4f8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.spotify-modal-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.spotify-modal-logo {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1DB954;
+  letter-spacing: 0.04em;
+}
+
+.spotify-modal-close {
+  background: none;
+  border: none;
+  color: rgba(244, 244, 248, 0.4);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
+  line-height: 1;
+}
+.spotify-modal-close:hover {
+  color: #f4f4f8;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.spotify-modal-art {
+  margin-bottom: 16px;
+}
+
+.spotify-modal-disc {
+  animation: spotify-disc-spin 4s linear infinite;
+  filter: drop-shadow(0 0 14px rgba(29, 185, 84, 0.25));
+}
+
+.spotify-modal-info {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.spotify-modal-username {
+  font-size: 20px;
+  font-weight: 800;
+  color: #f4f4f8;
+  margin: 0 0 4px;
+  letter-spacing: 0.02em;
+}
+
+.spotify-modal-meta {
+  font-size: 12px;
+  color: rgba(244, 244, 248, 0.45);
+  margin: 0;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.spotify-modal-playlists {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  justify-content: center;
+  margin-bottom: 22px;
+  width: 100%;
+}
+
+.spotify-modal-playlist-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: rgba(29, 185, 84, 0.08);
+  border: 1px solid rgba(29, 185, 84, 0.2);
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(244, 244, 248, 0.8);
+  letter-spacing: 0.02em;
+}
+
+.spotify-modal-playlist-icon {
+  color: #1DB954;
+  font-size: 11px;
+}
+
+.spotify-modal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #1DB954;
+  color: #000;
+  font-family: 'Author', 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  padding: 11px 24px;
+  border-radius: 500px;
+  transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 4px 20px rgba(29, 185, 84, 0.3);
+  width: 100%;
+  justify-content: center;
+}
+.spotify-modal-btn:hover {
+  background: #1ed760;
+  transform: scale(1.03);
+  box-shadow: 0 6px 28px rgba(29, 185, 84, 0.45);
+}
+.spotify-modal-btn:active {
+  transform: scale(0.98);
+}
+
 /* ── Dead Poets Society — words drifting off the poster ─────────────────────── */
 
 @keyframes dps-word-rise {

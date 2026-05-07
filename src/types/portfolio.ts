@@ -32,6 +32,19 @@ export interface Club {
   org: string
 }
 
+// ─── Spotify ─────────────────────────────────────────────────────────────────
+
+export interface SpotifyPlaylist {
+  name: string
+  url: string
+  weight: number
+}
+
+export interface SpotifyConfig {
+  profileUrl: string
+  playlists: SpotifyPlaylist[]
+}
+
 // ─── Links ───────────────────────────────────────────────────────────────────
 
 export type LinkIcon = 'github' | 'linkedin' | 'devpost' | 'twitter' | 'web'
@@ -81,6 +94,7 @@ export interface PortfolioData {
   experiences: Experience[]
   projects: Project[]
   clubs: Club[]
+  spotify: SpotifyConfig
   links: SocialLink[]
   desk: DeskProp[]
 }

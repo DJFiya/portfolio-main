@@ -52,6 +52,15 @@
     }
   ],
 
+  "spotify": {
+    "profileUrl": "https://open.spotify.com/user/6qjio67deca3untd2l5rfgvpd",
+    "playlists": [
+      { "name": "All Good",     "url": "https://open.spotify.com/playlist/6pZfvyZycC0acnbzQI858P", "weight": 5 },
+      { "name": "Soft Angels",  "url": "https://open.spotify.com/playlist/5UqZrSvzRRkjgTBMsRchp3", "weight": 4 },
+      { "name": "Nostalgia",    "url": "https://open.spotify.com/playlist/50fijFYY5h0nTi6QeTFWOA", "weight": 1 }
+    ]
+  },
+
   "links": [
     {
       "label": "GitHub",
