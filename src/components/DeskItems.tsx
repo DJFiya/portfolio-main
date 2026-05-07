@@ -516,7 +516,7 @@ export function DiamondSwordItem() {
 }
 
 // ── D20 — pentagon face with internal lines ───────────────────────────────────
-export function D20Item() {
+export function D20Item({ value }: { value?: number }) {
   const cx = 32, cy = 33, R = 30
   // Pentagon with point at top (−90° start)
   const verts = Array.from({ length: 5 }, (_, i) => {
@@ -524,16 +524,14 @@ export function D20Item() {
     return [cx + R * Math.cos(a), cy + R * Math.sin(a)] as [number, number]
   })
   const outerPts = verts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ')
+  const fs = value !== undefined && value >= 10 ? 13 : 14
   return (
     <svg width="65" height="65" viewBox="0 0 65 65" fill="none">
-      {/* Pentagon body */}
       <polygon points={outerPts} fill="#1e3a8a" stroke="#60a5fa" strokeWidth="1.5" />
-      {/* Lines from centre to each vertex — show the triangular faces */}
       {verts.map(([x, y], i) => (
         <line key={i} x1={cx} y1={cy} x2={x} y2={y}
           stroke="#93c5fd" strokeWidth="0.8" opacity="0.45" />
       ))}
-      {/* Inner pentagon ring */}
       {(() => {
         const inner = Array.from({ length: 5 }, (_, i) => {
           const a = (Math.PI * 2 * i) / 5 - Math.PI / 2
@@ -541,15 +539,16 @@ export function D20Item() {
         }).join(' ')
         return <polygon points={inner} fill="none" stroke="#93c5fd" strokeWidth="0.6" opacity="0.3" />
       })()}
-      {/* Number */}
-      <text x={cx} y={cy + 5.5} textAnchor="middle" fontFamily="serif"
-        fontSize="14" fontWeight="700" fill="#bfdbfe" letterSpacing="-0.5">20</text>
+      {value !== undefined && (
+        <text x={cx} y={cy + 5.5} textAnchor="middle" fontFamily="serif"
+          fontSize={fs} fontWeight="700" fill="#bfdbfe" letterSpacing="-0.5">{value}</text>
+      )}
     </svg>
   )
 }
 
 // ── D12 — pentagon face ───────────────────────────────────────────────────────
-export function D12Item() {
+export function D12Item({ value }: { value?: number }) {
   const pts = Array.from({ length: 5 }, (_, i) => {
     const a = (Math.PI * 2 * i) / 5 - Math.PI / 2
     return `${(20 + 18 * Math.cos(a)).toFixed(1)},${(20 + 18 * Math.sin(a)).toFixed(1)}`
@@ -558,19 +557,31 @@ export function D12Item() {
     const a = (Math.PI * 2 * i) / 5 - Math.PI / 2
     return `${(20 + 11 * Math.cos(a)).toFixed(1)},${(20 + 11 * Math.sin(a)).toFixed(1)}`
   }).join(' ')
+  const fs = value !== undefined && value >= 10 ? 9.5 : 11
   return (
     <svg width="60" height="60" viewBox="0 0 40 40" fill="none">
       <polygon points={pts} fill="#172554" stroke="#60a5fa" strokeWidth="1.5" />
       <polygon points={inner} fill="none" stroke="#93c5fd" strokeWidth="0.7" opacity="0.4" />
-      <text x="20" y="24" textAnchor="middle" fontFamily="serif"
-        fontSize="11" fontWeight="700" fill="#bfdbfe">12</text>
+      {value !== undefined && (
+        <text x="20" y="24" textAnchor="middle" fontFamily="serif"
+          fontSize={fs} fontWeight="700" fill="#bfdbfe">{value}</text>
+      )}
     </svg>
   )
 }
 
-// ── D6 — rounded square with six dots ────────────────────────────────────────
-export function D6Item() {
-  const dots = [[11,11],[25,11],[11,18],[25,18],[11,25],[25,25]]
+// ── D6 — rounded square with dots matching the rolled value ───────────────────
+const D6_DOTS: Record<number, [number, number][]> = {
+  1: [[18, 18]],
+  2: [[25, 11], [11, 25]],
+  3: [[25, 11], [18, 18], [11, 25]],
+  4: [[11, 11], [25, 11], [11, 25], [25, 25]],
+  5: [[11, 11], [25, 11], [18, 18], [11, 25], [25, 25]],
+  6: [[11, 11], [25, 11], [11, 18], [25, 18], [11, 25], [25, 25]],
+}
+
+export function D6Item({ value }: { value?: number }) {
+  const dots = value !== undefined ? (D6_DOTS[value] ?? []) : []
   return (
     <svg width="54" height="54" viewBox="0 0 36 36" fill="none">
       <rect x="1" y="1" width="34" height="34" rx="5" fill="#1e3a8a" stroke="#60a5fa" strokeWidth="1.5" />
@@ -582,7 +593,7 @@ export function D6Item() {
 }
 
 // ── Dispatcher ───────────────────────────────────────────────────────────────
-export function DeskItemSVG({ type, label }: { type: string; label: string }) {
+export function DeskItemSVG({ type, label, diceValue }: { type: string; label: string; diceValue?: number }) {
   switch (type) {
     case 'terminal':   return <TerminalItem />
     case 'blueprint':  return <BlueprintItem />
@@ -594,9 +605,9 @@ export function DeskItemSVG({ type, label }: { type: string; label: string }) {
     case 'poem':       return <PoemItem />
     case 'mug':        return <MugItem />
     case 'poster':     return <PosterItem label={label} />
-    case 'dice-d20':   return <D20Item />
-    case 'dice-d12':   return <D12Item />
-    case 'dice-d6':    return <D6Item />
+    case 'dice-d20':   return <D20Item value={diceValue} />
+    case 'dice-d12':   return <D12Item value={diceValue} />
+    case 'dice-d6':    return <D6Item value={diceValue} />
     case 'diamond-sword': return <DiamondSwordItem />
     case 'laptop':     return <LaptopItem />
     default:           return null
