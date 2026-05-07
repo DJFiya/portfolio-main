@@ -1109,3 +1109,309 @@
   animation: invincible-title-in 2000ms ease-in-out forwards;
 }
 
+/* ─── Controller "Split Screen Reality" ──────────────────────────────────────
+   While body has .desk-game-mode, the desk takes on game logic:
+   - every desk-item gets a soft cyan "interactable" glow
+   - specific item types upgrade further (rarity, parchment, dashed physics, etc)
+   - a portal-rendered .game-mode-overlay sits on top with letterbox + HUD
+   The overlay never blocks clicks — every layer is pointer-events:none except
+   the explicit EXIT pill, so dice rolls / sword glow / laptop QTE all stay
+   reachable. That reachability IS the "interactable" payoff.
+   ───────────────────────────────────────────────────────────────────────── */
+
+body.desk-game-mode .desk-item {
+  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.55));
+  transition: filter 0.45s ease;
+}
+body.desk-game-mode .desk-item[data-game-variant="rare"] {
+  filter:
+    drop-shadow(0 0 8px rgba(251, 191, 36, 0.85))
+    drop-shadow(0 0 18px rgba(251, 191, 36, 0.45));
+  animation: gm-rare-pulse 1.6s ease-in-out infinite;
+}
+body.desk-game-mode .desk-item[data-game-variant="quest"] {
+  filter:
+    drop-shadow(0 0 4px rgba(217, 180, 119, 0.65))
+    sepia(0.18) saturate(1.1);
+}
+body.desk-game-mode .desk-item[data-game-variant="action"] {
+  filter:
+    drop-shadow(0 0 4px rgba(239, 68, 68, 0.7))
+    drop-shadow(0 0 12px rgba(239, 68, 68, 0.35));
+}
+body.desk-game-mode .desk-item[data-game-variant="heal"] {
+  filter:
+    drop-shadow(0 0 6px rgba(74, 222, 128, 0.75))
+    drop-shadow(0 0 14px rgba(74, 222, 128, 0.35));
+}
+body.desk-game-mode .desk-item[data-game-variant="active"] {
+  animation: gm-active-pulse 0.9s ease-in-out infinite;
+}
+
+@keyframes gm-rare-pulse {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.85)) drop-shadow(0 0 18px rgba(251, 191, 36, 0.45)); }
+  50%      { filter: drop-shadow(0 0 12px rgba(251, 191, 36, 1))   drop-shadow(0 0 26px rgba(251, 191, 36, 0.65)); }
+}
+@keyframes gm-active-pulse {
+  0%, 100% { filter: drop-shadow(0 0 8px  rgba(56, 189, 248, 0.7)) drop-shadow(0 0 18px rgba(56, 189, 248, 0.35)); }
+  50%      { filter: drop-shadow(0 0 14px rgba(56, 189, 248, 1))   drop-shadow(0 0 28px rgba(56, 189, 248, 0.55)); }
+}
+
+/* ── Overlay container ──────────────────────────────────────────────────── */
+.game-mode-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99950;        /* below SpotifyModal (99998+) and GwhPlane (100001) */
+  pointer-events: none;  /* clicks fall through to desk items */
+  overflow: hidden;
+  font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, monospace;
+  color: #67e8f9;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* Subtle non-destructive color grade — sits above the desk but doesn't touch
+   text inside modals because we never apply it to <body>. */
+.game-mode-tint {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, rgba(8, 47, 73, 0.0) 30%, rgba(8, 47, 73, 0.28) 100%),
+    linear-gradient(rgba(15, 118, 110, 0.05), rgba(8, 47, 73, 0.06));
+  mix-blend-mode: multiply;
+  animation: gm-tint-in 360ms ease-out both;
+}
+
+.game-mode-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+  animation: gm-tint-in 360ms ease-out both;
+}
+
+.game-mode-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(34, 211, 238, 0.04) 0px,
+    rgba(34, 211, 238, 0.04) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: screen;
+  opacity: 0.7;
+  animation: gm-scan-shift 5s linear infinite, gm-tint-in 360ms ease-out both;
+}
+
+@keyframes gm-tint-in   { from { opacity: 0; } to { opacity: 1; } }
+@keyframes gm-scan-shift { 0% { background-position: 0 0; } 100% { background-position: 0 60px; } }
+
+/* Letterbox bars — kept thin (5vh) so they don't cover content. */
+.game-mode-letterbox {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 5vh;
+  background: linear-gradient(rgba(0,0,0,0.95), rgba(0,0,0,0.85));
+  border-color: rgba(34, 211, 238, 0.35);
+  border-style: solid;
+  border-width: 0;
+}
+.game-mode-letterbox--top {
+  top: 0;
+  border-bottom-width: 1px;
+  animation: gm-letterbox-top 360ms cubic-bezier(.2,.8,.2,1) both;
+}
+.game-mode-letterbox--bottom {
+  bottom: 0;
+  border-top-width: 1px;
+  animation: gm-letterbox-bot 360ms cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes gm-letterbox-top { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+@keyframes gm-letterbox-bot { from { transform: translateY(100%);  } to { transform: translateY(0); } }
+
+/* Banner — slides + fades early so it doesn't camp the screen. */
+.game-mode-banner {
+  position: absolute;
+  top: calc(5vh + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  color: #e0f2fe;
+  text-shadow: 0 0 8px rgba(34, 211, 238, 0.9), 0 0 18px rgba(34, 211, 238, 0.5);
+  animation: gm-banner 1700ms ease-out forwards;
+}
+.game-mode-banner-bracket { color: #67e8f9; margin: 0 0.4em; }
+@keyframes gm-banner {
+  0%   { opacity: 0; transform: translate(-50%, -8px); letter-spacing: 0.18em; }
+  18%  { opacity: 1; transform: translate(-50%,  0);   letter-spacing: 0.4em; }
+  78%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%,  0); }
+}
+
+/* Top-right HUD — anchored under the letterbox bar. */
+.game-mode-hud {
+  position: absolute;
+  top: calc(5vh + 14px);
+  right: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  color: #67e8f9;
+  text-shadow: 0 0 6px rgba(34, 211, 238, 0.6);
+  animation: gm-hud-in 380ms ease-out 120ms both;
+}
+.game-mode-hud-row { display: flex; gap: 10px; justify-content: flex-end; }
+.game-mode-hud-key { color: rgba(165, 243, 252, 0.55); }
+.game-mode-hud-val { color: #e0f2fe; }
+.game-mode-hud-val--ok  { color: #4ade80; }
+.game-mode-hud-val--dim { color: rgba(165, 243, 252, 0.45); }
+@keyframes gm-hud-in { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: translateX(0); } }
+
+/* Per-item floating chip — anchored above the item, stays upright. */
+.game-mode-chip {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  padding: 2px 7px;
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  font-weight: 700;
+  color: #e0f2fe;
+  background: rgba(8, 47, 73, 0.85);
+  border: 1px solid rgba(34, 211, 238, 0.7);
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.35);
+  white-space: nowrap;
+  animation: gm-chip-in 320ms ease-out both;
+}
+.game-mode-chip--rare {
+  color: #fde68a;
+  background: rgba(120, 53, 15, 0.85);
+  border-color: rgba(251, 191, 36, 0.85);
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.55);
+}
+.game-mode-chip--quest {
+  color: #fef3c7;
+  background: rgba(120, 53, 15, 0.7);
+  border-color: rgba(217, 180, 119, 0.85);
+}
+.game-mode-chip--action {
+  color: #fee2e2;
+  background: rgba(127, 29, 29, 0.85);
+  border-color: rgba(248, 113, 113, 0.85);
+  box-shadow: 0 0 10px rgba(248, 113, 113, 0.45);
+}
+.game-mode-chip--heal {
+  color: #dcfce7;
+  background: rgba(20, 83, 45, 0.85);
+  border-color: rgba(74, 222, 128, 0.85);
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.45);
+}
+.game-mode-chip--active {
+  color: #cffafe;
+  background: rgba(8, 47, 73, 0.9);
+  border-color: rgba(56, 189, 248, 0.95);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.55);
+}
+@keyframes gm-chip-in {
+  from { opacity: 0; transform: translate(-50%, -90%) scale(0.92); }
+  to   { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+}
+
+/* Laptop QTE — keycap that cycles through E/F/SPACE/R. */
+.game-mode-qte {
+  position: absolute;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.game-mode-qte-keycap {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, monospace;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #ecfeff;
+  background: linear-gradient(180deg, rgba(8, 47, 73, 0.95) 0%, rgba(7, 89, 133, 0.95) 100%);
+  border: 1.5px solid rgba(56, 189, 248, 0.85);
+  border-radius: 6px;
+  box-shadow:
+    0 0 14px rgba(56, 189, 248, 0.55),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  animation: gm-qte-press 700ms ease-out;
+}
+.game-mode-qte-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+  color: rgba(165, 243, 252, 0.75);
+  text-shadow: 0 0 6px rgba(34, 211, 238, 0.5);
+}
+@keyframes gm-qte-press {
+  0%   { transform: translateY(-4px) scale(0.92); opacity: 0; box-shadow: 0 0 22px rgba(56, 189, 248, 0.85), inset 0 -2px 0 rgba(0,0,0,0.4); }
+  35%  { transform: translateY(0)    scale(1.05); opacity: 1; }
+  100% { transform: translateY(0)    scale(1);    opacity: 1; }
+}
+
+/* Mouse-clickable EXIT pill — the only interactive element in the overlay.
+   Escape hatch for users who can't / don't want to wait the auto-revert. */
+.game-mode-exit-pill {
+  position: absolute;
+  bottom: calc(5vh + 14px);
+  right: 22px;
+  pointer-events: auto;
+  padding: 6px 12px;
+  font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  font-weight: 700;
+  color: #e0f2fe;
+  background: rgba(8, 47, 73, 0.85);
+  border: 1px solid rgba(34, 211, 238, 0.7);
+  border-radius: 999px;
+  cursor: pointer;
+  text-transform: uppercase;
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.4);
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  animation: gm-hud-in 380ms ease-out 200ms both;
+}
+.game-mode-exit-pill:hover {
+  background: rgba(8, 47, 73, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.7);
+}
+.game-mode-exit-pill:active { transform: translateY(0); }
+
+/* Reduced motion: keep the informational layer (letterbox, chips, HUD) but
+   strip pulses, scanlines, and slide-ins so it never causes discomfort. */
+@media (prefers-reduced-motion: reduce) {
+  body.desk-game-mode .desk-item,
+  body.desk-game-mode .desk-item[data-game-variant="rare"],
+  body.desk-game-mode .desk-item[data-game-variant="active"] {
+    animation: none !important;
+    transition: none !important;
+  }
+  .game-mode-tint,
+  .game-mode-vignette,
+  .game-mode-scanlines,
+  .game-mode-letterbox,
+  .game-mode-banner,
+  .game-mode-hud,
+  .game-mode-chip,
+  .game-mode-qte-keycap,
+  .game-mode-exit-pill {
+    animation: none !important;
+  }
+  .game-mode-scanlines { display: none; }
+}

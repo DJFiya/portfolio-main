@@ -20,9 +20,27 @@ const COFFEE_BLINK_MS = 1100
 const COFFEE_REFILL_SYNC_MS = 550
 const INVINCIBLE_FLY_MS = 2200
 const INVINCIBLE_TITLE_MS = 2000
+const GAME_MODE_MS = 4500
+const QTE_KEYS = ['E', 'F', 'SPACE', 'R'] as const
+const QTE_TICK_MS = 700
 
 const DICE_MAX: Record<string, number> = {
   'dice-d6': 6, 'dice-d12': 12, 'dice-d20': 20,
+}
+
+// Map desk-item type → game-mode HUD label (drives the per-item floating chip in
+// the overlay). null = item gets the global glow but no chip.
+function gameLabelFor(type: string): { label: string; variant: string } | null {
+  if (type === 'diamond-sword') return { label: 'LEGENDARY', variant: 'rare'   }
+  if (type === 'poem')          return { label: 'QUEST',     variant: 'quest'  }
+  if (type.startsWith('dice-')) return { label: 'ROLL',      variant: 'action' }
+  if (type === 'mug')           return { label: '+10 HP',    variant: 'heal'   }
+  if (type === 'terminal')      return { label: 'HACK',      variant: 'tech'   }
+  if (type === 'laptop')        return { label: 'INTERFACE', variant: 'tech'   }
+  if (type === 'controller')    return { label: 'ACTIVE',    variant: 'active' }
+  if (type === 'vinyl' || type === 'cassette') return { label: 'AUDIO', variant: 'audio' }
+  if (type === 'poster')        return { label: 'LORE',      variant: 'lore'   }
+  return null
 }
 
 type CritState  = 'hit' | 'fail'
@@ -126,14 +144,18 @@ export default function DeskClutter() {
   const [mugSipping, setMugSipping] = useState(false)
   const [coffeeBlinking, setCoffeeBlinking] = useState(false)
   const [steam, setSteam] = useState<SteamParticle[]>([])
+  const [gameMode, setGameMode] = useState(false)
+  const [gameModeTick, setGameModeTick] = useState(0)
   const atlaRef     = useRef<HTMLDivElement | null>(null)
   const dpsRef      = useRef<HTMLDivElement | null>(null)
   const cassetteRef = useRef<HTMLDivElement | null>(null)
   const mugRef      = useRef<HTMLDivElement | null>(null)
+  const laptopRef   = useRef<HTMLDivElement | null>(null)
   const noteIdRef   = useRef(0)
   const steamIdRef  = useRef(0)
   const atlaEffectIndexRef = useRef(0)
   const poemVerseIndexRef = useRef(0)
+  const gameModeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleRoll = useCallback((id: string, type: string) => {
     if (rolling.has(id)) return
@@ -205,6 +227,59 @@ export default function DeskClutter() {
     if (invincibleActive) return
     setInvincibleActive(true)
   }, [invincibleActive])
+
+  // ── Controller "Split Screen Reality" toggle ──────────────────────────────
+  // Pain-point removals:
+  //  • Second click immediately exits (no trapping the user)
+  //  • Won't trigger if a major modal/scene is already running (avoids stacked overlays)
+  //  • Auto-reverts at GAME_MODE_MS so it never overstays its welcome
+  //  • ESC handler below is the keyboard escape hatch
+  const exitGameMode = useCallback(() => {
+    if (gameModeTimerRef.current) {
+      clearTimeout(gameModeTimerRef.current)
+      gameModeTimerRef.current = null
+    }
+    setGameMode(false)
+  }, [])
+
+  const handleController = useCallback(() => {
+    if (gameMode) {
+      exitGameMode()
+      return
+    }
+    if (spotifyOpen || gwhActive || invincibleActive || coffeeBlinking) return
+    setGameMode(true)
+    setGameModeTick(t => t + 1)
+    gameModeTimerRef.current = setTimeout(() => {
+      setGameMode(false)
+      gameModeTimerRef.current = null
+    }, GAME_MODE_MS)
+  }, [gameMode, exitGameMode, spotifyOpen, gwhActive, invincibleActive, coffeeBlinking])
+
+  // body class drives all per-item CSS (HUD glow, rarity, parchment, etc.)
+  useEffect(() => {
+    if (!gameMode) return
+    document.body.classList.add('desk-game-mode')
+    return () => document.body.classList.remove('desk-game-mode')
+  }, [gameMode])
+
+  // ESC exits game mode
+  useEffect(() => {
+    if (!gameMode) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') exitGameMode()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [gameMode, exitGameMode])
+
+  // unmount cleanup
+  useEffect(() => {
+    return () => {
+      if (gameModeTimerRef.current) clearTimeout(gameModeTimerRef.current)
+      document.body.classList.remove('desk-game-mode')
+    }
+  }, [])
 
   const handleInvincibleDone = useCallback(() => {
     setInvincibleActive(false)
@@ -338,8 +413,10 @@ export default function DeskClutter() {
         const isLaptop     = item.type === 'laptop'
         const isPoem       = item.type === 'poem'
         const isMug        = item.type === 'mug'
+        const isController = item.type === 'controller'
         const isRolling    = rolling.has(item.id)
         const crit         = criticals[item.id]
+        const gl           = gameLabelFor(item.type)
 
         const innerClass = [
           isRolling       ? 'dice-rolling'   : undefined,
@@ -350,14 +427,18 @@ export default function DeskClutter() {
         return (
           <div
             key={item.id}
-            ref={isAtlaPoster ? atlaRef : isDpsPoster ? dpsRef : isCassette ? cassetteRef : isMug ? mugRef : undefined}
-            className={`absolute select-none desk-item${isLaptop ? ' desk-item--laptop' : ''}${isLaptop && laptopClicking ? ' desk-item--laptop-click' : ''}${isCassette && cassetteActive ? ' cassette-playing' : ''}${isPoem ? ' desk-item--poem' : ''}${isPoem && poemBurst ? ' desk-item--poem-active' : ''}${isTerminal ? ' desk-item--terminal' : ''}${isTerminal && terminalHacking ? ' desk-item--terminal-hack' : ''}`}
+            ref={isAtlaPoster ? atlaRef : isDpsPoster ? dpsRef : isCassette ? cassetteRef : isMug ? mugRef : isLaptop ? laptopRef : undefined}
+            data-item-id={item.id}
+            data-item-type={item.type}
+            data-game-label={gl?.label}
+            data-game-variant={gl?.variant}
+            className={`absolute select-none desk-item${isLaptop ? ' desk-item--laptop' : ''}${isLaptop && laptopClicking ? ' desk-item--laptop-click' : ''}${isCassette && cassetteActive ? ' cassette-playing' : ''}${isPoem ? ' desk-item--poem' : ''}${isPoem && poemBurst ? ' desk-item--poem-active' : ''}${isTerminal ? ' desk-item--terminal' : ''}${isTerminal && terminalHacking ? ' desk-item--terminal-hack' : ''}${isController ? ' desk-item--controller' : ''}${isController && gameMode ? ' desk-item--controller-active' : ''}`}
             style={{
               left: `${item.x}%`,
               top:  `${item.y}%`,
               '--item-rotate': `${item.rotate}deg`,
               zIndex: item.zIndex,
-              cursor: isDice || isAtlaPoster || isDpsPoster || isGwhPoster || isInvPoster || isVinyl || isCassette || isLaptop || isPoem || isTerminal || isMug ? 'pointer' : undefined,
+              cursor: isDice || isAtlaPoster || isDpsPoster || isGwhPoster || isInvPoster || isVinyl || isCassette || isLaptop || isPoem || isTerminal || isMug || isController ? 'pointer' : undefined,
             } as React.CSSProperties}
             onClick={
               isDice         ? () => handleRoll(item.id, item.type)
@@ -371,6 +452,7 @@ export default function DeskClutter() {
               : isLaptop     ? handleLaptopClick
               : isPoem       ? (e) => handlePoemClick(e.currentTarget)
               : isMug        ? handleMugClick
+              : isController ? handleController
               : undefined
             }
           >
@@ -477,7 +559,134 @@ export default function DeskClutter() {
         </div>,
         document.body
       )}
+
+      {gameMode && createPortal(
+        <GameModeOverlay key={gameModeTick} laptopRef={laptopRef} onExit={exitGameMode} />,
+        document.body
+      )}
     </>
+  )
+}
+
+// ── "Split Screen Reality" overlay ────────────────────────────────────────────
+// Layered, non-destructive HUD that runs while the controller is engaged.
+// Pain-point removals baked into the component:
+//   • The whole tree has pointer-events:none so it never blocks dice / sword /
+//     laptop clicks — keeping those handlers reachable IS the payoff
+//   • Only the floating "EXIT" pill captures clicks (escape hatch with mouse)
+//   • Per-item HUD chips are anchored via getBoundingClientRect and re-read on
+//     resize/scroll so they stay aligned even if layout shifts
+//   • prefers-reduced-motion suppresses the heavier animations (handled in CSS)
+interface GameLabelInfo {
+  id:      string
+  label:   string
+  variant: string
+  cx:      number
+  cy:      number
+  top:     number
+}
+
+function GameModeOverlay({ laptopRef, onExit }: { laptopRef: React.RefObject<HTMLDivElement | null>; onExit: () => void }) {
+  const [labels,     setLabels]     = useState<GameLabelInfo[]>([])
+  const [laptopRect, setLaptopRect] = useState<DOMRect | null>(null)
+  const [qteIndex,   setQteIndex]   = useState(0)
+
+  useEffect(() => {
+    const update = () => {
+      const items = document.querySelectorAll<HTMLElement>('.desk-item[data-game-label]')
+      const next: GameLabelInfo[] = []
+      items.forEach(el => {
+        const r = el.getBoundingClientRect()
+        next.push({
+          id:      el.dataset.itemId ?? '',
+          label:   el.dataset.gameLabel ?? '',
+          variant: el.dataset.gameVariant ?? '',
+          cx:      r.left + r.width / 2,
+          cy:      r.top  + r.height / 2,
+          top:     r.top,
+        })
+      })
+      setLabels(next)
+      const lr = laptopRef.current?.getBoundingClientRect() ?? null
+      setLaptopRect(lr)
+    }
+    update()
+    window.addEventListener('resize', update)
+    window.addEventListener('scroll', update, true)
+    return () => {
+      window.removeEventListener('resize', update)
+      window.removeEventListener('scroll', update, true)
+    }
+  }, [laptopRef])
+
+  useEffect(() => {
+    const id = setInterval(() => setQteIndex(i => (i + 1) % QTE_KEYS.length), QTE_TICK_MS)
+    return () => clearInterval(id)
+  }, [])
+
+  return (
+    <div className="game-mode-overlay" aria-hidden="true">
+      <div className="game-mode-tint" />
+      <div className="game-mode-scanlines" />
+      <div className="game-mode-vignette" />
+      <div className="game-mode-letterbox game-mode-letterbox--top" />
+      <div className="game-mode-letterbox game-mode-letterbox--bottom" />
+
+      <div className="game-mode-banner">
+        <span className="game-mode-banner-bracket">[</span>
+        SYSTEM&nbsp;ENGAGED
+        <span className="game-mode-banner-bracket">]</span>
+      </div>
+
+      <div className="game-mode-hud">
+        <div className="game-mode-hud-row">
+          <span className="game-mode-hud-key">STATUS</span>
+          <span className="game-mode-hud-val game-mode-hud-val--ok">ONLINE</span>
+        </div>
+        <div className="game-mode-hud-row">
+          <span className="game-mode-hud-key">OBJECTS</span>
+          <span className="game-mode-hud-val">{data.desk.length.toString().padStart(2, '0')}</span>
+        </div>
+        <div className="game-mode-hud-row">
+          <span className="game-mode-hud-key">EXIT</span>
+          <span className="game-mode-hud-val game-mode-hud-val--dim">[ESC]</span>
+        </div>
+      </div>
+
+      {labels.map(l => (
+        <div
+          key={l.id}
+          className={`game-mode-chip game-mode-chip--${l.variant}`}
+          style={{ left: l.cx, top: l.top - 14 }}
+        >
+          {l.label}
+        </div>
+      ))}
+
+      {laptopRect && (
+        <div
+          className="game-mode-qte"
+          style={{
+            left: laptopRect.left + laptopRect.width / 2,
+            top:  laptopRect.top  + laptopRect.height + 10,
+          }}
+        >
+          <div className="game-mode-qte-keycap" key={qteIndex}>
+            {QTE_KEYS[qteIndex]}
+          </div>
+          <div className="game-mode-qte-label">QUICK&nbsp;TIME</div>
+        </div>
+      )}
+
+      <button
+        type="button"
+        className="game-mode-exit-pill"
+        onClick={onExit}
+        aria-label="Exit game mode"
+      >
+        ✕ EXIT
+      </button>
+    </div>
   )
 }
 
