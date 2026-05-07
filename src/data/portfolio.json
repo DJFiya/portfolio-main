@@ -1,0 +1,228 @@
+{
+  "meta": {
+    "title": "Daevik Jain's Portfolio",
+    "subtitle": "Software Engineer · Builder · Creator"
+  },
+
+  "experiences": [
+    {
+      "title": "QA / SWE",
+      "company": "Relay",
+      "skills": ["AWS", "DynamoDB", "Vue", "React", "TypeScript", "Playwright"]
+    },
+    {
+      "title": "SDET",
+      "company": "RideCo",
+      "skills": ["Python", "Django", "Redis", "APIs", "Linux", "Pytest"]
+    }
+  ],
+
+  "projects": [
+    {
+      "name": "Avesia",
+      "tagline": "Autonomous Smart Cameras",
+      "awardLabel": "Winner · NexHacks · $1k New York Trip + Billboard",
+      "awardTier": "gold",
+      "devpostUrl": "https://devpost.com/software/avesia"
+    },
+    {
+      "name": "Compass",
+      "tagline": "Civic Intelligence System",
+      "awardLabel": "Winner· QHacks · $100",
+      "awardTier": "silver",
+      "devpostUrl": "https://devpost.com/software/compass-w5iugc"
+    },
+    {
+      "name": "Blurr",
+      "tagline": "AI Privacy Guardian",
+      "awardLabel": "Semifinalist · Hack the North",
+      "awardTier": "bronze",
+      "devpostUrl": "https://devpost.com/software/blurr"
+    }
+  ],
+
+  "clubs": [
+    {
+      "role": "ML Researcher",
+      "org": "Watolink"
+    },
+    {
+      "role": "Simulations Developer",
+      "org": "Biomechatronic Club"
+    }
+  ],
+
+  "links": [
+    {
+      "label": "GitHub",
+      "handle": "DJFiya",
+      "url": "https://github.com/DJFiya",
+      "icon": "github"
+    },
+    {
+      "label": "GitHub (Work)",
+      "handle": "rel-Daevik-Jain",
+      "url": "https://github.com/rel-Daevik-Jain",
+      "icon": "github"
+    },
+    {
+      "label": "LinkedIn",
+      "handle": "daevik-jain",
+      "url": "https://linkedin.com/in/daevik-jain",
+      "icon": "linkedin"
+    },
+    {
+      "label": "Devpost",
+      "handle": "daevikjain",
+      "url": "https://devpost.com/daevikjain",
+      "icon": "devpost"
+    }
+  ],
+
+  "desk": [
+    {
+      "id": "terminal",
+      "type": "terminal",
+      "label": "terminal",
+      "x": 8,
+      "y": 12,
+      "rotate": -5,
+      "zIndex": 4
+    },
+    {
+      "id": "blueprint",
+      "type": "blueprint",
+      "label": "blueprint",
+      "x": 72,
+      "y": 8,
+      "rotate": 4,
+      "zIndex": 3
+    },
+    {
+      "id": "stickers",
+      "type": "stickers",
+      "label": "stickers",
+      "x": 78,
+      "y": 68,
+      "rotate": 2,
+      "zIndex": 4
+    },
+    {
+      "id": "cables",
+      "type": "cables",
+      "label": "cables",
+      "x": 0,
+      "y": 0,
+      "rotate": 0,
+      "zIndex": 1
+    },
+    {
+      "id": "vinyl",
+      "type": "vinyl",
+      "label": "vinyl",
+      "x": 5,
+      "y": 60,
+      "rotate": -8,
+      "zIndex": 5
+    },
+    {
+      "id": "cassette",
+      "type": "cassette",
+      "label": "cassette",
+      "x": 10,
+      "y": 78,
+      "rotate": 12,
+      "zIndex": 4
+    },
+    {
+      "id": "controller",
+      "type": "controller",
+      "label": "controller",
+      "x": 75,
+      "y": 80,
+      "rotate": -10,
+      "zIndex": 5
+    },
+    {
+      "id": "poem",
+      "type": "poem",
+      "label": "poem",
+      "x": 62,
+      "y": 72,
+      "rotate": 6,
+      "zIndex": 3
+    },
+    {
+      "id": "mug",
+      "type": "mug",
+      "label": "mug",
+      "x": 82,
+      "y": 42,
+      "rotate": 3,
+      "zIndex": 6
+    },
+    {
+      "id": "poster-atla",
+      "type": "poster",
+      "label": "ATLA",
+      "x": 3,
+      "y": 30,
+      "rotate": -4,
+      "zIndex": 3
+    },
+    {
+      "id": "poster-invincible",
+      "type": "poster",
+      "label": "Invincible",
+      "x": 86,
+      "y": 22,
+      "rotate": 7,
+      "zIndex": 3
+    },
+    {
+      "id": "poster-dwh",
+      "type": "poster",
+      "label": "Dead Poets",
+      "x": 2,
+      "y": 48,
+      "rotate": 3,
+      "zIndex": 2
+    },
+    {
+      "id": "poster-gwh",
+      "type": "poster",
+      "label": "Good Will Hunting",
+      "x": 84,
+      "y": 55,
+      "rotate": -6,
+      "zIndex": 2
+    },
+    {
+      "id": "dice-d20",
+      "type": "dice-d20",
+      "label": "d20",
+      "x": 18,
+      "y": 88,
+      "rotate": 15,
+      "zIndex": 6
+    },
+    {
+      "id": "dice-d12",
+      "type": "dice-d12",
+      "label": "d12",
+      "x": 24,
+      "y": 84,
+      "rotate": -8,
+      "zIndex": 5
+    },
+    {
+      "id": "dice-d6",
+      "type": "dice-d6",
+      "label": "d6",
+      "x": 30,
+      "y": 88,
+      "rotate": 22,
+      "zIndex": 6
+    }
+  ]
+}
