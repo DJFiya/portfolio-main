@@ -1,109 +1,167 @@
 import type { AwardTier } from '../types/portfolio'
 
-interface MedallionProps {
-  tier: AwardTier
+// Generate an n-pointed starburst path
+function starburst(cx: number, cy: number, r1: number, r2: number, n: number) {
+  const pts: string[] = []
+  for (let i = 0; i < n * 2; i++) {
+    const a = (Math.PI / n) * i - Math.PI / 2
+    const r = i % 2 === 0 ? r1 : r2
+    pts.push(
+      `${i === 0 ? 'M' : 'L'}${(cx + r * Math.cos(a)).toFixed(2)},${(cy + r * Math.sin(a)).toFixed(2)}`
+    )
+  }
+  return pts.join(' ') + 'Z'
 }
 
-const CFG = {
+const CFG: Record<
+  AwardTier,
+  {
+    size: number
+    points: number
+    spikeR: number
+    valleyR: number
+    diskR: number
+    ringR: number
+    burstFill: string
+    diskFill: string
+    ringColor: string
+    textColor: string
+    label: string
+    labelSize: number
+    ribbon: boolean
+    ribbonFill: string
+    ribbonH: number
+  }
+> = {
   gold: {
-    size: 46,
-    outerFill: '#1e4fa0',
-    innerFill: '#2563c2',
-    ringStroke: '#60a5fa',
-    starColor: '#fff',
+    size: 52,
+    points: 12,
+    spikeR: 25,
+    valleyR: 20,
+    diskR: 15,
+    ringR: 12.5,
+    burstFill: '#1e3a8a',
+    diskFill: '#1e4fa0',
+    ringColor: '#93c5fd',
+    textColor: '#dbeafe',
+    label: 'W',
+    labelSize: 13,
     ribbon: true,
+    ribbonFill: '#1e3a8a',
+    ribbonH: 16,
   },
   silver: {
-    size: 40,
-    outerFill: '#1a3a7a',
-    innerFill: '#1e4fa0',
-    ringStroke: '#93c5fd',
-    starColor: '#fff',
+    size: 42,
+    points: 10,
+    spikeR: 20,
+    valleyR: 16,
+    diskR: 12,
+    ringR: 10,
+    burstFill: '#172554',
+    diskFill: '#1a3a7a',
+    ringColor: '#60a5fa',
+    textColor: '#bfdbfe',
+    label: 'W',
+    labelSize: 11,
     ribbon: true,
+    ribbonFill: '#172554',
+    ribbonH: 13,
   },
   bronze: {
     size: 34,
-    outerFill: 'none',
-    innerFill: 'none',
-    ringStroke: '#93c5fd',
-    starColor: '#93c5fd',
+    points: 8,
+    spikeR: 16,
+    valleyR: 13,
+    diskR: 9.5,
+    ringR: 8,
+    burstFill: '#0f172a',
+    diskFill: '#0f172a',
+    ringColor: '#3b82f6',
+    textColor: '#93c5fd',
+    label: 'SF',
+    labelSize: 8.5,
     ribbon: false,
+    ribbonFill: 'none',
+    ribbonH: 0,
   },
 }
 
-export default function Medallion({ tier }: MedallionProps) {
-  const { size, outerFill, innerFill, ringStroke, starColor, ribbon } = CFG[tier]
-  const cx = size / 2
-  const cy = size / 2
-  const outerR = size / 2 - 1
-  const innerR = outerR - 5
-  const rw = 7
-  const totalH = size + (ribbon ? 14 : 0)
+export default function Medallion({ tier }: { tier: AwardTier }) {
+  const c = CFG[tier]
+  const cx = c.size / 2
+  const cy = c.size / 2
+  const totalH = c.size + c.ribbonH
 
   return (
     <svg
-      width={size}
+      width={c.size}
       height={totalH}
-      viewBox={`0 0 ${size} ${totalH}`}
+      viewBox={`0 0 ${c.size} ${totalH}`}
       aria-hidden="true"
+      style={{ display: 'block' }}
     >
-      {/* Ribbon strips */}
-      {ribbon && (
+      {/* Ribbon tails */}
+      {c.ribbon && (
         <>
           <rect
-            x={cx - rw - 1}
-            y={size - 5}
-            width={rw}
-            height={13}
-            rx="1"
-            fill={outerFill}
-            transform={`rotate(-5 ${cx - rw / 2 - 1} ${size + 2})`}
+            x={cx - 8}
+            y={c.size - 5}
+            width={6.5}
+            height={c.ribbonH}
+            rx="1.5"
+            fill={c.ribbonFill}
+            transform={`rotate(-7 ${cx - 4.75} ${c.size + c.ribbonH / 2})`}
           />
           <rect
-            x={cx + 1}
-            y={size - 5}
-            width={rw}
-            height={13}
-            rx="1"
-            fill={outerFill}
-            transform={`rotate(5 ${cx + rw / 2 + 1} ${size + 2})`}
+            x={cx + 1.5}
+            y={c.size - 5}
+            width={6.5}
+            height={c.ribbonH}
+            rx="1.5"
+            fill={c.ribbonFill}
+            transform={`rotate(7 ${cx + 4.75} ${c.size + c.ribbonH / 2})`}
+          />
+          {/* Notch V at ribbon bottom */}
+          <polygon
+            points={`${cx - 8},${totalH - 0.5} ${cx - 4.75},${totalH - 5} ${cx - 1.5},${totalH - 0.5}`}
+            fill="#0f172a"
+          />
+          <polygon
+            points={`${cx + 1.5},${totalH - 0.5} ${cx + 4.75},${totalH - 5} ${cx + 8},${totalH - 0.5}`}
+            fill="#0f172a"
           />
         </>
       )}
 
-      {/* Outer circle */}
-      <circle
-        cx={cx}
-        cy={cy}
-        r={outerR}
-        fill={outerFill}
-        stroke={tier === 'bronze' ? ringStroke : 'none'}
-        strokeWidth={tier === 'bronze' ? 1.5 : 0}
-      />
-      {/* Inner circle */}
-      {tier !== 'bronze' && (
-        <circle cx={cx} cy={cy} r={innerR} fill={innerFill} />
-      )}
+      {/* Starburst body */}
+      <path d={starburst(cx, cy, c.spikeR, c.valleyR, c.points)} fill={c.burstFill} />
+
+      {/* Inner disk */}
+      <circle cx={cx} cy={cy} r={c.diskR} fill={c.diskFill} />
+
       {/* Decorative ring */}
       <circle
-        cx={cx}
-        cy={cy}
-        r={innerR - (tier === 'bronze' ? 3 : 4)}
+        cx={cx} cy={cy} r={c.ringR}
         fill="none"
-        stroke={ringStroke}
+        stroke={c.ringColor}
         strokeWidth="0.8"
-        opacity="0.6"
+        opacity="0.65"
       />
-      {/* Star */}
+
+      {/* Rank label ("1st" / "2nd" / "SF") */}
       <text
         x={cx}
-        y={cy + 5}
+        y={cy + c.labelSize * 0.36}
         textAnchor="middle"
-        fontSize={tier === 'gold' ? 14 : tier === 'silver' ? 12 : 10}
-        fill={starColor}
+        fontSize={c.labelSize}
+        fontFamily="system-ui, sans-serif"
+        fontWeight="700"
+        fill={c.textColor}
+        letterSpacing="-0.3"
       >
-        ★
+        {c.label}
       </text>
+
     </svg>
   )
 }

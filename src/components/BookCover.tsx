@@ -1,4 +1,3 @@
-import { motion, useReducedMotion } from 'framer-motion'
 import rawData from '../data/portfolio.json'
 import type { PortfolioData } from '../types/portfolio'
 
@@ -41,8 +40,6 @@ function CornerBracket({
 }
 
 export default function BookCover({ onOpen }: BookCoverProps) {
-  const prefersReduced = useReducedMotion()
-
   return (
     <div
       className="w-full h-full relative cursor-pointer select-none group"
@@ -52,16 +49,6 @@ export default function BookCover({ onOpen }: BookCoverProps) {
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && onOpen()}
     >
-      {/* Sway wrapper — separate from the cover so it doesn't conflict with exit rotateY */}
-      <motion.div
-        className="w-full h-full"
-        animate={
-          prefersReduced
-            ? {}
-            : { rotate: [-1.5, 1.5, -1.5] }
-        }
-        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-      >
         {/* Book body */}
         <div
           className="absolute inset-0 rounded-sm overflow-hidden"
@@ -129,6 +116,14 @@ export default function BookCover({ onOpen }: BookCoverProps) {
               {data.meta.title}
             </h1>
 
+            {/* Subtitle */}
+            <p
+              className="font-author text-center tracking-[0.18em] uppercase"
+              style={{ color: 'rgba(147,170,220,0.6)', fontSize: '0.6rem' }}
+            >
+              Waterloo BME Student
+            </p>
+
             {/* Ornament */}
             <div className="flex items-center gap-2.5">
               <div
@@ -180,7 +175,6 @@ export default function BookCover({ onOpen }: BookCoverProps) {
             </svg>
           </div>
         </div>
-      </motion.div>
     </div>
   )
 }

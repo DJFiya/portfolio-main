@@ -30,8 +30,18 @@ export default function BookSpread({
   return (
     <div
       className="relative w-full h-full flex rounded-sm overflow-hidden"
-      style={{ boxShadow: '10px 10px 30px rgba(0,0,0,0.65), 2px 2px 6px rgba(0,0,0,0.35)' }}
+      style={{ boxShadow: '12px 12px 32px rgba(0,0,0,0.7), 3px 3px 8px rgba(0,0,0,0.4)' }}
     >
+      {/* ── LEFT HARDCOVER BOARD ─────────────────────────── */}
+      <div
+        className="flex-shrink-0 z-10"
+        style={{
+          width: 20,
+          background: 'linear-gradient(to right, #0e0e18, #181824)',
+          boxShadow: 'inset -3px 0 6px rgba(0,0,0,0.5)',
+          borderRight: '1px solid rgba(255,255,255,0.04)',
+        }}
+      />
       {/* ── LEFT PAGE ─────────────────────────────────────── */}
       <div
         className="relative flex flex-col w-1/2 h-full paper-texture"
@@ -149,6 +159,17 @@ export default function BookSpread({
           </span>
         </div>
       </div>
+
+      {/* ── RIGHT HARDCOVER BOARD ────────────────────────── */}
+      <div
+        className="flex-shrink-0 z-10"
+        style={{
+          width: 20,
+          background: 'linear-gradient(to left, #0e0e18, #181824)',
+          boxShadow: 'inset 3px 0 6px rgba(0,0,0,0.5)',
+          borderLeft: '1px solid rgba(255,255,255,0.04)',
+        }}
+      />
     </div>
   )
 }

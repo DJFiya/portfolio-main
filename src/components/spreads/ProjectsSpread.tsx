@@ -6,27 +6,56 @@ const data = rawData as unknown as PortfolioData
 
 export default function ProjectsSpread() {
   return (
-    <div className="flex flex-col gap-6 h-full justify-center">
-      {data.projects.map((project) => (
-        <div key={project.name} className="flex items-start gap-3">
-          <div className="flex-shrink-0 pt-0.5">
-            <Medallion tier={project.awardTier} />
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <a
-              href={project.devpostUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-author font-semibold text-ink-900 text-sm hover:text-azure-700 transition-colors focus-visible:outline-none focus-visible:underline"
-            >
-              {project.name} ↗
-            </a>
-            <p className="font-author text-ink-600 text-xs italic leading-snug">
-              {project.tagline}
-            </p>
-            <p className="font-author text-ink-400 text-xs mt-0.5 leading-snug">
-              {project.awardLabel}
-            </p>
+    <div className="flex flex-col justify-center h-full gap-5">
+      {data.projects.map((project, i) => (
+        <div key={project.name}>
+          {/* Thin rule above each entry */}
+          {i > 0 && (
+            <div
+              className="mb-4"
+              style={{
+                height: 1,
+                background:
+                  'linear-gradient(to right, rgba(30,79,160,0.18), transparent)',
+              }}
+            />
+          )}
+
+          <div className="flex items-start gap-3">
+            {/* Badge */}
+            <div className="flex-shrink-0">
+              <Medallion tier={project.awardTier} />
+            </div>
+
+            {/* Text */}
+            <div className="flex flex-col gap-1 pt-1">
+              <a
+                href={project.devpostUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-author font-semibold text-ink-900 leading-tight hover:text-azure-700 transition-colors focus-visible:outline-none focus-visible:underline"
+                style={{ fontSize: '0.85rem' }}
+              >
+                {project.name}
+                <span className="ml-1 text-azure-500" style={{ fontSize: '0.7rem' }}>
+                  ↗
+                </span>
+              </a>
+
+              <p
+                className="font-author text-ink-500 italic leading-snug"
+                style={{ fontSize: '0.72rem' }}
+              >
+                {project.tagline}
+              </p>
+
+              <p
+                className="font-author text-ink-400 leading-snug"
+                style={{ fontSize: '0.67rem', letterSpacing: '0.01em' }}
+              >
+                {project.awardLabel}
+              </p>
+            </div>
           </div>
         </div>
       ))}

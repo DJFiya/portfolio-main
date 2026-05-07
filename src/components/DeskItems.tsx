@@ -1,0 +1,596 @@
+// Inline SVG desk-prop illustrations.
+// All coordinates are in their own viewBox; rendered width/height ≈1.5× the original.
+
+// ── Terminal window ───────────────────────────────────────────────────────────
+export function TerminalItem() {
+  return (
+    <svg width="231" height="153" viewBox="0 0 154 102" fill="none">
+      <rect width="154" height="102" rx="6" fill="#0d0f14" />
+      <rect width="154" height="20" rx="6" fill="#161b22" />
+      <rect y="14" width="154" height="6" fill="#161b22" />
+      <circle cx="13" cy="10" r="4" fill="#ff5f57" opacity="0.75" />
+      <circle cx="25" cy="10" r="4" fill="#febc2e" opacity="0.75" />
+      <circle cx="37" cy="10" r="4" fill="#28c840" opacity="0.75" />
+      <text x="8" y="34" fontFamily="monospace" fontSize="7" fill="#4ade80">$ npm run dev</text>
+      <text x="8" y="46" fontFamily="monospace" fontSize="7" fill="#6b7280">  ➜  localhost:5173</text>
+      <text x="8" y="60" fontFamily="monospace" fontSize="7" fill="#4ade80">$ git log --oneline</text>
+      <text x="8" y="72" fontFamily="monospace" fontSize="7" fill="#6b7280">a3f2c1b feat: page flip</text>
+      <text x="8" y="84" fontFamily="monospace" fontSize="7" fill="#6b7280">9e1d0f2 fix: board sync</text>
+      <rect x="8" y="89" width="6" height="8" fill="#60a5fa" opacity="0.85" />
+    </svg>
+  )
+}
+
+// ── Blueprint — system architecture diagram ───────────────────────────────────
+export function BlueprintItem() {
+  // Helper for connector lines
+  const conn = (x1: number, y1: number, x2: number, y2: number, key: string) => (
+    <line key={key} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#93c5fd" strokeWidth="0.8" markerEnd="url(#arr)" />
+  )
+  const box = (x: number, y: number, w: number, h: number, label: string, sub?: string) => (
+    <g key={label}>
+      <rect x={x} y={y} width={w} height={h} rx="2" fill="#0a1e4a" stroke="#60a5fa" strokeWidth="0.9" />
+      <text x={x + w / 2} y={y + h / 2 + (sub ? -1.5 : 2.5)} textAnchor="middle"
+        fontFamily="monospace" fontSize="5.5" fontWeight="700" fill="#93c5fd">{label}</text>
+      {sub && <text x={x + w / 2} y={y + h / 2 + 5.5} textAnchor="middle"
+        fontFamily="monospace" fontSize="3.8" fill="#60a5fa" opacity="0.65">{sub}</text>}
+    </g>
+  )
+
+  return (
+    <svg width="162" height="207" viewBox="0 0 108 138" fill="none">
+      <defs>
+        <marker id="arr" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto">
+          <path d="M0,0 L0,4 L4,2 Z" fill="#60a5fa" />
+        </marker>
+      </defs>
+
+      {/* Background grid */}
+      <rect width="108" height="138" fill="#071430" />
+      {[10,20,30,40,50,60,70,80,90,100,110,120,130].map(y =>
+        <line key={`gy${y}`} x1="0" y1={y} x2="108" y2={y} stroke="#1e3a8a" strokeWidth="0.3" opacity="0.4" />
+      )}
+      {[10,20,30,40,50,60,70,80,90,100].map(x =>
+        <line key={`gx${x}`} x1={x} y1="0" x2={x} y2="138" stroke="#1e3a8a" strokeWidth="0.3" opacity="0.4" />
+      )}
+
+      {/* Title bar */}
+      <rect width="108" height="12" fill="#0d2452" />
+      <text x="54" y="8.5" textAnchor="middle" fontFamily="monospace" fontSize="5.5"
+        fontWeight="700" fill="#60a5fa" letterSpacing="1">SYS ARCH v2</text>
+
+      {/* Layer: Client */}
+      {box(35, 18, 38, 14, 'CLIENT', 'browser')}
+
+      {/* Arrow: client → gateway */}
+      {conn(54, 32, 54, 40, 'c-gw')}
+
+      {/* Layer: API Gateway */}
+      {box(28, 40, 52, 14, 'API GATEWAY', 'REST / WS')}
+
+      {/* Branch lines from gateway */}
+      <line x1="28" y1="47" x2="18" y2="47" stroke="#93c5fd" strokeWidth="0.8" />
+      <line x1="80" y1="47" x2="90" y2="47" stroke="#93c5fd" strokeWidth="0.8" />
+      {conn(18, 47, 18, 60, 'gw-auth')}
+      {conn(90, 47, 90, 60, 'gw-svc')}
+      {conn(54, 54, 54, 60, 'gw-db')}
+
+      {/* Auth service */}
+      {box(4, 60, 28, 14, 'AUTH', 'JWT')}
+      {/* Main service */}
+      {box(76, 60, 28, 14, 'SERVICE', 'worker')}
+      {/* Database */}
+      {box(30, 60, 48, 14, 'DATABASE', 'postgres')}
+
+      {/* Arrow from service → cache */}
+      {conn(90, 74, 90, 84, 'svc-cache')}
+      {box(75, 84, 29, 14, 'CACHE', 'redis')}
+
+      {/* Arrow from db → queue */}
+      {conn(54, 74, 54, 84, 'db-q')}
+      {box(29, 84, 50, 14, 'QUEUE', 'async jobs')}
+
+      {/* Footer stamp */}
+      <rect y="126" width="108" height="12" fill="#0d2452" />
+      <text x="54" y="134" textAnchor="middle" fontFamily="monospace" fontSize="4"
+        fill="#3b82f6" letterSpacing="0.5" opacity="0.7">DJ · REV-A · 2025</text>
+    </svg>
+  )
+}
+
+// ── Laptop stickers — 5 × 4 sheet, ordered by industry usefulness ─────────────
+export function StickersItem() {
+  const W = 24, H = 17, GAP = 3
+  const COL = [2, 2 + W + GAP, 2 + (W + GAP) * 2, 2 + (W + GAP) * 3] // x positions
+  const ROW = [2, 2 + H + GAP, 2 + (H + GAP) * 2, 2 + (H + GAP) * 3, 2 + (H + GAP) * 4] // y positions
+
+  // [col, row, fill, textFill, label]
+  // Ordered by industry demand (top-left = most demanded)
+  const stickers: [number, number, string, string, string][] = [
+    // Row 0 — essentials
+    [0, 0, '#2496ED', '#fff',    'Docker'  ],
+    [1, 0, '#FF9900', '#111',    'AWS'     ],
+    [2, 0, '#FFD43B', '#3776AB', 'Python'  ],
+    [3, 0, '#3178C6', '#fff',    'TS'      ],
+    // Row 1 — web + databases
+    [0, 1, '#20232a', '#61DAFB', 'React'   ],
+    [1, 1, '#336791', '#fff',    'postgres'],
+    [2, 1, '#47A248', '#fff',    'Mongo'   ],
+    [3, 1, '#DC382D', '#fff',    'Redis'   ],
+    // Row 2 — backend frameworks
+    [0, 2, '#0C4B33', '#fff',    'Django'  ],
+    [1, 2, '#009688', '#fff',    'FastAPI' ],
+    [2, 2, '#1a1a1a', '#e5e5e5', 'Flask'   ],
+    [3, 2, '#2270E3', '#fff',    'Dynamo'  ],
+    // Row 3 — ML / data
+    [0, 3, '#FF6F00', '#fff',    'TF'      ],
+    [1, 3, '#EE4C2C', '#fff',    'PyTorch' ],
+    [2, 3, '#150458', '#e0d4ff', 'pandas'  ],
+    [3, 3, '#5C3EE8', '#fff',    'OpenCV'  ],
+    // Row 4 — tooling
+    [0, 4, '#C21325', '#fff',    'Jest'    ],
+    [1, 4, '#1b1f23', '#fff',    'GitHub'  ],
+    [2, 4, '#111',    '#f0f0f0', 'Linux'   ],
+    [3, 4, '#00ED64', '#0a1f0a', 'Atlas'   ],
+  ]
+
+  const vbW = COL[3] + W + 2   // 110
+  const vbH = ROW[4] + H + 2   // 102
+
+  return (
+    <svg width="165" height="153" viewBox={`0 0 ${vbW} ${vbH}`} fill="none">
+      {/* Sticker-sheet backing */}
+      <rect width={vbW} height={vbH} rx="3" fill="#f6f5f3" stroke="#d4d0ca" strokeWidth="0.5" />
+      {stickers.map(([ci, ri, fill, tf, text]) => {
+        const x = COL[ci], y = ROW[ri]
+        return (
+          <g key={text}>
+            {/* Die-cut white halo */}
+            <rect x={x - 1.2} y={y - 1.2} width={W + 2.4} height={H + 2.4} rx="3.5" fill="white" />
+            <rect x={x} y={y} width={W} height={H} rx="2.5" fill={fill} />
+            <text x={x + W / 2} y={y + H / 2 + 2.2}
+              textAnchor="middle" fontFamily="monospace" fontSize="4.8" fontWeight="700" fill={tf}>
+              {text}
+            </text>
+          </g>
+        )
+      })}
+    </svg>
+  )
+}
+
+// ── Cable doodle ──────────────────────────────────────────────────────────────
+export function CablesItem() {
+  return (
+    <svg width="315" height="135" viewBox="0 0 210 90" fill="none">
+      <rect x="0" y="35" width="18" height="12" rx="2" fill="#444" />
+      <rect x="3" y="38" width="12" height="6" rx="1" fill="#888" />
+      <path d="M18,41 C35,41 40,28 58,28 C76,28 80,52 98,52 C116,52 120,33 138,33 C156,33 160,50 178,50"
+        stroke="#1a1a1a" strokeWidth="5" strokeLinecap="round" />
+      <path d="M18,41 C35,41 40,28 58,28 C76,28 80,52 98,52 C116,52 120,33 138,33 C156,33 160,50 178,50"
+        stroke="#333" strokeWidth="3" strokeLinecap="round" />
+      <rect x="178" y="43" width="18" height="10" rx="4" fill="#555" />
+      <rect x="181" y="45" width="12" height="6" rx="3" fill="#777" />
+      <path d="M30,70 C55,70 60,55 80,55 C100,55 105,75 130,75 C155,75 165,60 190,62"
+        stroke="#1a1a1a" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M30,70 C55,70 60,55 80,55 C100,55 105,75 130,75 C155,75 165,60 190,62"
+        stroke="#2a2a2a" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+// ── Vinyl record ──────────────────────────────────────────────────────────────
+export function VinylItem() {
+  return (
+    <svg width="132" height="132" viewBox="0 0 88 88" fill="none">
+      <circle cx="44" cy="44" r="43" fill="#111" />
+      {[38, 34, 30, 26, 22].map((r) => (
+        <circle key={r} cx="44" cy="44" r={r} stroke="#1a1a1a" strokeWidth="1.2" />
+      ))}
+      <circle cx="44" cy="44" r="16" fill="#1a1a2e" />
+      <circle cx="44" cy="44" r="14" fill="none" stroke="#1e3a8a" strokeWidth="0.8" />
+      <text x="44" y="41" textAnchor="middle" fontFamily="sans-serif" fontSize="4.5" fill="#60a5fa" fontWeight="600">SIDE A</text>
+      <text x="44" y="49" textAnchor="middle" fontFamily="sans-serif" fontSize="3.5" fill="#3b82f6" opacity="0.7">◈ 33 RPM ◈</text>
+      <circle cx="44" cy="44" r="2.5" fill="#0d0f14" />
+    </svg>
+  )
+}
+
+// ── Cassette tape ─────────────────────────────────────────────────────────────
+export function CassetteItem() {
+  return (
+    <svg width="135" height="87" viewBox="0 0 90 58" fill="none">
+      <rect x="1" y="1" width="88" height="56" rx="5" fill="#1a1a2e" stroke="#2a2a40" strokeWidth="1" />
+      <rect x="8" y="6" width="74" height="28" rx="2" fill="#f0ede8" />
+      <text x="45" y="18" textAnchor="middle" fontFamily="sans-serif" fontSize="5.5" fontWeight="700" fill="#1a1a2e">SIDE A</text>
+      <text x="45" y="28" textAnchor="middle" fontFamily="sans-serif" fontSize="3.8" fill="#555">lo-fi · study vibes · vol. 1</text>
+      <circle cx="30" cy="45" r="10" fill="#0d0f14" stroke="#333" strokeWidth="1" />
+      <circle cx="60" cy="45" r="10" fill="#0d0f14" stroke="#333" strokeWidth="1" />
+      {[0, 120, 240].map((deg) => (
+        <line key={`l-${deg}`}
+          x1={30 + 4 * Math.cos((deg * Math.PI) / 180)} y1={45 + 4 * Math.sin((deg * Math.PI) / 180)}
+          x2={30 + 9 * Math.cos((deg * Math.PI) / 180)} y2={45 + 9 * Math.sin((deg * Math.PI) / 180)}
+          stroke="#333" strokeWidth="1" />
+      ))}
+      {[0, 120, 240].map((deg) => (
+        <line key={`r-${deg}`}
+          x1={60 + 4 * Math.cos((deg * Math.PI) / 180)} y1={45 + 4 * Math.sin((deg * Math.PI) / 180)}
+          x2={60 + 9 * Math.cos((deg * Math.PI) / 180)} y2={45 + 9 * Math.sin((deg * Math.PI) / 180)}
+          stroke="#333" strokeWidth="1" />
+      ))}
+      <path d="M40,45 Q45,38 50,45" fill="none" stroke="#111" strokeWidth="1.5" />
+    </svg>
+  )
+}
+
+// ── Game controller ───────────────────────────────────────────────────────────
+export function ControllerItem() {
+  return (
+    <svg width="150" height="102" viewBox="0 0 100 68" fill="none">
+      <path d="M22,22 C12,17 6,32 10,50 C14,64 28,66 40,57 L50,52 L60,57 C72,66 86,64 90,50 C94,32 88,17 78,22 C73,24 62,27 50,27 C38,27 27,24 22,22 Z"
+        fill="#1a1a2e" stroke="#2a2a40" strokeWidth="1" />
+      <rect x="20" y="37" width="5" height="14" rx="1" fill="#2a2a40" />
+      <rect x="15" y="42" width="14" height="5" rx="1" fill="#2a2a40" />
+      <circle cx="72" cy="36" r="4.5" fill="#1e4fa0" opacity="0.9" />
+      <circle cx="80" cy="42" r="4.5" fill="#172554" opacity="0.9" />
+      <circle cx="72" cy="48" r="4.5" fill="#1e3a8a" opacity="0.9" />
+      <circle cx="64" cy="42" r="4.5" fill="#1a3a7a" opacity="0.9" />
+      <text x="72" y="39" textAnchor="middle" fontFamily="sans-serif" fontSize="5" fill="#93c5fd">▲</text>
+      <text x="80" y="45" textAnchor="middle" fontFamily="sans-serif" fontSize="5" fill="#93c5fd">●</text>
+      <text x="72" y="51" textAnchor="middle" fontFamily="sans-serif" fontSize="5" fill="#93c5fd">✕</text>
+      <text x="64" y="45" textAnchor="middle" fontFamily="sans-serif" fontSize="5" fill="#93c5fd">■</text>
+      <circle cx="35" cy="48" r="7" fill="#111" stroke="#333" strokeWidth="1" />
+      <circle cx="58" cy="48" r="7" fill="#111" stroke="#333" strokeWidth="1" />
+      <rect x="43" y="32" width="7" height="4" rx="2" fill="#222" />
+      <rect x="50" y="32" width="7" height="4" rx="2" fill="#222" />
+      <path d="M22,22 C18,18 16,14 22,12 C30,10 40,12 50,12" stroke="#2a2a40" strokeWidth="2" fill="none" />
+      <path d="M78,22 C82,18 84,14 78,12 C70,10 60,12 50,12" stroke="#2a2a40" strokeWidth="2" fill="none" />
+    </svg>
+  )
+}
+
+// ── Poem paper ────────────────────────────────────────────────────────────────
+export function PoemItem() {
+  const lines = [58, 46, 54, 38, 52, 44, 50, 56, 42, 60, 48]
+  return (
+    <svg width="117" height="168" viewBox="0 0 78 112" fill="none">
+      <rect x="2" y="2" width="76" height="110" rx="1" fill="rgba(0,0,0,0.18)" />
+      <rect x="0" y="0" width="76" height="110" fill="#f5f1eb" />
+      <line x1="8" y1="14" x2="68" y2="14" stroke="#ccc" strokeWidth="0.5" />
+      {lines.map((w, i) => {
+        const y = 24 + i * 8 + (i >= 4 ? 5 : 0) + (i >= 7 ? 5 : 0)
+        return <line key={i} x1="8" y1={y} x2={w} y2={y} stroke="#555" strokeWidth="0.75" opacity="0.7" />
+      })}
+      <text x="38" y="104" textAnchor="middle" fontFamily="serif" fontSize="10" fill="#999" opacity="0.4">※</text>
+    </svg>
+  )
+}
+
+// ── Coffee mug — top-down view ────────────────────────────────────────────────
+export function MugItem() {
+  return (
+    <svg width="155" height="155" viewBox="0 0 110 110" fill="none">
+      {/* Coffee ring stain on desk surface (circular, like a real mug ring) */}
+      <circle cx="82" cy="85" r="22" fill="none" stroke="rgba(101,67,33,0.22)" strokeWidth="5" />
+      <circle cx="82" cy="85" r="15" fill="none" stroke="rgba(101,67,33,0.1)" strokeWidth="2.5" />
+      {/* Outer mug rim */}
+      <ellipse cx="46" cy="48" rx="38" ry="38" fill="#f0ede8" stroke="#bbb" strokeWidth="1.5" />
+      {/* Rim shadow / depth ring */}
+      <ellipse cx="46" cy="48" rx="34" ry="34" fill="none" stroke="#d0c8be" strokeWidth="1" />
+      {/* Coffee surface */}
+      <ellipse cx="46" cy="47" rx="26" ry="26" fill="#3d1f08" opacity="0.88" />
+      {/* Cream swirl highlight */}
+      <path d="M36,39 Q46,33 54,45 Q50,59 38,55 Q33,47 36,39" fill="rgba(255,235,210,0.13)" />
+      <ellipse cx="40" cy="42" rx="4" ry="3" fill="rgba(255,245,230,0.1)" />
+      {/* Handle — D-shape visible from top right */}
+      <path d="M82,36 C96,36 96,60 82,60" fill="none" stroke="#ccc" strokeWidth="5" strokeLinecap="round" />
+      <path d="M82,36 C94,36 94,60 82,60" fill="none" stroke="#e4ddd4" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+// ── Typographic movie posters ─────────────────────────────────────────────────
+interface PosterLine { text: string; size: number }
+interface PosterTheme {
+  bg: string
+  accent: string
+  lines: PosterLine[]
+  sub: string
+}
+
+const POSTER_THEMES: Record<string, PosterTheme> = {
+  // ATLA: Aang's robes + fire nation intensity → warm orange
+  ATLA: {
+    bg: '#1a0800',
+    accent: '#f97316',
+    lines: [
+      { text: 'AVATAR',     size: 9   },
+      { text: 'THE LAST',   size: 8.5 },
+      { text: 'AIRBENDER',  size: 7   },
+    ],
+    sub: '— animated —',
+  },
+  // Invincible: blue suit + yellow logo — the show's iconic palette
+  Invincible: {
+    bg: '#1455b8',
+    accent: '#eab308',
+    lines: [
+      { text: 'INVINCIBLE', size: 8 },
+    ],
+    sub: '★ series ★',
+  },
+  // Dead Poets Society: warm amber candlelight / autumn leaves
+  'Dead Poets': {
+    bg: '#100900',
+    accent: '#f59e0b',
+    lines: [
+      { text: 'DEAD',    size: 13  },
+      { text: 'POETS',   size: 13  },
+      { text: 'SOCIETY', size: 9   },
+    ],
+    sub: '· carpe diem ·',
+  },
+  // Good Will Hunting: Boston-night deep blue / intellectual cool
+  'Good Will Hunting': {
+    bg: '#020b18',
+    accent: '#38bdf8',
+    lines: [
+      { text: 'GOOD',    size: 13  },
+      { text: 'WILL',    size: 13  },
+      { text: 'HUNTING', size: 9.5 },
+    ],
+    sub: '— 1997 —',
+  },
+}
+
+export function PosterItem({ label }: { label: string }) {
+  const theme = POSTER_THEMES[label] ?? {
+    bg: '#111', accent: '#60a5fa',
+    lines: [{ text: label, size: 9 }],
+    sub: '',
+  }
+
+  // Stack lines centred vertically in the inner content area (y 18–76)
+  const linesH = theme.lines.length * 16
+  const blockTop = (76 - linesH) / 2 + 18
+
+  return (
+    <svg width="102" height="144" viewBox="0 0 68 96" fill="none">
+      {/* Mat */}
+      <rect width="68" height="96" fill="#e8e4de" />
+      {/* Inner frame */}
+      <rect x="4" y="4" width="60" height="88" fill={theme.bg} />
+      {/* Top rule */}
+      <line x1="10" y1="14" x2="58" y2="14" stroke={theme.accent} strokeWidth="0.8" opacity="0.55" />
+
+      {/* Title lines */}
+      {theme.lines.map((line, i) => (
+        <text
+          key={i}
+          x="34"
+          y={blockTop + i * 16 + line.size * 0.85}
+          textAnchor="middle"
+          fontFamily="serif"
+          fontSize={line.size}
+          fontWeight="700"
+          fill={theme.accent}
+          letterSpacing="1.2"
+        >
+          {line.text}
+        </text>
+      ))}
+
+      {/* Divider */}
+      <line x1="18" y1={blockTop + theme.lines.length * 16 + 3} x2="50" y2={blockTop + theme.lines.length * 16 + 3}
+        stroke={theme.accent} strokeWidth="0.5" opacity="0.4" />
+
+      {/* Sub label */}
+      <text
+        x="34"
+        y={blockTop + theme.lines.length * 16 + 12}
+        textAnchor="middle"
+        fontFamily="serif"
+        fontSize="4.8"
+        fill={theme.accent}
+        opacity="0.65"
+        letterSpacing="0.4"
+      >
+        {theme.sub}
+      </text>
+
+      {/* Bottom rule */}
+      <line x1="10" y1="82" x2="58" y2="82" stroke={theme.accent} strokeWidth="0.8" opacity="0.55" />
+    </svg>
+  )
+}
+
+// ── Laptop — partially visible from top edge ─────────────────────────────────
+export function LaptopItem() {
+  // Key rows: [y from top, count, key-width, gap, startX]
+  const rows: Array<{ y: number; count: number; kw: number; gap: number; startX: number }> = [
+    { y: 113, count: 14, kw: 15,   gap: 1.5, startX: 15 },  // fn row
+    { y: 125, count: 13, kw: 17,   gap: 1.5, startX: 11 },  // numbers
+    { y: 137, count: 12, kw: 18,   gap: 1.5, startX: 14 },  // QWERTY
+    { y: 149, count: 11, kw: 18.5, gap: 1.5, startX: 21 },  // ASDF
+    { y: 161, count: 10, kw: 19,   gap: 1.5, startX: 28 },  // ZXCV
+  ]
+  const keyH = 9
+
+  return (
+    <svg width="390" height="300" viewBox="0 0 260 200" fill="none">
+      {/* Screen lid */}
+      <rect x="4" y="0" width="252" height="100" rx="8" fill="#1c1c1e" />
+      <rect x="12" y="7" width="236" height="88" rx="4" fill="#0d1117" />
+
+      {/* Code on screen */}
+      <text x="20" y="24" fontFamily="monospace" fontSize="7.5" fill="#4ade80">$ npm run dev</text>
+      <text x="20" y="37" fontFamily="monospace" fontSize="7" fill="#6b7280">  VITE v5  ready in 209ms</text>
+      <text x="20" y="50" fontFamily="monospace" fontSize="6.5" fill="#60a5fa">  ➜  http://localhost:5173/</text>
+      <text x="20" y="63" fontFamily="monospace" fontSize="6.5" fill="#4ade80">$ git log --oneline</text>
+      <text x="20" y="74" fontFamily="monospace" fontSize="6.5" fill="#6b7280">  a3f2c1 feat: board anim</text>
+      <text x="20" y="85" fontFamily="monospace" fontSize="6.5" fill="#6b7280">  9e1d0f fix: page flip</text>
+
+      {/* Hinge bar */}
+      <rect x="0" y="100" width="260" height="8" rx="3" fill="#262628" />
+
+      {/* Keyboard deck */}
+      <rect x="0" y="107" width="260" height="93" rx="8" fill="#2c2c2e" />
+      {/* Keyboard recess */}
+      <rect x="7" y="113" width="246" height="80" rx="4" fill="#1c1c1e" />
+
+      {/* Key rows */}
+      {rows.map(({ y, count, kw, gap, startX }) =>
+        Array.from({ length: count }, (_, i) => (
+          <rect
+            key={`k-${y}-${i}`}
+            x={startX + i * (kw + gap)}
+            y={y}
+            width={kw}
+            height={keyH}
+            rx="1.5"
+            fill="#2a2a2c"
+            stroke="#3a3a3c"
+            strokeWidth="0.35"
+          />
+        ))
+      )}
+
+      {/* Bottom modifier row */}
+      <rect x="15"  y="173" width="24" height={keyH} rx="1.5" fill="#2a2a2c" stroke="#3a3a3c" strokeWidth="0.35" />
+      <rect x="42"  y="173" width="24" height={keyH} rx="1.5" fill="#2a2a2c" stroke="#3a3a3c" strokeWidth="0.35" />
+      <rect x="70"  y="173" width="120" height={keyH} rx="1.5" fill="#2a2a2c" stroke="#3a3a3c" strokeWidth="0.35" />
+      <rect x="194" y="173" width="24" height={keyH} rx="1.5" fill="#2a2a2c" stroke="#3a3a3c" strokeWidth="0.35" />
+      <rect x="221" y="173" width="24" height={keyH} rx="1.5" fill="#2a2a2c" stroke="#3a3a3c" strokeWidth="0.35" />
+
+      {/* Trackpad */}
+      <rect x="88" y="184" width="84" height="14" rx="5" fill="#232325" stroke="#3a3a3c" strokeWidth="0.4" />
+    </svg>
+  )
+}
+
+// ── Minecraft diamond sword — accurate pixel art ──────────────────────────────
+// Blade goes from upper-right (tip) to lower-left (pommel), 45° diagonal.
+// Guard extends perpendicular (NW arm + SE arm) at the blade/handle junction.
+export function DiamondSwordItem() {
+  const P = 10 // px per pixel → 160×160 total
+
+  const px: [number, number, string][] = [
+    [13,0,'#143b38'],[14,0,'#0d3e3a'],[15,0,'#0d3f36'],
+    [12,1,'#084234'],[13,1,'#adfef7'],[14,1,'#a0fff2'],[15,1,'#0c251f'],
+    [11,2,'#0e4035'],[12,2,'#aafcf0'],[13,2,'#31c9b0'],[14,2,'#acfff5'],[15,2,'#0f2523'],
+    [10,3,'#0d3f34'],[11,3,'#a6fcf1'],[12,3,'#28c8ae'],[13,3,'#aafaf1'],[14,3,'#072722'],
+    [9,4,'#084234'],[10,4,'#a9fbef'],[11,4,'#28c8ae'],[12,4,'#33ebc9'],[13,4,'#00291d'],
+    [8,5,'#133c36'],[9,5,'#a2fff8'],[10,5,'#2bc7af'],[11,5,'#36e9cc'],[12,5,'#0c231d'],
+    [2,6,'#0b3e37'],[3,6,'#0c3e35'],[7,6,'#094334'],[8,6,'#31edcc'],[9,6,'#33c9b0'],[10,6,'#2de8c9'],[11,6,'#082823'],
+    [2,7,'#0b3e37'],[3,7,'#196155'],[4,7,'#0b4036'],[6,7,'#094334'],[7,7,'#3de5cc'],[8,7,'#2cc6ac'],[9,7,'#30eccb'],[10,7,'#002b21'],
+    [3,8,'#0d3f34'],[4,8,'#1f8a78'],[5,8,'#07261e'],[6,8,'#2eedcb'],[7,8,'#238878'],[8,8,'#2feccc'],[9,8,'#0c231b'],
+    [3,9,'#0d3f34'],[4,9,'#1f8a78'],[5,9,'#23907d'],[6,9,'#1a614f'],[7,9,'#30ebcc'],[8,9,'#0c231b'],
+    [4,10,'#084233'],[5,10,'#146255'],[6,10,'#123b33'],[7,10,'#012b1d'],
+    [3,11,'#463718'],[4,11,'#694e19'],[5,11,'#06271e'],[6,11,'#0d3f36'],[7,11,'#0d3f36'],[8,11,'#0a2520'],
+    [2,12,'#4a3812'],[3,12,'#8a6820'],[4,12,'#271e0f'],[6,12,'#082520'],[7,12,'#082520'],[8,12,'#0d3f36'],[9,12,'#0b2621'],
+    [0,13,'#103d38'],[1,13,'#0c3f3a'],[2,13,'#6a4c1a'],[3,13,'#291e0a'],[8,13,'#092621'],[9,13,'#05261f'],
+    [0,14,'#0f3c39'],[1,14,'#116454'],[2,14,'#082721'],
+    [0,15,'#06271e'],[1,15,'#062720'],[2,15,'#07281f'],
+  ]
+
+  return (
+    <svg
+      width={P * 16}
+      height={P * 16}
+      viewBox={`0 0 ${P * 16} ${P * 16}`}
+      style={{ shapeRendering: 'crispEdges' }}
+    >
+      {px.map(([c, r, fill], i) => (
+        <rect key={i} x={c * P} y={r * P} width={P} height={P} fill={fill} />
+      ))}
+    </svg>
+  )
+}
+
+// ── D20 — pentagon face with internal lines ───────────────────────────────────
+export function D20Item() {
+  const cx = 32, cy = 33, R = 30
+  // Pentagon with point at top (−90° start)
+  const verts = Array.from({ length: 5 }, (_, i) => {
+    const a = (Math.PI * 2 * i) / 5 - Math.PI / 2
+    return [cx + R * Math.cos(a), cy + R * Math.sin(a)] as [number, number]
+  })
+  const outerPts = verts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ')
+  return (
+    <svg width="65" height="65" viewBox="0 0 65 65" fill="none">
+      {/* Pentagon body */}
+      <polygon points={outerPts} fill="#1e3a8a" stroke="#60a5fa" strokeWidth="1.5" />
+      {/* Lines from centre to each vertex — show the triangular faces */}
+      {verts.map(([x, y], i) => (
+        <line key={i} x1={cx} y1={cy} x2={x} y2={y}
+          stroke="#93c5fd" strokeWidth="0.8" opacity="0.45" />
+      ))}
+      {/* Inner pentagon ring */}
+      {(() => {
+        const inner = Array.from({ length: 5 }, (_, i) => {
+          const a = (Math.PI * 2 * i) / 5 - Math.PI / 2
+          return `${(cx + 12 * Math.cos(a)).toFixed(1)},${(cy + 12 * Math.sin(a)).toFixed(1)}`
+        }).join(' ')
+        return <polygon points={inner} fill="none" stroke="#93c5fd" strokeWidth="0.6" opacity="0.3" />
+      })()}
+      {/* Number */}
+      <text x={cx} y={cy + 5.5} textAnchor="middle" fontFamily="serif"
+        fontSize="14" fontWeight="700" fill="#bfdbfe" letterSpacing="-0.5">20</text>
+    </svg>
+  )
+}
+
+// ── D12 — pentagon face ───────────────────────────────────────────────────────
+export function D12Item() {
+  const pts = Array.from({ length: 5 }, (_, i) => {
+    const a = (Math.PI * 2 * i) / 5 - Math.PI / 2
+    return `${(20 + 18 * Math.cos(a)).toFixed(1)},${(20 + 18 * Math.sin(a)).toFixed(1)}`
+  }).join(' ')
+  const inner = Array.from({ length: 5 }, (_, i) => {
+    const a = (Math.PI * 2 * i) / 5 - Math.PI / 2
+    return `${(20 + 11 * Math.cos(a)).toFixed(1)},${(20 + 11 * Math.sin(a)).toFixed(1)}`
+  }).join(' ')
+  return (
+    <svg width="60" height="60" viewBox="0 0 40 40" fill="none">
+      <polygon points={pts} fill="#172554" stroke="#60a5fa" strokeWidth="1.5" />
+      <polygon points={inner} fill="none" stroke="#93c5fd" strokeWidth="0.7" opacity="0.4" />
+      <text x="20" y="24" textAnchor="middle" fontFamily="serif"
+        fontSize="11" fontWeight="700" fill="#bfdbfe">12</text>
+    </svg>
+  )
+}
+
+// ── D6 — rounded square with six dots ────────────────────────────────────────
+export function D6Item() {
+  const dots = [[11,11],[25,11],[11,18],[25,18],[11,25],[25,25]]
+  return (
+    <svg width="54" height="54" viewBox="0 0 36 36" fill="none">
+      <rect x="1" y="1" width="34" height="34" rx="5" fill="#1e3a8a" stroke="#60a5fa" strokeWidth="1.5" />
+      {dots.map(([cx, cy], i) => (
+        <circle key={i} cx={cx} cy={cy} r="2.5" fill="#93c5fd" />
+      ))}
+    </svg>
+  )
+}
+
+// ── Dispatcher ───────────────────────────────────────────────────────────────
+export function DeskItemSVG({ type, label }: { type: string; label: string }) {
+  switch (type) {
+    case 'terminal':   return <TerminalItem />
+    case 'blueprint':  return <BlueprintItem />
+    case 'stickers':   return <StickersItem />
+    case 'cables':     return <CablesItem />
+    case 'vinyl':      return <VinylItem />
+    case 'cassette':   return <CassetteItem />
+    case 'controller': return <ControllerItem />
+    case 'poem':       return <PoemItem />
+    case 'mug':        return <MugItem />
+    case 'poster':     return <PosterItem label={label} />
+    case 'dice-d20':   return <D20Item />
+    case 'dice-d12':   return <D12Item />
+    case 'dice-d6':    return <D6Item />
+    case 'diamond-sword': return <DiamondSwordItem />
+    case 'laptop':     return <LaptopItem />
+    default:           return null
+  }
+}

@@ -1,13 +1,20 @@
 interface HangTagProps {
   skill: string
   rotate?: number
+  fillColor?: string
+  strokeColor?: string
 }
 
-const CHAR_WIDTH = 6.2
+const CHAR_WIDTH = 7.8
 
-export default function HangTag({ skill, rotate = 0 }: HangTagProps) {
-  const tagW = Math.max(42, Math.ceil(skill.length * CHAR_WIDTH) + 14)
-  const tagH = 24
+export default function HangTag({
+  skill,
+  rotate = 0,
+  fillColor = '#dbeafe',
+  strokeColor = '#1e4fa0',
+}: HangTagProps) {
+  const tagW = Math.max(52, Math.ceil(skill.length * CHAR_WIDTH) + 18)
+  const tagH = 28
   const totalH = tagH + 16
   const cx = tagW / 2 + 2
 
@@ -25,9 +32,9 @@ export default function HangTag({ skill, rotate = 0 }: HangTagProps) {
       aria-label={skill}
     >
       {/* String */}
-      <line x1={cx} y1="1" x2={cx} y2="12" stroke="#3b82f6" strokeWidth="0.8" />
+      <line x1={cx} y1="1" x2={cx} y2="12" stroke={strokeColor} strokeWidth="0.8" opacity="0.7" />
       {/* Hole */}
-      <circle cx={cx} cy="5" r="2" fill="none" stroke="#3b82f6" strokeWidth="0.8" />
+      <circle cx={cx} cy="5" r="2" fill="none" stroke={strokeColor} strokeWidth="0.8" opacity="0.7" />
       {/* Tag body */}
       <rect
         x="2"
@@ -35,8 +42,8 @@ export default function HangTag({ skill, rotate = 0 }: HangTagProps) {
         width={tagW}
         height={tagH}
         rx="2.5"
-        fill="#f0ede8"
-        stroke="#1e4fa0"
+        fill={fillColor}
+        stroke={strokeColor}
         strokeWidth="1"
       />
       {/* Skill text */}

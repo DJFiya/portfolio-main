@@ -15,9 +15,10 @@ export default function ClubsSpread() {
           <span className="font-author font-semibold text-ink-900 text-sm leading-snug">
             {club.role}
           </span>
-          <span className="font-author text-azure-700 text-xs tracking-wide">
-            @ {club.org}
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-ink-300 text-xs select-none">·</span>
+            <span className="font-author text-ink-500 text-xs italic">{club.org}</span>
+          </div>
         </div>
       ))}
     </div>

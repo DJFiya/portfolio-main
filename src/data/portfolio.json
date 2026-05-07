@@ -91,20 +91,20 @@
     },
     {
       "id": "blueprint",
-      "type": "blueprint",
-      "label": "blueprint",
-      "x": 72,
-      "y": 8,
-      "rotate": 4,
+      "type": "diamond-sword",
+      "label": "diamond-sword",
+      "x": 74,
+      "y": 5,
+      "rotate": -20,
       "zIndex": 3
     },
     {
       "id": "stickers",
       "type": "stickers",
       "label": "stickers",
-      "x": 78,
-      "y": 68,
-      "rotate": 2,
+      "x": 39,
+      "y": 82,
+      "rotate": -3,
       "zIndex": 4
     },
     {
@@ -157,7 +157,7 @@
       "type": "mug",
       "label": "mug",
       "x": 82,
-      "y": 42,
+      "y": 56,
       "rotate": 3,
       "zIndex": 6
     },
@@ -192,8 +192,8 @@
       "id": "poster-gwh",
       "type": "poster",
       "label": "Good Will Hunting",
-      "x": 84,
-      "y": 55,
+      "x": 79,
+      "y": 42,
       "rotate": -6,
       "zIndex": 2
     },
@@ -223,6 +223,15 @@
       "y": 88,
       "rotate": 22,
       "zIndex": 6
+    },
+    {
+      "id": "laptop",
+      "type": "laptop",
+      "label": "laptop",
+      "x": 32,
+      "y": -12,
+      "rotate": -1,
+      "zIndex": 5
     }
   ]
 }
