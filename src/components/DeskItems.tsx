@@ -320,8 +320,8 @@ const POSTER_THEMES: Record<string, PosterTheme> = {
   },
   // Invincible: blue suit + yellow logo — the show's iconic palette
   Invincible: {
-    bg: '#1455b8',
-    accent: '#eab308',
+    bg: '#38bdf8',
+    accent: '#020b18',
     lines: [
       { text: 'INVINCIBLE', size: 8 },
     ],

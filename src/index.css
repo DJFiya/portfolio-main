@@ -125,6 +125,29 @@
     box-shadow: -3px -3px 5px rgba(0, 0, 0, 0.22);
   }
 
+  /* ── Desk item hover expand ─────────────────────────────────────────────── */
+  .desk-item {
+    transform: rotate(var(--item-rotate, 0deg)) scale(1);
+    transform-origin: center;
+    transition: transform 0.22s ease, z-index 0s;
+    cursor: default;
+  }
+  .desk-item:hover {
+    transform: rotate(var(--item-rotate, 0deg)) scale(1.12);
+    z-index: 999 !important;
+  }
+
+  /* ── Hang-tag hover swing ────────────────────────────────────────────────── */
+  .hang-tag {
+    transform: rotate(var(--rot, 0deg));
+    transform-origin: var(--tx, 50%) 2px;
+    transition: transform 0.28s ease;
+    cursor: default;
+  }
+  .hang-tag:hover {
+    transform: rotate(var(--rot-hover, 8deg));
+  }
+
   /* Spine shadow gradient on open book center */
   .spine-shadow {
     background: linear-gradient(

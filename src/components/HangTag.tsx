@@ -18,17 +18,22 @@ export default function HangTag({
   const totalH = tagH + 16
   const cx = tagW / 2 + 2
 
+  // Hover swings the tag further in the direction it already leans
+  const hoverRot = rotate >= 0 ? rotate + 8 : rotate - 8
+
   return (
     <svg
       width={tagW + 4}
       height={totalH}
       viewBox={`0 0 ${tagW + 4} ${totalH}`}
+      className="hang-tag"
       style={{
-        transform: `rotate(${rotate}deg)`,
-        transformOrigin: `${cx}px 2px`,
+        '--rot': `${rotate}deg`,
+        '--rot-hover': `${hoverRot}deg`,
+        '--tx': `${cx}px`,
         display: 'block',
         flexShrink: 0,
-      }}
+      } as React.CSSProperties}
       aria-label={skill}
     >
       {/* String */}
