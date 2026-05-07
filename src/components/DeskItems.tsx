@@ -2,7 +2,7 @@
 // All coordinates are in their own viewBox; rendered width/height ≈1.5× the original.
 
 // ── Terminal window ───────────────────────────────────────────────────────────
-export function TerminalItem() {
+export function TerminalItem({ hacking }: { hacking?: boolean }) {
   return (
     <svg width="231" height="153" viewBox="0 0 154 102" fill="none">
       <rect width="154" height="102" rx="6" fill="#0d0f14" />
@@ -11,12 +11,25 @@ export function TerminalItem() {
       <circle cx="13" cy="10" r="4" fill="#ff5f57" opacity="0.75" />
       <circle cx="25" cy="10" r="4" fill="#febc2e" opacity="0.75" />
       <circle cx="37" cy="10" r="4" fill="#28c840" opacity="0.75" />
-      <text x="8" y="34" fontFamily="monospace" fontSize="7" fill="#4ade80">$ npm run dev</text>
-      <text x="8" y="46" fontFamily="monospace" fontSize="7" fill="#6b7280">  ➜  localhost:5173</text>
-      <text x="8" y="60" fontFamily="monospace" fontSize="7" fill="#4ade80">$ git log --oneline</text>
-      <text x="8" y="72" fontFamily="monospace" fontSize="7" fill="#6b7280">a3f2c1b feat: page flip</text>
-      <text x="8" y="84" fontFamily="monospace" fontSize="7" fill="#6b7280">9e1d0f2 fix: board sync</text>
-      <rect x="8" y="89" width="6" height="8" fill="#60a5fa" opacity="0.85" />
+      {hacking ? (
+        <>
+          <text x="8" y="34" fontFamily="monospace" fontSize="7" fill="#22d3ee">$ sudo nmap -sV 10.0.0.0/24</text>
+          <text x="8" y="46" fontFamily="monospace" fontSize="6.3" fill="#67e8f9">  host 10.0.0.7  ports: 22,80,443 open</text>
+          <text x="8" y="60" fontFamily="monospace" fontSize="7" fill="#4ade80">$ ssh root@10.0.0.7</text>
+          <text x="8" y="72" fontFamily="monospace" fontSize="6.3" fill="#fca5a5">  ACCESS DENIED // key mismatch</text>
+          <text x="8" y="84" fontFamily="monospace" fontSize="6.8" fill="#22d3ee">  brute-force blocked [trace detected]</text>
+          <rect x="8" y="89" width="6" height="8" fill="#22d3ee" opacity="0.95" />
+        </>
+      ) : (
+        <>
+          <text x="8" y="34" fontFamily="monospace" fontSize="7" fill="#4ade80">$ npm run dev</text>
+          <text x="8" y="46" fontFamily="monospace" fontSize="7" fill="#6b7280">  ➜  localhost:5173</text>
+          <text x="8" y="60" fontFamily="monospace" fontSize="7" fill="#4ade80">$ git log --oneline</text>
+          <text x="8" y="72" fontFamily="monospace" fontSize="7" fill="#6b7280">a3f2c1b feat: page flip</text>
+          <text x="8" y="84" fontFamily="monospace" fontSize="7" fill="#6b7280">9e1d0f2 fix: board sync</text>
+          <rect x="8" y="89" width="6" height="8" fill="#60a5fa" opacity="0.85" />
+        </>
+      )}
     </svg>
   )
 }
@@ -431,12 +444,26 @@ export function LaptopItem() {
       <rect x="12" y="7" width="236" height="88" rx="4" fill="#0d1117" />
 
       {/* Code on screen */}
-      <text x="20" y="24" fontFamily="monospace" fontSize="7.5" fill="#4ade80">$ npm run dev</text>
-      <text x="20" y="37" fontFamily="monospace" fontSize="7" fill="#6b7280">  VITE v5  ready in 209ms</text>
-      <text x="20" y="50" fontFamily="monospace" fontSize="6.5" fill="#60a5fa">  ➜  http://localhost:5173/</text>
-      <text x="20" y="63" fontFamily="monospace" fontSize="6.5" fill="#4ade80">$ git log --oneline</text>
-      <text x="20" y="74" fontFamily="monospace" fontSize="6.5" fill="#6b7280">  a3f2c1 feat: board anim</text>
-      <text x="20" y="85" fontFamily="monospace" fontSize="6.5" fill="#6b7280">  9e1d0f fix: page flip</text>
+      <g clipPath="url(#laptop-screen-clip)">
+        <g className="laptop-log-stack">
+          <g className="laptop-log-page laptop-log-page--current">
+            <text x="20" y="24" fontFamily="monospace" fontSize="7.5" fill="#4ade80">$ npm run dev</text>
+            <text x="20" y="37" fontFamily="monospace" fontSize="7" fill="#6b7280">  VITE v5  ready in 209ms</text>
+            <text x="20" y="50" fontFamily="monospace" fontSize="6.5" fill="#60a5fa">  ➜  http://localhost:5173/</text>
+            <text x="20" y="63" fontFamily="monospace" fontSize="6.5" fill="#4ade80">$ git log --oneline</text>
+            <text x="20" y="74" fontFamily="monospace" fontSize="6.5" fill="#6b7280">  a3f2c1 feat: board anim</text>
+            <text x="20" y="85" fontFamily="monospace" fontSize="6.5" fill="#6b7280">  9e1d0f fix: page flip</text>
+          </g>
+          <g className="laptop-log-page laptop-log-page--next">
+            <text x="20" y="108" fontFamily="monospace" fontSize="7.5" fill="#4ade80">$ npm run build</text>
+            <text x="20" y="121" fontFamily="monospace" fontSize="7" fill="#6b7280">  transforming modules...</text>
+            <text x="20" y="134" fontFamily="monospace" fontSize="6.5" fill="#6b7280">  rendering chunks...</text>
+            <text x="20" y="147" fontFamily="monospace" fontSize="6.5" fill="#4ade80">✓ built in 1.1s</text>
+            <text x="20" y="158" fontFamily="monospace" fontSize="6.5" fill="#60a5fa">$ git push origin main</text>
+            <text x="20" y="169" fontFamily="monospace" fontSize="6.5" fill="#6b7280">Everything up-to-date</text>
+          </g>
+        </g>
+      </g>
 
       {/* Hinge bar */}
       <rect x="0" y="100" width="260" height="8" rx="3" fill="#262628" />
@@ -470,8 +497,20 @@ export function LaptopItem() {
       <rect x="194" y="173" width="24" height={keyH} rx="1.5" fill="#2a2a2c" stroke="#3a3a3c" strokeWidth="0.35" />
       <rect x="221" y="173" width="24" height={keyH} rx="1.5" fill="#2a2a2c" stroke="#3a3a3c" strokeWidth="0.35" />
 
+      {/* Click glow targets: W, A, S, D */}
+      <rect className="laptop-key-glow laptop-key-glow--w" x="33.5" y="137" width="18" height={keyH} rx="1.5" fill="none" stroke="#67e8f9" strokeWidth="1.1" />
+      <rect className="laptop-key-glow laptop-key-glow--a" x="21" y="149" width="18.5" height={keyH} rx="1.5" fill="none" stroke="#67e8f9" strokeWidth="1.1" />
+      <rect className="laptop-key-glow laptop-key-glow--s" x="41" y="149" width="18.5" height={keyH} rx="1.5" fill="none" stroke="#67e8f9" strokeWidth="1.1" />
+      <rect className="laptop-key-glow laptop-key-glow--d" x="61" y="149" width="18.5" height={keyH} rx="1.5" fill="none" stroke="#67e8f9" strokeWidth="1.1" />
+
       {/* Trackpad */}
       <rect x="88" y="184" width="84" height="14" rx="5" fill="#232325" stroke="#3a3a3c" strokeWidth="0.4" />
+
+      <defs>
+        <clipPath id="laptop-screen-clip">
+          <rect x="12" y="7" width="236" height="88" rx="4" />
+        </clipPath>
+      </defs>
     </svg>
   )
 }
@@ -593,9 +632,19 @@ export function D6Item({ value }: { value?: number }) {
 }
 
 // ── Dispatcher ───────────────────────────────────────────────────────────────
-export function DeskItemSVG({ type, label, diceValue }: { type: string; label: string; diceValue?: number }) {
+export function DeskItemSVG({
+  type,
+  label,
+  diceValue,
+  terminalHacking,
+}: {
+  type: string
+  label: string
+  diceValue?: number
+  terminalHacking?: boolean
+}) {
   switch (type) {
-    case 'terminal':   return <TerminalItem />
+    case 'terminal':   return <TerminalItem hacking={terminalHacking} />
     case 'blueprint':  return <BlueprintItem />
     case 'stickers':   return <StickersItem />
     case 'cables':     return <CablesItem />

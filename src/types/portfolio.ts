@@ -73,6 +73,7 @@ export type DeskPropType =
   | 'dice-d20'
   | 'dice-d12'
   | 'dice-d6'
+  | 'laptop'
 
 export interface DeskProp {
   id: string

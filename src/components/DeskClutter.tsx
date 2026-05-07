@@ -11,6 +11,7 @@ const ROLL_MS = 820
 const CRIT_MS = 2600
 const ATLA_MS = 900
 const DPS_MS  = 4500
+const TERMINAL_HACK_MS = 1900
 
 const DICE_MAX: Record<string, number> = {
   'dice-d6': 6, 'dice-d12': 12, 'dice-d20': 20,
@@ -20,6 +21,13 @@ type CritState  = 'hit' | 'fail'
 type AtlaEffect = 'fire' | 'earth' | 'water' | 'air'
 
 const ATLA_EFFECTS: AtlaEffect[] = ['fire', 'earth', 'water', 'air']
+const POEM_MS = 1700
+const POEM_VERSES: [string, string][] = [
+  ['ink remembers fingertips', 'long after hands let go'],
+  ['paper keeps the midnight hush', 'between each careful line'],
+  ['small words fall like rain', 'and bloom into quiet'],
+  ['every margin holds a moon', 'for thoughts that missed their train'],
+]
 const ATLA_LABELS: Record<AtlaEffect, string> = {
   fire:  '🔥 FIRE',
   earth: '🪨 EARTH',
@@ -42,6 +50,15 @@ interface DpsBurst {
   top: number
   width: number
   height: number
+  tick: number
+}
+
+interface PoemBurst {
+  left: number
+  top: number
+  width: number
+  height: number
+  lines: [string, string]
   tick: number
 }
 
@@ -77,15 +94,21 @@ export default function DeskClutter() {
   const [criticals,     setCriticals]     = useState<Record<string, CritState>>({})
   const [atlaBurst,     setAtlaBurst]     = useState<AtlaBurst | null>(null)
   const [dpsBurst,      setDpsBurst]      = useState<DpsBurst  | null>(null)
+  const [poemBurst,     setPoemBurst]     = useState<PoemBurst | null>(null)
   const [spotifyOpen,    setSpotifyOpen]    = useState(false)
   const [cassetteActive, setCassetteActive] = useState(false)
   const [cassetteRect,   setCassetteRect]   = useState<{ left: number; top: number; width: number; height: number } | null>(null)
   const [notes,          setNotes]          = useState<NoteParticle[]>([])
   const [playlistId,     setPlaylistId]     = useState<string | null>(null)
+  const [gwhActive,      setGwhActive]      = useState(false)
+  const [laptopClicking, setLaptopClicking] = useState(false)
+  const [terminalHacking, setTerminalHacking] = useState(false)
   const atlaRef     = useRef<HTMLDivElement | null>(null)
   const dpsRef      = useRef<HTMLDivElement | null>(null)
   const cassetteRef = useRef<HTMLDivElement | null>(null)
   const noteIdRef   = useRef(0)
+  const atlaEffectIndexRef = useRef(0)
+  const poemVerseIndexRef = useRef(0)
 
   const handleRoll = useCallback((id: string, type: string) => {
     if (rolling.has(id)) return
@@ -121,7 +144,8 @@ export default function DeskClutter() {
     if (atlaBurst) return
     const rect = atlaRef.current?.getBoundingClientRect()
     if (!rect) return
-    const effect = ATLA_EFFECTS[Math.floor(Math.random() * ATLA_EFFECTS.length)]
+    const effect = ATLA_EFFECTS[atlaEffectIndexRef.current]
+    atlaEffectIndexRef.current = (atlaEffectIndexRef.current + 1) % ATLA_EFFECTS.length
     setAtlaBurst(prev => ({
       effect,
       left: rect.left, top: rect.top,
@@ -130,6 +154,42 @@ export default function DeskClutter() {
     }))
     setTimeout(() => setAtlaBurst(null), ATLA_MS)
   }, [atlaBurst])
+
+  const handleGwh = useCallback(() => {
+    if (gwhActive) return
+    setGwhActive(true)
+  }, [gwhActive])
+
+  const handleLaptopClick = useCallback(() => {
+    setLaptopClicking(false)
+    requestAnimationFrame(() => {
+      setLaptopClicking(true)
+      setTimeout(() => setLaptopClicking(false), 920)
+    })
+  }, [])
+
+  const handleTerminalClick = useCallback(() => {
+    setTerminalHacking(false)
+    requestAnimationFrame(() => {
+      setTerminalHacking(true)
+      setTimeout(() => setTerminalHacking(false), TERMINAL_HACK_MS)
+    })
+  }, [])
+
+  const handlePoemClick = useCallback((target: HTMLDivElement) => {
+    const rect = target.getBoundingClientRect()
+    const lines = POEM_VERSES[poemVerseIndexRef.current]
+    poemVerseIndexRef.current = (poemVerseIndexRef.current + 1) % POEM_VERSES.length
+    setPoemBurst(prev => ({
+      left: rect.left,
+      top: rect.top,
+      width: rect.width,
+      height: rect.height,
+      lines,
+      tick: (prev?.tick ?? 0) + 1,
+    }))
+    setTimeout(() => setPoemBurst(null), POEM_MS)
+  }, [])
 
   const stopCassette = useCallback(() => {
     setCassetteActive(false)
@@ -180,8 +240,12 @@ export default function DeskClutter() {
         const isDice       = item.type.startsWith('dice-')
         const isAtlaPoster = item.type === 'poster' && item.label === 'ATLA'
         const isDpsPoster  = item.type === 'poster' && item.label === 'Dead Poets'
+        const isGwhPoster  = item.type === 'poster' && item.label === 'Good Will Hunting'
+        const isTerminal   = item.type === 'terminal'
         const isVinyl      = item.type === 'vinyl'
         const isCassette   = item.type === 'cassette'
+        const isLaptop     = item.type === 'laptop'
+        const isPoem       = item.type === 'poem'
         const isRolling    = rolling.has(item.id)
         const crit         = criticals[item.id]
 
@@ -195,20 +259,24 @@ export default function DeskClutter() {
           <div
             key={item.id}
             ref={isAtlaPoster ? atlaRef : isDpsPoster ? dpsRef : isCassette ? cassetteRef : undefined}
-            className={`absolute select-none desk-item${isCassette && cassetteActive ? ' cassette-playing' : ''}`}
+            className={`absolute select-none desk-item${isLaptop ? ' desk-item--laptop' : ''}${isLaptop && laptopClicking ? ' desk-item--laptop-click' : ''}${isCassette && cassetteActive ? ' cassette-playing' : ''}${isPoem ? ' desk-item--poem' : ''}${isPoem && poemBurst ? ' desk-item--poem-active' : ''}${isTerminal ? ' desk-item--terminal' : ''}${isTerminal && terminalHacking ? ' desk-item--terminal-hack' : ''}`}
             style={{
               left: `${item.x}%`,
               top:  `${item.y}%`,
               '--item-rotate': `${item.rotate}deg`,
               zIndex: item.zIndex,
-              cursor: isDice || isAtlaPoster || isDpsPoster || isVinyl || isCassette ? 'pointer' : undefined,
+              cursor: isDice || isAtlaPoster || isDpsPoster || isGwhPoster || isVinyl || isCassette || isLaptop || isPoem || isTerminal ? 'pointer' : undefined,
             } as React.CSSProperties}
             onClick={
               isDice         ? () => handleRoll(item.id, item.type)
               : isAtlaPoster ? handleAtla
               : isDpsPoster  ? handleDps
+              : isGwhPoster  ? handleGwh
+              : isTerminal   ? handleTerminalClick
               : isVinyl      ? () => setSpotifyOpen(true)
               : isCassette   ? handleCassette
+              : isLaptop     ? handleLaptopClick
+              : isPoem       ? (e) => handlePoemClick(e.currentTarget)
               : undefined
             }
           >
@@ -222,6 +290,7 @@ export default function DeskClutter() {
                 type={item.type}
                 label={item.label}
                 diceValue={isRolling ? undefined : diceValues[item.id]}
+                terminalHacking={isTerminal ? terminalHacking : undefined}
               />
             </div>
           </div>
@@ -236,6 +305,15 @@ export default function DeskClutter() {
 
       {dpsBurst && createPortal(
         <DeadPoetsParticles key={dpsBurst.tick} burst={dpsBurst} />,
+        document.body
+      )}
+      {poemBurst && createPortal(
+        <PoemParticles key={poemBurst.tick} burst={poemBurst} />,
+        document.body
+      )}
+
+      {gwhActive && createPortal(
+        <GwhPlane onDone={() => setGwhActive(false)} />,
         document.body
       )}
 
@@ -270,6 +348,16 @@ export default function DeskClutter() {
         document.body
       )}
     </>
+  )
+}
+
+function PoemParticles({ burst }: { burst: PoemBurst }) {
+  const { left, top, width, lines } = burst
+  return (
+    <div className="poem-burst" style={{ left: left + width / 2, top: top - 8 }}>
+      <div className="poem-burst-line poem-burst-line--1">{lines[0]}</div>
+      <div className="poem-burst-line poem-burst-line--2">{lines[1]}</div>
+    </div>
   )
 }
 
@@ -393,6 +481,104 @@ function SpotifyModal({ onClose }: { onClose: () => void }) {
         </a>
       </div>
     </div>
+  )
+}
+
+// ── Good Will Hunting — paper airplane carries the message ───────────────────
+
+type GwhPhase = 'fly-in' | 'align' | 'unfurl' | 'open' | 'refold' | 'fly-out'
+
+const GWH_TIMINGS: Record<GwhPhase, number> = {
+  'fly-in':  950,
+  'align':   180,
+  'unfurl':  650,
+  'open':    2100,
+  'refold':  650,
+  'fly-out': 900,
+}
+
+function GwhPlane({ onDone }: { onDone: () => void }) {
+  const [phase, setPhase] = useState<GwhPhase>('fly-in')
+
+  useEffect(() => {
+    const phases: GwhPhase[] = ['fly-in', 'align', 'unfurl', 'open', 'refold', 'fly-out']
+    let elapsed = 0
+    const timers: ReturnType<typeof setTimeout>[] = []
+    phases.slice(1).forEach((ph, i) => {
+      elapsed += GWH_TIMINGS[phases[i]]
+      timers.push(setTimeout(() => setPhase(ph), elapsed))
+    })
+    elapsed += GWH_TIMINGS['fly-out']
+    timers.push(setTimeout(onDone, elapsed))
+    return () => timers.forEach(clearTimeout)
+  }, [onDone])
+
+  const showPlane = true
+  const showNote  = phase === 'unfurl'  || phase === 'open'   || phase === 'refold'
+
+  const planeAnim =
+    phase === 'unfurl' ? 'fold'   :
+    phase === 'open'   ? 'folded' :
+    phase === 'refold' ? 'emerge' : 'steady'
+
+  const planeMotion =
+    phase === 'fly-in'  ? 'fly-in'  :
+    phase === 'fly-out' ? 'fly-out' : 'center'
+
+  const noteAnim =
+    phase === 'refold'  ? 'fold'   :
+    phase === 'unfurl'  ? 'unfold' : 'open'
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: '42vh',
+      left: '50vw',
+      width: 0,
+      height: 0,
+      overflow: 'visible',
+      zIndex: 100001,
+      pointerEvents: 'none',
+    }}>
+      {showPlane && (
+        <div className={`gwh-plane-motion gwh-plane-motion--${planeMotion}`}>
+          <div className={`gwh-plane-anim gwh-plane-anim--${planeAnim}`}>
+            {(phase === 'fly-in' || phase === 'fly-out') && (
+              <div className="gwh-plane-trail" aria-hidden="true">
+                <span className="gwh-plane-trail-dot gwh-plane-trail-dot--1" />
+                <span className="gwh-plane-trail-dot gwh-plane-trail-dot--2" />
+                <span className="gwh-plane-trail-dot gwh-plane-trail-dot--3" />
+              </div>
+            )}
+            <PaperPlaneIcon />
+          </div>
+        </div>
+      )}
+      {showNote && (
+        <div style={{ position: 'absolute', top: 0, left: 0, transform: 'translate(-50%, -50%)' }}>
+          <div className={`gwh-note-anim gwh-note-anim--${noteAnim}`}>
+            <div className="gwh-note-paper">
+              <span className="gwh-note-text">Sorry, I had to go see about a girl ❤️</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function PaperPlaneIcon() {
+  return (
+    <svg viewBox="0 0 100 62" width="100" height="62" fill="none">
+      {/* main body */}
+      <path d="M98 31 L2 5 L34 31 L2 57 Z" fill="#f5f0e8" stroke="#bfb49a" strokeWidth="1.4"/>
+      {/* centre fold crease */}
+      <line x1="98" y1="31" x2="34" y2="31" stroke="#bfb49a" strokeWidth="0.9" strokeDasharray="4 2.5" opacity="0.7"/>
+      {/* wing fold lines */}
+      <path d="M66 20 L34 31 L66 42" stroke="#bfb49a" strokeWidth="0.75" fill="none" opacity="0.55"/>
+      {/* subtle highlight on upper wing */}
+      <path d="M98 31 L2 5 L34 31 Z" fill="rgba(255,255,255,0.18)"/>
+    </svg>
   )
 }
 
@@ -560,3 +746,4 @@ function AirParticles({ left, top, width, height }: { left: number; top: number;
     ))}
   </>
 }
+
