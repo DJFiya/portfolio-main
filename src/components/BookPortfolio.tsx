@@ -219,7 +219,7 @@ export default function BookPortfolio() {
           drawShadow
           flippingTime={680}
           startPage={initPage}
-          useMouseEvents={false}
+          useMouseEvents
           onFlip={handleFlip}
           className=""
           style={{}}
@@ -231,7 +231,7 @@ export default function BookPortfolio() {
           usePortrait={false}
           swipeDistance={0}
           showPageCorners={false}
-          disableFlipByClick={false}
+          disableFlipByClick
         >
           {/* Page 0 — Front cover */}
           <BookPage key="cover">
