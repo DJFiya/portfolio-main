@@ -1,13 +1,14 @@
+import { BrowserRouter } from 'react-router-dom'
+import DeskScene from './components/DeskScene'
+import BookPortfolio from './components/BookPortfolio'
 import './index.css'
 
-function App() {
+export default function App() {
   return (
-    <div className="min-h-screen bg-ink-950 flex items-center justify-center">
-      <p className="font-serif text-ink-300 text-lg tracking-wide">
-        Daevik Jain — Portfolio
-      </p>
-    </div>
+    <BrowserRouter>
+      <DeskScene>
+        <BookPortfolio />
+      </DeskScene>
+    </BrowserRouter>
   )
 }
-
-export default App
