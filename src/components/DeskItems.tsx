@@ -98,64 +98,72 @@ export function BlueprintItem() {
   )
 }
 
-// ── Laptop stickers — 5 × 4 sheet, ordered by industry usefulness ─────────────
+// ── Laptop stickers — 5 × 4 HTML sheet with CSS corner-peel on hover ──────────
+// HTML (not SVG) so ::after pseudo-elements work for the peel effect.
 export function StickersItem() {
-  const W = 24, H = 17, GAP = 3
-  const COL = [2, 2 + W + GAP, 2 + (W + GAP) * 2, 2 + (W + GAP) * 3] // x positions
-  const ROW = [2, 2 + H + GAP, 2 + (H + GAP) * 2, 2 + (H + GAP) * 3, 2 + (H + GAP) * 4] // y positions
-
-  // [col, row, fill, textFill, label]
-  // Ordered by industry demand (top-left = most demanded)
-  const stickers: [number, number, string, string, string][] = [
-    // Row 0 — essentials
-    [0, 0, '#2496ED', '#fff',    'Docker'  ],
-    [1, 0, '#FF9900', '#111',    'AWS'     ],
-    [2, 0, '#FFD43B', '#3776AB', 'Python'  ],
-    [3, 0, '#3178C6', '#fff',    'TS'      ],
-    // Row 1 — web + databases
-    [0, 1, '#20232a', '#61DAFB', 'React'   ],
-    [1, 1, '#336791', '#fff',    'postgres'],
-    [2, 1, '#47A248', '#fff',    'Mongo'   ],
-    [3, 1, '#DC382D', '#fff',    'Redis'   ],
-    // Row 2 — backend frameworks
-    [0, 2, '#0C4B33', '#fff',    'Django'  ],
-    [1, 2, '#009688', '#fff',    'FastAPI' ],
-    [2, 2, '#1a1a1a', '#e5e5e5', 'Flask'   ],
-    [3, 2, '#2270E3', '#fff',    'Dynamo'  ],
-    // Row 3 — ML / data
-    [0, 3, '#FF6F00', '#fff',    'TF'      ],
-    [1, 3, '#EE4C2C', '#fff',    'PyTorch' ],
-    [2, 3, '#150458', '#e0d4ff', 'pandas'  ],
-    [3, 3, '#5C3EE8', '#fff',    'OpenCV'  ],
-    // Row 4 — tooling
-    [0, 4, '#C21325', '#fff',    'Jest'    ],
-    [1, 4, '#1b1f23', '#fff',    'GitHub'  ],
-    [2, 4, '#111',    '#f0f0f0', 'Linux'   ],
-    [3, 4, '#00ED64', '#0a1f0a', 'Atlas'   ],
+  // [fill, textColor, label]  — ordered by industry demand top→bottom, left→right
+  const stickers: [string, string, string][] = [
+    ['#2496ED', '#fff',    'Docker'  ],
+    ['#FF9900', '#111',    'AWS'     ],
+    ['#FFD43B', '#3776AB', 'Python'  ],
+    ['#3178C6', '#fff',    'TS'      ],
+    ['#20232a', '#61DAFB', 'React'   ],
+    ['#336791', '#fff',    'postgres'],
+    ['#47A248', '#fff',    'Mongo'   ],
+    ['#DC382D', '#fff',    'Redis'   ],
+    ['#0C4B33', '#fff',    'Django'  ],
+    ['#009688', '#fff',    'FastAPI' ],
+    ['#1a1a1a', '#e5e5e5', 'Flask'   ],
+    ['#2270E3', '#fff',    'Dynamo'  ],
+    ['#FF6F00', '#fff',    'TF'      ],
+    ['#EE4C2C', '#fff',    'PyTorch' ],
+    ['#150458', '#e0d4ff', 'pandas'  ],
+    ['#5C3EE8', '#fff',    'OpenCV'  ],
+    ['#C21325', '#fff',    'Jest'    ],
+    ['#1b1f23', '#fff',    'GitHub'  ],
+    ['#111111', '#f0f0f0', 'Linux'   ],
+    ['#00ED64', '#0a1f0a', 'Atlas'   ],
   ]
 
-  const vbW = COL[3] + W + 2   // 110
-  const vbH = ROW[4] + H + 2   // 102
-
   return (
-    <svg width="165" height="153" viewBox={`0 0 ${vbW} ${vbH}`} fill="none">
-      {/* Sticker-sheet backing */}
-      <rect width={vbW} height={vbH} rx="3" fill="#f6f5f3" stroke="#d4d0ca" strokeWidth="0.5" />
-      {stickers.map(([ci, ri, fill, tf, text]) => {
-        const x = COL[ci], y = ROW[ri]
-        return (
-          <g key={text}>
-            {/* Die-cut white halo */}
-            <rect x={x - 1.2} y={y - 1.2} width={W + 2.4} height={H + 2.4} rx="3.5" fill="white" />
-            <rect x={x} y={y} width={W} height={H} rx="2.5" fill={fill} />
-            <text x={x + W / 2} y={y + H / 2 + 2.2}
-              textAnchor="middle" fontFamily="monospace" fontSize="4.8" fontWeight="700" fill={tf}>
-              {text}
-            </text>
-          </g>
-        )
-      })}
-    </svg>
+    // White sticker-sheet backing — pointer-events enabled so hover works
+    <div style={{
+      width: '162px',
+      background: '#f6f5f3',
+      border: '0.5px solid #d4d0ca',
+      borderRadius: '4px',
+      padding: '3px',
+      display: 'grid',
+      gridTemplateColumns: 'repeat(4, 1fr)',
+      gap: '4px',
+      pointerEvents: 'all',
+    }}>
+      {stickers.map(([fill, tf, text]) => (
+        <div
+          key={text}
+          className="desk-sticker"
+          style={{
+            background: fill,
+            color: tf,
+            borderRadius: '3px',
+            // White die-cut halo border
+            outline: '2px solid white',
+            outlineOffset: '1px',
+            height: '26px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontFamily: 'monospace',
+            fontSize: '5.5px',
+            fontWeight: 700,
+            letterSpacing: '0.02em',
+            userSelect: 'none',
+          }}
+        >
+          {text}
+        </div>
+      ))}
+    </div>
   )
 }
 

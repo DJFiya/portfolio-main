@@ -97,6 +97,34 @@
     z-index: 0;
   }
 
+  /* ── Sticker peel-corner effect ──────────────────────────────────────────── */
+  .desk-sticker {
+    position: relative;
+    /* prevent the ::after triangle from being clipped */
+    overflow: visible;
+  }
+  .desk-sticker::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    /* Right-angle triangle filling the bottom-right corner:
+       colour fills the lower-right half, transparent fills the upper-left */
+    background: linear-gradient(to top left, #e8e4de 50%, transparent 50%);
+    border-radius: 0 0 3px 0;
+    box-shadow: none;
+    pointer-events: none;
+    z-index: 10;
+    transition: width 0.22s ease, height 0.22s ease, box-shadow 0.22s ease;
+  }
+  .desk-sticker:hover::after {
+    width: 13px;
+    height: 13px;
+    box-shadow: -3px -3px 5px rgba(0, 0, 0, 0.22);
+  }
+
   /* Spine shadow gradient on open book center */
   .spine-shadow {
     background: linear-gradient(
