@@ -4,6 +4,8 @@ import { createPortal } from 'react-dom'
 import rawData from '../data/portfolio.json'
 import type { PortfolioData } from '../types/portfolio'
 import { DeskItemSVG } from './DeskItems'
+import invincibleFlying from '../assets/invincible/invincible-flying.png'
+import invincibleTitleCard from '../assets/invincible/title-card.png'
 
 const data = rawData as unknown as PortfolioData
 
@@ -16,6 +18,8 @@ const MUG_MAX_SIPS = 6
 const MUG_SIP_MS = 260
 const COFFEE_BLINK_MS = 1100
 const COFFEE_REFILL_SYNC_MS = 550
+const INVINCIBLE_FLY_MS = 2200
+const INVINCIBLE_TITLE_MS = 2000
 
 const DICE_MAX: Record<string, number> = {
   'dice-d6': 6, 'dice-d12': 12, 'dice-d20': 20,
@@ -117,6 +121,7 @@ export default function DeskClutter() {
   const [gwhActive,      setGwhActive]      = useState(false)
   const [laptopClicking, setLaptopClicking] = useState(false)
   const [terminalHacking, setTerminalHacking] = useState(false)
+  const [invincibleActive, setInvincibleActive] = useState(false)
   const [coffeeSips, setCoffeeSips] = useState(0)
   const [mugSipping, setMugSipping] = useState(false)
   const [coffeeBlinking, setCoffeeBlinking] = useState(false)
@@ -194,6 +199,19 @@ export default function DeskClutter() {
       setTerminalHacking(true)
       setTimeout(() => setTerminalHacking(false), TERMINAL_HACK_MS)
     })
+  }, [])
+
+  const handleInvincible = useCallback(() => {
+    if (invincibleActive) return
+    setInvincibleActive(true)
+  }, [invincibleActive])
+
+  const handleInvincibleDone = useCallback(() => {
+    setInvincibleActive(false)
+  }, [])
+
+  const handleGwhDone = useCallback(() => {
+    setGwhActive(false)
   }, [])
 
   const handleMugClick = useCallback(() => {
@@ -313,6 +331,7 @@ export default function DeskClutter() {
         const isAtlaPoster = item.type === 'poster' && item.label === 'ATLA'
         const isDpsPoster  = item.type === 'poster' && item.label === 'Dead Poets'
         const isGwhPoster  = item.type === 'poster' && item.label === 'Good Will Hunting'
+        const isInvPoster  = item.type === 'poster' && item.label === 'Invincible'
         const isTerminal   = item.type === 'terminal'
         const isVinyl      = item.type === 'vinyl'
         const isCassette   = item.type === 'cassette'
@@ -338,13 +357,14 @@ export default function DeskClutter() {
               top:  `${item.y}%`,
               '--item-rotate': `${item.rotate}deg`,
               zIndex: item.zIndex,
-              cursor: isDice || isAtlaPoster || isDpsPoster || isGwhPoster || isVinyl || isCassette || isLaptop || isPoem || isTerminal || isMug ? 'pointer' : undefined,
+              cursor: isDice || isAtlaPoster || isDpsPoster || isGwhPoster || isInvPoster || isVinyl || isCassette || isLaptop || isPoem || isTerminal || isMug ? 'pointer' : undefined,
             } as React.CSSProperties}
             onClick={
               isDice         ? () => handleRoll(item.id, item.type)
               : isAtlaPoster ? handleAtla
               : isDpsPoster  ? handleDps
               : isGwhPoster  ? handleGwh
+              : isInvPoster  ? handleInvincible
               : isTerminal   ? handleTerminalClick
               : isVinyl      ? () => setSpotifyOpen(true)
               : isCassette   ? handleCassette
@@ -390,7 +410,12 @@ export default function DeskClutter() {
       )}
 
       {gwhActive && createPortal(
-        <GwhPlane onDone={() => setGwhActive(false)} />,
+        <GwhPlane onDone={handleGwhDone} />,
+        document.body
+      )}
+
+      {invincibleActive && createPortal(
+        <InvincibleSequence onDone={handleInvincibleDone} />,
         document.body
       )}
 
@@ -453,6 +478,46 @@ export default function DeskClutter() {
         document.body
       )}
     </>
+  )
+}
+
+type InvinciblePhase = 'fly' | 'title'
+
+function InvincibleSequence({ onDone }: { onDone: () => void }) {
+  const [phase, setPhase] = useState<InvinciblePhase>('fly')
+
+  useEffect(() => {
+    const toTitle = setTimeout(() => setPhase('title'), INVINCIBLE_FLY_MS)
+    const toDone = setTimeout(() => onDone(), INVINCIBLE_FLY_MS + INVINCIBLE_TITLE_MS)
+    return () => {
+      clearTimeout(toTitle)
+      clearTimeout(toDone)
+    }
+  }, [onDone])
+
+  return (
+    <div className="invincible-overlay" aria-hidden="true">
+      {phase === 'fly' && (
+        <div className="invincible-fly-stage">
+          <div className="invincible-fly-grow">
+            <img
+              src={invincibleFlying}
+              alt=""
+              className="invincible-fly-image"
+              draggable={false}
+            />
+          </div>
+        </div>
+      )}
+      {phase === 'title' && (
+        <img
+          src={invincibleTitleCard}
+          alt=""
+          className="invincible-title-image"
+          draggable={false}
+        />
+      )}
+    </div>
   )
 }
 

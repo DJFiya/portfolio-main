@@ -1042,3 +1042,70 @@
   animation: coffee-lid-close-bottom 1100ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
+/* ── Invincible poster sequence ─────────────────────────────────────────────── */
+
+.invincible-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100006;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+@keyframes invincible-fly-grow {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) translate3d(0, 0, 0) scale(0.32);
+    filter: blur(0.9px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) translate3d(2.8vw, -4.8vh, 0) scale(2.32);
+    filter: blur(0px);
+  }
+}
+
+@keyframes invincible-fly-wobble {
+  0%   { transform: rotate(-0.95deg) translateY(-1px); }
+  25%  { transform: rotate(0deg) translateY(0px); }
+  50%  { transform: rotate(0.95deg) translateY(1px); }
+  75%  { transform: rotate(0deg) translateY(0px); }
+  100% { transform: rotate(-0.95deg) translateY(-1px); }
+}
+
+.invincible-fly-stage {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.invincible-fly-grow {
+  animation: invincible-fly-grow 2200ms linear forwards;
+}
+
+.invincible-fly-image {
+  width: min(32vw, 420px);
+  max-width: none;
+  user-select: none;
+  transform-origin: center;
+  animation: invincible-fly-wobble 300ms linear infinite;
+}
+
+@keyframes invincible-title-in {
+  0%   { opacity: 0; transform: scale(1.015); filter: blur(0.7px); }
+  10%  { opacity: 1; transform: scale(1);     filter: blur(0); }
+  90%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.008); }
+}
+
+.invincible-title-image {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  user-select: none;
+  animation: invincible-title-in 2000ms ease-in-out forwards;
+}
+
