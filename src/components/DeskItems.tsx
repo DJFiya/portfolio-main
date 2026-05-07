@@ -288,7 +288,22 @@ export function PoemItem() {
 }
 
 // ── Coffee mug — top-down view ────────────────────────────────────────────────
-export function MugItem() {
+export function MugItem({
+  fillLevel = 1,
+  sipping = false,
+  empty = false,
+}: {
+  fillLevel?: number
+  sipping?: boolean
+  empty?: boolean
+}) {
+  const clampedFill = Math.max(0, Math.min(1, fillLevel))
+  const baseRadius = 26 * (0.75 + clampedFill * 0.25)
+  const sipScale = sipping ? 0.95 : 1
+  const coffeeRadius = baseRadius * sipScale
+  const swirlOpacity = 0.13 * clampedFill
+  const highlightOpacity = 0.1 * clampedFill
+
   return (
     <svg width="155" height="155" viewBox="0 0 110 110" fill="none">
       {/* Coffee ring stain on desk surface (circular, like a real mug ring) */}
@@ -298,11 +313,20 @@ export function MugItem() {
       <ellipse cx="46" cy="48" rx="38" ry="38" fill="#f0ede8" stroke="#bbb" strokeWidth="1.5" />
       {/* Rim shadow / depth ring */}
       <ellipse cx="46" cy="48" rx="34" ry="34" fill="none" stroke="#d0c8be" strokeWidth="1" />
+      {/* Inner basin tint so low coffee doesn't look white */}
+      <circle cx="46" cy="47" r="26" fill="#3d1f08" opacity="0.22" />
       {/* Coffee surface */}
-      <ellipse cx="46" cy="47" rx="26" ry="26" fill="#3d1f08" opacity="0.88" />
+      <circle
+        cx="46"
+        cy="47"
+        r={coffeeRadius}
+        fill={empty ? '#5d4635' : '#3d1f08'}
+        opacity={empty ? 0.35 : 0.88}
+        style={{ transition: 'r 180ms ease' }}
+      />
       {/* Cream swirl highlight */}
-      <path d="M36,39 Q46,33 54,45 Q50,59 38,55 Q33,47 36,39" fill="rgba(255,235,210,0.13)" />
-      <ellipse cx="40" cy="42" rx="4" ry="3" fill="rgba(255,245,230,0.1)" />
+      <path d="M36,39 Q46,33 54,45 Q50,59 38,55 Q33,47 36,39" fill={`rgba(255,235,210,${swirlOpacity})`} />
+      <ellipse cx="40" cy="42" rx="4" ry="3" fill={`rgba(255,245,230,${highlightOpacity})`} />
       {/* Handle — D-shape visible from top right */}
       <path d="M82,36 C96,36 96,60 82,60" fill="none" stroke="#ccc" strokeWidth="5" strokeLinecap="round" />
       <path d="M82,36 C94,36 94,60 82,60" fill="none" stroke="#e4ddd4" strokeWidth="2" strokeLinecap="round" />
@@ -637,11 +661,17 @@ export function DeskItemSVG({
   label,
   diceValue,
   terminalHacking,
+  mugFillLevel,
+  mugSipping,
+  mugEmpty,
 }: {
   type: string
   label: string
   diceValue?: number
   terminalHacking?: boolean
+  mugFillLevel?: number
+  mugSipping?: boolean
+  mugEmpty?: boolean
 }) {
   switch (type) {
     case 'terminal':   return <TerminalItem hacking={terminalHacking} />
@@ -652,7 +682,7 @@ export function DeskItemSVG({
     case 'cassette':   return <CassetteItem />
     case 'controller': return <ControllerItem />
     case 'poem':       return <PoemItem />
-    case 'mug':        return <MugItem />
+    case 'mug':        return <MugItem fillLevel={mugFillLevel} sipping={mugSipping} empty={mugEmpty} />
     case 'poster':     return <PosterItem label={label} />
     case 'dice-d20':   return <D20Item value={diceValue} />
     case 'dice-d12':   return <D12Item value={diceValue} />

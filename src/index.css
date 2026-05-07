@@ -966,3 +966,79 @@
   }
 }
 
+/* ── Coffee mug interactions ─────────────────────────────────────────────────── */
+
+.coffee-steam-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100003;
+  overflow: visible;
+}
+
+@keyframes coffee-steam-rise {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.55);
+    filter: blur(1px);
+  }
+  18% {
+    opacity: 0.46;
+    transform: translate(calc(var(--steam-drift) * 0.22), -8px) scale(1);
+    filter: blur(0.2px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--steam-drift), -46px) scale(1.2);
+    filter: blur(2.8px);
+  }
+}
+
+.coffee-steam-particle {
+  position: fixed;
+  border-radius: 999px;
+  background: radial-gradient(ellipse at center, rgba(247, 244, 237, 0.6) 0%, rgba(247, 244, 237, 0.22) 52%, rgba(247, 244, 237, 0) 100%);
+  animation: coffee-steam-rise linear forwards;
+}
+
+.coffee-blink-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100004;
+  overflow: hidden;
+}
+
+@keyframes coffee-lid-close-top {
+  0%   { transform: translateY(-101%); }
+  38%  { transform: translateY(0%); }
+  62%  { transform: translateY(0%); }
+  100% { transform: translateY(-101%); }
+}
+
+@keyframes coffee-lid-close-bottom {
+  0%   { transform: translateY(101%); }
+  38%  { transform: translateY(0%); }
+  62%  { transform: translateY(0%); }
+  100% { transform: translateY(101%); }
+}
+
+.coffee-eyelid {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 50.5%;
+  background: #050505;
+  will-change: transform;
+}
+
+.coffee-eyelid--top {
+  top: 0;
+  animation: coffee-lid-close-top 1100ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.coffee-eyelid--bottom {
+  bottom: 0;
+  animation: coffee-lid-close-bottom 1100ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
