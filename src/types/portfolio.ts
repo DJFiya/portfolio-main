@@ -73,6 +73,7 @@ export type DeskPropType =
   | 'dice-d20'
   | 'dice-d12'
   | 'dice-d6'
+  | 'diamond-sword'
   | 'laptop'
 
 export interface DeskProp {

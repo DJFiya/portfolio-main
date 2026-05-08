@@ -2,6 +2,7 @@ import type React from 'react'
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import rawData from '../data/portfolio.json'
+import swordEnemiesData from '../data/swordEnemies.json'
 import type { PortfolioData } from '../types/portfolio'
 import { DeskItemSVG } from './DeskItems'
 import invincibleFlying from '../assets/invincible/invincible-flying.png'
@@ -21,6 +22,9 @@ const COFFEE_REFILL_SYNC_MS = 550
 const INVINCIBLE_FLY_MS = 2200
 const INVINCIBLE_TITLE_MS = 2000
 const GAME_MODE_MS = 4500
+const REALITY_HIT_MS = 2100
+const SWORD_BASE_CRIT_CHANCE = 0
+const SWORD_IDLE_TICK_MS = 1000
 const QTE_KEYS = ['E', 'F', 'SPACE', 'R'] as const
 const QTE_TICK_MS = 700
 
@@ -111,6 +115,39 @@ interface SteamParticle {
   removeAt: number
 }
 
+interface RealityShard {
+  id: number
+  x: number
+  y: number
+  size: number
+  driftX: number
+  driftY: number
+  spin: number
+  delay: number
+}
+
+interface RealityHitBurst {
+  left: number
+  top: number
+  width: number
+  height: number
+  shards: RealityShard[]
+  tick: number
+}
+
+interface SwordBoss {
+  name: string
+  hp: number
+}
+
+interface DamageFloat {
+  id: number
+  amount: number
+  crit: boolean
+}
+
+type SwordUpgradeKey = 'click' | 'dps' | 'crit' | 'goldps' | 'loot' | 'hp' | 'armor' | 'regen' | 'totem'
+
 const NOTE_COLORS = ['#a78bfa', '#f472b6', '#60a5fa', '#34d399', '#fbbf24', '#fb923c', '#2dd4bf', '#f87171']
 const NOTE_GLYPHS = ['♩', '♪', '♫', '♬']
 
@@ -144,13 +181,16 @@ export default function DeskClutter() {
   const [mugSipping, setMugSipping] = useState(false)
   const [coffeeBlinking, setCoffeeBlinking] = useState(false)
   const [steam, setSteam] = useState<SteamParticle[]>([])
+  const [realityHitBurst, setRealityHitBurst] = useState<RealityHitBurst | null>(null)
   const [gameMode, setGameMode] = useState(false)
   const [gameModeTick, setGameModeTick] = useState(0)
+  const [swordGameOpen, setSwordGameOpen] = useState(false)
   const atlaRef     = useRef<HTMLDivElement | null>(null)
   const dpsRef      = useRef<HTMLDivElement | null>(null)
   const cassetteRef = useRef<HTMLDivElement | null>(null)
   const mugRef      = useRef<HTMLDivElement | null>(null)
   const laptopRef   = useRef<HTMLDivElement | null>(null)
+  const swordRef    = useRef<HTMLDivElement | null>(null)
   const noteIdRef   = useRef(0)
   const steamIdRef  = useRef(0)
   const atlaEffectIndexRef = useRef(0)
@@ -227,6 +267,35 @@ export default function DeskClutter() {
     if (invincibleActive) return
     setInvincibleActive(true)
   }, [invincibleActive])
+
+  const handleRealityHit = useCallback(() => {
+    if (realityHitBurst) return
+    const rect = swordRef.current?.getBoundingClientRect()
+    if (!rect) return
+    const shards: RealityShard[] = Array.from({ length: 12 }, (_, i) => ({
+      id: i,
+      x: rect.left + rect.width * (0.28 + Math.random() * 0.44),
+      y: rect.top + rect.height * (0.24 + Math.random() * 0.52),
+      size: 10 + Math.random() * 16,
+      driftX: -115 + Math.random() * 230,
+      driftY: -130 - Math.random() * 130,
+      spin: -88 + Math.random() * 176,
+      delay: Math.random() * 0.18,
+    }))
+    setRealityHitBurst(prev => ({
+      left: rect.left,
+      top: rect.top,
+      width: rect.width,
+      height: rect.height,
+      shards,
+      tick: (prev?.tick ?? 0) + 1,
+    }))
+    setTimeout(() => setRealityHitBurst(null), REALITY_HIT_MS)
+  }, [realityHitBurst])
+
+  const handleSwordGameOpen = useCallback(() => {
+    setSwordGameOpen(true)
+  }, [])
 
   // ── Controller "Split Screen Reality" toggle ──────────────────────────────
   // Pain-point removals:
@@ -401,80 +470,94 @@ export default function DeskClutter() {
 
   return (
     <>
-      {data.desk.map((item) => {
-        const isDice       = item.type.startsWith('dice-')
-        const isAtlaPoster = item.type === 'poster' && item.label === 'ATLA'
-        const isDpsPoster  = item.type === 'poster' && item.label === 'Dead Poets'
-        const isGwhPoster  = item.type === 'poster' && item.label === 'Good Will Hunting'
-        const isInvPoster  = item.type === 'poster' && item.label === 'Invincible'
-        const isTerminal   = item.type === 'terminal'
-        const isVinyl      = item.type === 'vinyl'
-        const isCassette   = item.type === 'cassette'
-        const isLaptop     = item.type === 'laptop'
-        const isPoem       = item.type === 'poem'
-        const isMug        = item.type === 'mug'
-        const isController = item.type === 'controller'
-        const isRolling    = rolling.has(item.id)
-        const crit         = criticals[item.id]
-        const gl           = gameLabelFor(item.type)
+      <div className="desk-clutter-layer">
+        <div className="desk-clutter-content">
+        {data.desk.map((item) => {
+          const isDice       = item.type.startsWith('dice-')
+          const isAtlaPoster = item.type === 'poster' && item.label === 'ATLA'
+          const isDpsPoster  = item.type === 'poster' && item.label === 'Dead Poets'
+          const isGwhPoster  = item.type === 'poster' && item.label === 'Good Will Hunting'
+          const isInvPoster  = item.type === 'poster' && item.label === 'Invincible'
+          const isTerminal   = item.type === 'terminal'
+          const isVinyl      = item.type === 'vinyl'
+          const isCassette   = item.type === 'cassette'
+          const isLaptop     = item.type === 'laptop'
+          const isPoem       = item.type === 'poem'
+          const isMug        = item.type === 'mug'
+          const isController = item.type === 'controller'
+          const isSword      = item.type === 'diamond-sword'
+          const isRolling    = rolling.has(item.id)
+          const crit         = criticals[item.id]
+          const gl           = gameLabelFor(item.type)
 
-        const innerClass = [
-          isRolling       ? 'dice-rolling'   : undefined,
-          crit === 'hit'  ? 'dice-crit-hit'  : undefined,
-          crit === 'fail' ? 'dice-crit-fail' : undefined,
-        ].filter(Boolean).join(' ') || undefined
+          const innerClass = [
+            isRolling       ? 'dice-rolling'   : undefined,
+            crit === 'hit'  ? 'dice-crit-hit'  : undefined,
+            crit === 'fail' ? 'dice-crit-fail' : undefined,
+          ].filter(Boolean).join(' ') || undefined
 
-        return (
-          <div
-            key={item.id}
-            ref={isAtlaPoster ? atlaRef : isDpsPoster ? dpsRef : isCassette ? cassetteRef : isMug ? mugRef : isLaptop ? laptopRef : undefined}
-            data-item-id={item.id}
-            data-item-type={item.type}
-            data-game-label={gl?.label}
-            data-game-variant={gl?.variant}
-            className={`absolute select-none desk-item${isLaptop ? ' desk-item--laptop' : ''}${isLaptop && laptopClicking ? ' desk-item--laptop-click' : ''}${isCassette && cassetteActive ? ' cassette-playing' : ''}${isPoem ? ' desk-item--poem' : ''}${isPoem && poemBurst ? ' desk-item--poem-active' : ''}${isTerminal ? ' desk-item--terminal' : ''}${isTerminal && terminalHacking ? ' desk-item--terminal-hack' : ''}${isController ? ' desk-item--controller' : ''}${isController && gameMode ? ' desk-item--controller-active' : ''}`}
-            style={{
-              left: `${item.x}%`,
-              top:  `${item.y}%`,
-              '--item-rotate': `${item.rotate}deg`,
-              zIndex: item.zIndex,
-              cursor: isDice || isAtlaPoster || isDpsPoster || isGwhPoster || isInvPoster || isVinyl || isCassette || isLaptop || isPoem || isTerminal || isMug || isController ? 'pointer' : undefined,
-            } as React.CSSProperties}
-            onClick={
-              isDice         ? () => handleRoll(item.id, item.type)
-              : isAtlaPoster ? handleAtla
-              : isDpsPoster  ? handleDps
-              : isGwhPoster  ? handleGwh
-              : isInvPoster  ? handleInvincible
-              : isTerminal   ? handleTerminalClick
-              : isVinyl      ? () => setSpotifyOpen(true)
-              : isCassette   ? handleCassette
-              : isLaptop     ? handleLaptopClick
-              : isPoem       ? (e) => handlePoemClick(e.currentTarget)
-              : isMug        ? handleMugClick
-              : isController ? handleController
-              : undefined
-            }
-          >
-            {crit && (
-              <div className={`dice-crit-label dice-crit-label--${crit}`}>
-                {crit === 'hit' ? 'CRITICAL HIT' : 'CRITICAL FAIL'}
+          return (
+            <div
+              key={item.id}
+              ref={
+                isAtlaPoster ? atlaRef :
+                isDpsPoster ? dpsRef :
+                isCassette ? cassetteRef :
+                isMug ? mugRef :
+                isLaptop ? laptopRef :
+                isSword ? swordRef :
+                undefined
+              }
+              data-item-id={item.id}
+              data-item-type={item.type}
+              data-game-label={gl?.label}
+              data-game-variant={gl?.variant}
+              className={`absolute select-none desk-item${isLaptop ? ' desk-item--laptop' : ''}${isLaptop && laptopClicking ? ' desk-item--laptop-click' : ''}${isCassette && cassetteActive ? ' cassette-playing' : ''}${isPoem ? ' desk-item--poem' : ''}${isPoem && poemBurst ? ' desk-item--poem-active' : ''}${isTerminal ? ' desk-item--terminal' : ''}${isTerminal && terminalHacking ? ' desk-item--terminal-hack' : ''}${isController ? ' desk-item--controller' : ''}${isController && gameMode ? ' desk-item--controller-active' : ''}${isSword && realityHitBurst ? ' desk-item--sword-reality-hit' : ''}`}
+              style={{
+                left: `${item.x}%`,
+                top:  `${item.y}%`,
+                '--item-rotate': `${item.rotate}deg`,
+                zIndex: item.zIndex,
+                cursor: isDice || isAtlaPoster || isDpsPoster || isGwhPoster || isInvPoster || isVinyl || isCassette || isLaptop || isPoem || isTerminal || isMug || isController || isSword ? 'pointer' : undefined,
+              } as React.CSSProperties}
+              onClick={
+                isDice         ? () => handleRoll(item.id, item.type)
+                : isAtlaPoster ? handleAtla
+                : isDpsPoster  ? handleDps
+                : isGwhPoster  ? handleGwh
+                : isInvPoster  ? handleInvincible
+                : isTerminal   ? handleTerminalClick
+                : isVinyl      ? () => setSpotifyOpen(true)
+                : isCassette   ? handleCassette
+                : isLaptop     ? handleLaptopClick
+                : isPoem       ? (e) => handlePoemClick(e.currentTarget)
+                : isMug        ? handleMugClick
+                : isController ? handleController
+                : isSword      ? handleSwordGameOpen
+                : undefined
+              }
+            >
+              {crit && (
+                <div className={`dice-crit-label dice-crit-label--${crit}`}>
+                  {crit === 'hit' ? 'CRITICAL HIT' : 'CRITICAL FAIL'}
+                </div>
+              )}
+              <div className={innerClass}>
+                <DeskItemSVG
+                  type={item.type}
+                  label={item.label}
+                  diceValue={isRolling ? undefined : diceValues[item.id]}
+                  terminalHacking={isTerminal ? terminalHacking : undefined}
+                  mugFillLevel={isMug ? coffeeFillLevel : undefined}
+                  mugSipping={isMug ? mugSipping : undefined}
+                  mugEmpty={isMug ? coffeeFillLevel <= 0 : undefined}
+                />
               </div>
-            )}
-            <div className={innerClass}>
-              <DeskItemSVG
-                type={item.type}
-                label={item.label}
-                diceValue={isRolling ? undefined : diceValues[item.id]}
-                terminalHacking={isTerminal ? terminalHacking : undefined}
-                mugFillLevel={isMug ? coffeeFillLevel : undefined}
-                mugSipping={isMug ? mugSipping : undefined}
-                mugEmpty={isMug ? coffeeFillLevel <= 0 : undefined}
-              />
             </div>
-          </div>
-        )
-      })}
+          )
+        })}
+        </div>
+      </div>
 
       {/* Render burst into document.body so nothing can clip or block it */}
       {atlaBurst && createPortal(
@@ -564,7 +647,479 @@ export default function DeskClutter() {
         <GameModeOverlay key={gameModeTick} laptopRef={laptopRef} onExit={exitGameMode} />,
         document.body
       )}
+
+      {realityHitBurst && createPortal(
+        <RealityHitOverlay burst={realityHitBurst} />,
+        document.body
+      )}
+
+      {swordGameOpen && createPortal(
+        <SwordIdleModal onClose={() => setSwordGameOpen(false)} onSwordHit={handleRealityHit} />,
+        document.body
+      )}
     </>
+  )
+}
+
+const SWORD_BOSS_POOL: SwordBoss[] = (swordEnemiesData as SwordBoss[]).length > 0
+  ? (swordEnemiesData as SwordBoss[])
+  : [{ name: 'Zombie', hp: 30 }]
+
+function SwordIdleModal({ onClose, onSwordHit }: { onClose: () => void; onSwordHit: () => void }) {
+  const [bossIndex, setBossIndex] = useState(0)
+  const [bossHp, setBossHp] = useState(SWORD_BOSS_POOL[0].hp)
+  const [maxHp, setMaxHp] = useState(SWORD_BOSS_POOL[0].hp)
+  const [kills, setKills] = useState(0)
+  const [gold, setGold] = useState(0)
+  const [clickDamage, setClickDamage] = useState(1)
+  const [dps, setDps] = useState(0)
+  const [critChance, setCritChance] = useState(SWORD_BASE_CRIT_CHANCE)
+  const [oreChance, setOreChance] = useState(0.08)
+  const [goldPerSecond, setGoldPerSecond] = useState(0)
+  const [lootBonus, setLootBonus] = useState(1)
+  const [playerMaxHp, setPlayerMaxHp] = useState(24)
+  const [playerHp, setPlayerHp] = useState(24)
+  const [armor, setArmor] = useState(0)
+  const [hpRegen, setHpRegen] = useState(0)
+  const [enemyDamage, setEnemyDamage] = useState(1)
+  const [deaths, setDeaths] = useState(0)
+  const [totems, setTotems] = useState(0)
+  const [potions, setPotions] = useState(0)
+  const [shopLevelClick, setShopLevelClick] = useState(0)
+  const [shopLevelDps, setShopLevelDps] = useState(0)
+  const [shopLevelCrit, setShopLevelCrit] = useState(0)
+  const [shopLevelOre, setShopLevelOre] = useState(0)
+  const [shopLevelGoldps, setShopLevelGoldps] = useState(0)
+  const [shopLevelLoot, setShopLevelLoot] = useState(0)
+  const [shopLevelHp, setShopLevelHp] = useState(0)
+  const [shopLevelArmor, setShopLevelArmor] = useState(0)
+  const [shopLevelRegen, setShopLevelRegen] = useState(0)
+  const [shopLevelTotem, setShopLevelTotem] = useState(0)
+  const [combo, setCombo] = useState(0)
+  const [victory, setVictory] = useState(false)
+  const [statusText, setStatusText] = useState('Hunt mobs and build your gear.')
+  const [floats, setFloats] = useState<DamageFloat[]>([])
+  const floatIdRef = useRef(0)
+  const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const currentBoss = SWORD_BOSS_POOL[bossIndex]
+  const hpPct = Math.max(0, Math.min(100, (bossHp / maxHp) * 100))
+  const playerHpPct = Math.max(0, Math.min(100, (playerHp / playerMaxHp) * 100))
+  const progressPct = Math.round((bossIndex / (SWORD_BOSS_POOL.length - 1)) * 100)
+  const enemyAttackMs = Math.max(1000, 2200 - bossIndex * 5)
+  const potionCost = Math.ceil(8 + playerMaxHp * 0.14)
+  const potionHeal = Math.ceil(playerMaxHp * 0.35)
+
+  const costs: Record<SwordUpgradeKey | 'ore', number> = {
+    click: Math.ceil(9 * (1.42 ** shopLevelClick)),
+    dps: Math.ceil(20 * (1.6 ** shopLevelDps)),
+    crit: Math.ceil(16 * (1.54 ** shopLevelCrit)),
+    ore: Math.ceil(18 * (1.5 ** shopLevelOre)),
+    goldps: Math.ceil(22 * (1.62 ** shopLevelGoldps)),
+    loot: Math.ceil(26 * (1.58 ** shopLevelLoot)),
+    hp: Math.ceil(18 * (1.55 ** shopLevelHp)),
+    armor: Math.ceil(16 * (1.52 ** shopLevelArmor)),
+    regen: Math.ceil(20 * (1.56 ** shopLevelRegen)),
+    totem: Math.ceil(34 * (1.7 ** shopLevelTotem)),
+  }
+
+  const queueStatus = useCallback((text: string) => {
+    if (statusTimerRef.current) clearTimeout(statusTimerRef.current)
+    setStatusText(text)
+    statusTimerRef.current = setTimeout(() => {
+      setStatusText(victory ? 'You cleared every boss. GG.' : 'Hunt mobs and build your gear.')
+      statusTimerRef.current = null
+    }, 1200)
+  }, [victory])
+
+  const spawnNextBoss = useCallback(() => {
+    const isLastBoss = bossIndex >= SWORD_BOSS_POOL.length - 1
+    const reward = Math.round((6 + maxHp * 0.085) * lootBonus)
+    setKills((prev) => prev + 1)
+    setGold((prev) => prev + reward)
+    setCombo((prev) => prev + 1)
+    setPlayerHp((prev) => Math.min(playerMaxHp, prev + Math.ceil(playerMaxHp * 0.12)))
+    if ((kills + 1) % 5 === 0) {
+      const chest = Math.round(22 * lootBonus)
+      setGold((prev) => prev + chest)
+      queueStatus(`Loot chest found: +${chest} gold`)
+    } else {
+      queueStatus(`Target down: +${reward} gold`)
+    }
+    if (isLastBoss) {
+      setVictory(true)
+      return
+    }
+    setBossIndex((prev) => prev + 1)
+  }, [bossIndex, kills, lootBonus, maxHp, playerMaxHp, queueStatus])
+
+  useEffect(() => {
+    if (victory) return
+    const boss = SWORD_BOSS_POOL[bossIndex]
+    const exponentialScale = 1.07 ** bossIndex
+    const nextHp = Math.max(1, Math.round(boss.hp * exponentialScale))
+    const nextEnemyDamage = Math.max(1, Math.round(1 + bossIndex * 0.18 + nextHp * 0.0018))
+    setMaxHp(nextHp)
+    setBossHp(nextHp)
+    setEnemyDamage(nextEnemyDamage)
+  }, [bossIndex, victory])
+
+  const dealDamage = useCallback((base: number, crit: boolean) => {
+    if (victory || base <= 0) return
+    const amount = crit ? Math.ceil(base * 1.5) : base
+    const id = floatIdRef.current++
+    setFloats((prev) => [...prev, { id, amount, crit }].slice(-10))
+    setTimeout(() => {
+      setFloats((prev) => prev.filter((f) => f.id !== id))
+    }, 700)
+    setBossHp((prev) => {
+      const next = Math.max(0, prev - amount)
+      if (next === 0 && prev > 0) {
+        spawnNextBoss()
+      }
+      return next
+    })
+  }, [spawnNextBoss, victory])
+
+  const handleHit = useCallback(() => {
+    if (victory) return
+    onSwordHit()
+    const crit = Math.random() < critChance
+    dealDamage(clickDamage, crit)
+    if (Math.random() < oreChance) {
+      setGold((prev) => prev + 1)
+      queueStatus('Lucky drop: +1 gold')
+    }
+  }, [clickDamage, critChance, dealDamage, onSwordHit, oreChance, queueStatus, victory])
+
+  const buyUpgrade = useCallback((kind: SwordUpgradeKey | 'ore') => {
+    if (victory) return
+    const cost = costs[kind]
+    if (gold < cost) return
+    setGold((prev) => prev - cost)
+    if (kind === 'click') {
+      setClickDamage((prev) => prev + 1)
+      setShopLevelClick((prev) => prev + 1)
+      queueStatus('Click damage increased')
+      return
+    }
+    if (kind === 'dps') {
+      setDps((prev) => prev + 3)
+      setShopLevelDps((prev) => prev + 1)
+      queueStatus('Passive damage increased by 3')
+      return
+    }
+    if (kind === 'crit') {
+      setCritChance((prev) => Math.min(0.75, prev + 0.02))
+      setShopLevelCrit((prev) => prev + 1)
+      queueStatus('Critical chance increased')
+      return
+    }
+    if (kind === 'goldps') {
+      setGoldPerSecond((prev) => prev + 3)
+      setShopLevelGoldps((prev) => prev + 1)
+      queueStatus('Passive gold increased by 3')
+      return
+    }
+    if (kind === 'loot') {
+      setLootBonus((prev) => prev + 0.08)
+      setShopLevelLoot((prev) => prev + 1)
+      queueStatus('Loot multiplier increased')
+      return
+    }
+    if (kind === 'hp') {
+      setPlayerMaxHp((prev) => prev + 10)
+      setPlayerHp((prev) => prev + 10)
+      setShopLevelHp((prev) => prev + 1)
+      queueStatus('Max HP increased')
+      return
+    }
+    if (kind === 'armor') {
+      setArmor((prev) => prev + 1)
+      setShopLevelArmor((prev) => prev + 1)
+      queueStatus('Armor increased')
+      return
+    }
+    if (kind === 'regen') {
+      setHpRegen((prev) => prev + 1)
+      setShopLevelRegen((prev) => prev + 1)
+      queueStatus('HP regen increased')
+      return
+    }
+    if (kind === 'totem') {
+      setTotems((prev) => prev + 1)
+      setShopLevelTotem((prev) => prev + 1)
+      queueStatus('Totem of Undying acquired')
+      return
+    }
+    setOreChance((prev) => Math.min(0.35, prev + 0.02))
+    setShopLevelOre((prev) => prev + 1)
+    queueStatus('Lucky drop chance increased')
+  }, [costs, gold, queueStatus, victory])
+
+  const handlePotion = useCallback(() => {
+    if (victory || potions <= 0 || playerHp >= playerMaxHp) return
+    setPotions((prev) => prev - 1)
+    setPlayerHp((prev) => Math.min(playerMaxHp, prev + potionHeal))
+    queueStatus(`Potion used: +${potionHeal} HP`)
+  }, [playerHp, playerMaxHp, potionHeal, potions, queueStatus, victory])
+
+  const handleBuyPotion = useCallback(() => {
+    if (victory || gold < potionCost) return
+    setGold((prev) => prev - potionCost)
+    setPotions((prev) => prev + 1)
+    queueStatus('Potion added to inventory')
+  }, [gold, potionCost, queueStatus, victory])
+
+  useEffect(() => {
+    if (victory || dps <= 0) return
+    const timer = setInterval(() => {
+      dealDamage(dps, false)
+    }, SWORD_IDLE_TICK_MS)
+    return () => clearInterval(timer)
+  }, [dealDamage, dps, victory])
+
+  useEffect(() => {
+    if (victory || goldPerSecond <= 0) return
+    const timer = setInterval(() => {
+      setGold((prev) => prev + goldPerSecond)
+    }, SWORD_IDLE_TICK_MS)
+    return () => clearInterval(timer)
+  }, [goldPerSecond, victory])
+
+  useEffect(() => {
+    if (victory || hpRegen <= 0) return
+    const timer = setInterval(() => {
+      setPlayerHp((prev) => Math.min(playerMaxHp, prev + hpRegen))
+    }, SWORD_IDLE_TICK_MS)
+    return () => clearInterval(timer)
+  }, [hpRegen, playerMaxHp, victory])
+
+  useEffect(() => {
+    if (victory) return
+    const timer = setInterval(() => {
+      const reduction = Math.min(0.72, armor * 0.045)
+      const taken = Math.max(1, Math.ceil(enemyDamage * (1 - reduction)))
+      setPlayerHp((prev) => {
+        const next = prev - taken
+        if (next <= 0) {
+          if (totems > 0) {
+            setTotems((t) => t - 1)
+            queueStatus('Totem triggered: death avoided')
+            return Math.ceil(playerMaxHp * 0.65)
+          }
+          setDeaths((d) => d + 1)
+          setCombo(0)
+          setGold((g) => Math.max(0, g - Math.ceil(g * 0.1)))
+          setBossHp(maxHp)
+          queueStatus('You were defeated. Current target reset.')
+          return playerMaxHp
+        }
+        return next
+      })
+    }, enemyAttackMs)
+    return () => clearInterval(timer)
+  }, [armor, enemyAttackMs, enemyDamage, maxHp, playerMaxHp, queueStatus, totems, victory])
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  useEffect(() => {
+    return () => {
+      if (statusTimerRef.current) clearTimeout(statusTimerRef.current)
+    }
+  }, [])
+
+  return (
+    <div className="sword-idle-modal-backdrop" onClick={onClose}>
+      <div
+        className="sword-idle-modal"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Sword boss simulator"
+      >
+        <div className="sword-idle-modal-header">
+          <div className="sword-idle-title-wrap">
+            <p className="sword-idle-title">BOSS FIGHT SIM</p>
+            <p className="sword-idle-subtitle">Minecraft sword training</p>
+          </div>
+          <button type="button" className="sword-idle-close" onClick={onClose} aria-label="Close">
+            ✕
+          </button>
+        </div>
+
+        <div className="sword-idle-top-grid">
+          <div className="sword-idle-info-card">
+            <p className="sword-idle-info-title">Run</p>
+            <div className="sword-idle-kv-grid">
+              <span>Kills</span><span>{kills}</span>
+              <span>Gold</span><span>{gold}</span>
+              <span>Combo</span><span>{combo}</span>
+              <span>Deaths</span><span>{deaths}</span>
+            </div>
+          </div>
+          <div className="sword-idle-info-card">
+            <p className="sword-idle-info-title">Build</p>
+            <div className="sword-idle-kv-grid">
+              <span>Click</span><span>{clickDamage}</span>
+              <span>DPS</span><span>{dps}</span>
+              <span>GPS</span><span>{goldPerSecond}</span>
+              <span>Crit</span><span>{(critChance * 100).toFixed(0)}%</span>
+              <span>Armor</span><span>{armor}</span>
+              <span>Regen</span><span>{hpRegen}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="sword-idle-run-progress">
+          <span>Run progress</span>
+          <span>{progressPct}%</span>
+          <span>{bossIndex + 1}/{SWORD_BOSS_POOL.length}</span>
+        </div>
+        <div className="sword-idle-run-bar">
+          <span className="sword-idle-run-fill" style={{ width: `${progressPct}%` }} />
+        </div>
+
+        <div className="sword-idle-boss-panel">
+          <div className="sword-idle-boss-row">
+            <span className="sword-idle-boss-name">{currentBoss.name}</span>
+            <span className="sword-idle-boss-hp">{bossHp} / {maxHp} | DMG {enemyDamage}</span>
+          </div>
+          <p className="sword-idle-bar-label sword-idle-bar-label--enemy">Enemy HP</p>
+          <div className="sword-idle-boss-bar">
+            <span className="sword-idle-boss-fill" style={{ width: `${hpPct}%` }} />
+          </div>
+          <p className="sword-idle-bar-label sword-idle-bar-label--player">Your HP</p>
+          <div className="sword-idle-boss-bar sword-idle-boss-bar--player">
+            <span className="sword-idle-boss-fill sword-idle-boss-fill--player" style={{ width: `${playerHpPct}%` }} />
+          </div>
+          <div className="sword-idle-float-layer" aria-hidden="true">
+            {floats.map((f) => (
+              <span key={f.id} className={`sword-idle-float${f.crit ? ' sword-idle-float--crit' : ''}`}>
+                -{f.amount}{f.crit ? ' CRIT!' : ''}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="sword-idle-actions">
+          <div className="sword-idle-actions-row">
+            <button type="button" className="sword-idle-hit-btn" onClick={handleHit} disabled={victory}>
+              {victory ? 'VICTORY' : 'HIT BOSS'}
+            </button>
+            <button type="button" className="sword-idle-hit-btn sword-idle-hit-btn--alt" onClick={handlePotion} disabled={victory || potions <= 0 || playerHp >= playerMaxHp}>
+              USE POTION ({potions})
+            </button>
+          </div>
+          <p className="sword-idle-help">Enemy HP bar is red. Your HP bar is green. Enemy attacks automatically.</p>
+          <p className="sword-idle-status">{statusText}</p>
+        </div>
+
+        <div className="sword-idle-shop sword-idle-shop--upgrades">
+          <p className="sword-idle-shop-title">Upgrades</p>
+          <div className="sword-idle-shop-grid">
+              <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('click')} disabled={gold < costs.click || victory}>
+                +1 Click Damage
+                <small>Boosts manual hit strength.</small>
+                <span>Cost: {costs.click}</span>
+              </button>
+              <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('dps')} disabled={gold < costs.dps || victory}>
+                +3 Passive Damage
+                <small>Auto damage every second.</small>
+                <span>Cost: {costs.dps}</span>
+              </button>
+              <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('crit')} disabled={gold < costs.crit || victory}>
+                +2% Crit Chance
+                <small>Raises chance for x1.5 hits.</small>
+                <span>Cost: {costs.crit}</span>
+              </button>
+              <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('ore')} disabled={gold < costs.ore || victory}>
+                +2% Lucky Drop
+                <small>Chance for +1 gold on hit.</small>
+                <span>Cost: {costs.ore}</span>
+              </button>
+              <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('goldps')} disabled={gold < costs.goldps || victory}>
+                +3 Passive Gold
+                <small>Auto gold income per second.</small>
+                <span>Cost: {costs.goldps}</span>
+              </button>
+              <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('loot')} disabled={gold < costs.loot || victory}>
+                +8% Bounty Bonus
+                <small>More boss and chest rewards.</small>
+                <span>Cost: {costs.loot}</span>
+              </button>
+              <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('hp')} disabled={gold < costs.hp || victory}>
+                +10 Max HP
+                <small>Increases survival pool.</small>
+                <span>Cost: {costs.hp}</span>
+              </button>
+              <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('armor')} disabled={gold < costs.armor || victory}>
+                +1 Armor
+                <small>Reduces incoming damage.</small>
+                <span>Cost: {costs.armor}</span>
+              </button>
+              <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('regen')} disabled={gold < costs.regen || victory}>
+                +1 HP Regen
+                <small>Restores HP each second.</small>
+                <span>Cost: {costs.regen}</span>
+              </button>
+          </div>
+        </div>
+
+        <div className="sword-idle-shop sword-idle-shop--items">
+          <p className="sword-idle-shop-title">Items</p>
+          <div className="sword-idle-shop-grid sword-idle-shop-grid--items">
+              <button type="button" className="sword-idle-shop-btn" onClick={handleBuyPotion} disabled={victory || gold < potionCost}>
+                +1 Potion
+                <small>Inventory heal item. Use any time.</small>
+                <span>Buy: {potionCost}g</span>
+              </button>
+              <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('totem')} disabled={gold < costs.totem || victory}>
+                +1 Totem
+                <small>Auto-revive once at lethal damage.</small>
+                <span>Cost: {costs.totem} | Owned: {totems}</span>
+              </button>
+            </div>
+          </div>
+      </div>
+    </div>
+  )
+}
+
+function RealityHitOverlay({
+  burst,
+}: {
+  burst: RealityHitBurst | null
+}) {
+  return (
+    <div className="reality-hit-overlay" aria-hidden="true">
+      {burst && (
+        <>
+          {burst.shards.map((s) => (
+            <span
+              key={`${burst.tick}-${s.id}`}
+              className="reality-hit-shard"
+              style={{
+                left: s.x,
+                top: s.y,
+                width: s.size,
+                height: s.size,
+                animationDelay: `${s.delay}s`,
+                ['--shard-dx' as string]: `${s.driftX}px`,
+                ['--shard-dy' as string]: `${s.driftY}px`,
+                ['--shard-spin' as string]: `${s.spin}deg`,
+              }}
+            />
+          ))}
+        </>
+      )}
+    </div>
   )
 }
 
