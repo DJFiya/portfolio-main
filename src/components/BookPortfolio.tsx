@@ -67,6 +67,31 @@ function slideForPage(page: number) {
   return 0
 }
 
+const LOGICAL_PAGES = [0, 1, 3, 5, 7, 9]
+
+function normalizeLogicalPage(page: number) {
+  if (page <= 0) return 0
+  if (page <= 2) return 1
+  if (page <= 4) return 3
+  if (page <= 6) return 5
+  if (page <= 8) return 7
+  return 9
+}
+
+function nextLogicalPage(cur: number) {
+  const normalized = normalizeLogicalPage(cur)
+  const idx = LOGICAL_PAGES.findIndex((p) => p === normalized)
+  const safeIdx = idx === -1 ? 0 : idx
+  return LOGICAL_PAGES[Math.min(safeIdx + 1, LOGICAL_PAGES.length - 1)]
+}
+
+function prevLogicalPage(cur: number) {
+  const normalized = normalizeLogicalPage(cur)
+  const idx = LOGICAL_PAGES.findIndex((p) => p === normalized)
+  const safeIdx = idx === -1 ? 0 : idx
+  return LOGICAL_PAGES[Math.max(safeIdx - 1, 0)]
+}
+
 function boardStyle(side: 'left' | 'right') {
   return {
     position: 'absolute' as const,
@@ -98,6 +123,10 @@ export default function BookPortfolio() {
   const initPage = ROUTE_TO_PAGE[location.pathname] ?? 0
 
   const [currentPage, setCurrentPage] = useState(initPage)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 900)
+  const [mobileFrameWidth, setMobileFrameWidth] = useState(() =>
+    Math.min(380, Math.max(280, window.innerWidth - 24)),
+  )
 
   // slidePage drives the centering slide — set pre-flip so it animates
   // concurrently with the page turn.
@@ -108,6 +137,33 @@ export default function BookPortfolio() {
   const currentPageRef = useRef(initPage)
   const TOTAL = 10
 
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 900px)')
+    const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    setIsMobile(media.matches)
+    media.addEventListener('change', onChange)
+    return () => media.removeEventListener('change', onChange)
+  }, [])
+
+  useEffect(() => {
+    const updateMobileFrame = () => {
+      const nextWidth = Math.min(380, Math.max(280, window.innerWidth - 24))
+      setMobileFrameWidth(nextWidth)
+    }
+    updateMobileFrame()
+    window.addEventListener('resize', updateMobileFrame)
+    return () => window.removeEventListener('resize', updateMobileFrame)
+  }, [])
+
+  const setPageAndRoute = (page: number) => {
+    const resolvedPage = isMobile ? normalizeLogicalPage(page) : page
+    currentPageRef.current = resolvedPage
+    setCurrentPage(resolvedPage)
+    setSlidePage(resolvedPage)
+    const route = pageToRoute(resolvedPage)
+    if (location.pathname !== route) navigate(route, { replace: true })
+  }
+
   // ── Pre-flip setup ────────────────────────────────────────────────────────
 
   const prepareFlip = (target: number) => {
@@ -117,16 +173,28 @@ export default function BookPortfolio() {
   // ── Navigation ────────────────────────────────────────────────────────────
 
   const flipNext = () => {
+    if (isMobile) {
+      setPageAndRoute(nextLogicalPage(currentPageRef.current))
+      return
+    }
     prepareFlip(nextPage(currentPageRef.current))
     book.current?.pageFlip().flipNext()
   }
 
   const flipPrev = () => {
+    if (isMobile) {
+      setPageAndRoute(prevLogicalPage(currentPageRef.current))
+      return
+    }
     prepareFlip(prevPage(currentPageRef.current))
     book.current?.pageFlip().flipPrev()
   }
 
   const flipTo = (target: number) => {
+    if (isMobile) {
+      setPageAndRoute(target)
+      return
+    }
     prepareFlip(target)
     isProgrammatic.current = true
     book.current?.pageFlip().flip(target)
@@ -152,12 +220,16 @@ export default function BookPortfolio() {
 
   useEffect(() => {
     const target = ROUTE_TO_PAGE[location.pathname] ?? 0
+    if (isMobile) {
+      if (target !== currentPageRef.current) setPageAndRoute(target)
+      return
+    }
     if (book.current && target !== currentPageRef.current) {
       prepareFlip(target)
       isProgrammatic.current = true
       book.current.pageFlip().flip(target)
     }
-  }, [location.pathname]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [location.pathname, isMobile]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Keyboard navigation ───────────────────────────────────────────────────
 
@@ -186,94 +258,121 @@ export default function BookPortfolio() {
     (p === 7 && currentPage >= 7 && currentPage <= 8) ||
     (p === 9 && currentPage === 9)
 
+  const logicalCurrentPage = normalizeLogicalPage(currentPage)
+  const activeSpread = SPREADS.find((_, idx) => logicalCurrentPage === idx * 2 + 1)
+  const ActiveSpreadComponent = activeSpread?.Component
+  const mobileFrameHeight = Math.round((mobileFrameWidth * 490) / 380)
+
   return (
     <div className="flex flex-col items-center gap-4">
-      {/* Book wrapper — slides to visually centre single-page covers */}
-      <motion.div
-        animate={{ x: slideX }}
-        transition={{ duration: 0.65, ease: 'easeInOut' }}
-        style={{ position: 'relative', display: 'inline-block' }}
-      >
-        {/* Left hardcover board
-             boardVisible uses BOTH slidePage (pre-flip) AND currentPage (post-flip).
-             slidePage triggers instant snap-off before the flip starts;
-             currentPage ensures we only reappear after the landing flip completes. */}
-        {(() => {
-          const bv = slidePage > 0 && slidePage < 9 && currentPage > 0 && currentPage < 9
-          return (
-            <div style={{ ...boardStyle('left'), opacity: bv ? 1 : 0, transition: bv ? 'opacity 0.2s ease' : 'none' }} />
-          )
-        })()}
-
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-        <HTMLFlipBook
-          ref={book}
-          width={380}
-          height={490}
-          size="fixed"
-          minWidth={300}
-          maxWidth={480}
-          minHeight={400}
-          maxHeight={600}
-          showCover
-          drawShadow
-          flippingTime={680}
-          startPage={initPage}
-          useMouseEvents
-          onFlip={handleFlip}
-          className=""
-          style={{}}
-          startZIndex={10}
-          autoSize
-          maxShadowOpacity={0.5}
-          mobileScrollSupport={false}
-          clickEventForward={false}
-          usePortrait={false}
-          swipeDistance={0}
-          showPageCorners={false}
-          disableFlipByClick
+      {isMobile ? (
+        <div className="relative z-30 w-full max-w-[430px] px-3 pointer-events-auto">
+          <div
+            className="mx-auto rounded-md overflow-hidden shadow-[0_12px_36px_rgba(0,0,0,0.52)]"
+            style={{ width: mobileFrameWidth, height: mobileFrameHeight }}
+          >
+            {currentPage === 0 ? (
+              <BookCover onOpen={flipNext} />
+            ) : currentPage === 9 ? (
+              <BackCover />
+            ) : (
+              <BookRightPage>
+                <div className="mb-6 pb-4 border-b border-ink-200/40">
+                  <p className="font-rosaline text-ink-400 tracking-widest text-base">
+                    {activeSpread?.chapterNum}
+                  </p>
+                  <h2 className="font-rosaline text-ink-900 text-[2rem] leading-tight">
+                    {activeSpread?.chapterTitle}
+                  </h2>
+                </div>
+                {ActiveSpreadComponent ? <ActiveSpreadComponent /> : null}
+              </BookRightPage>
+            )}
+          </div>
+        </div>
+      ) : (
+        <motion.div
+          animate={{ x: slideX }}
+          transition={{ duration: 0.65, ease: 'easeInOut' }}
+          style={{ position: 'relative', display: 'inline-block' }}
         >
-          {/* Page 0 — Front cover */}
-          <BookPage key="cover">
-            <BookCover onOpen={flipNext} />
-          </BookPage>
+          {(() => {
+            const bv = slidePage > 0 && slidePage < 9 && currentPage > 0 && currentPage < 9
+            return (
+              <div style={{ ...boardStyle('left'), opacity: bv ? 1 : 0, transition: bv ? 'opacity 0.2s ease' : 'none' }} />
+            )
+          })()}
 
-          {/* Pages 1–8 — Four spreads */}
-          {SPREADS.map((spread, i) => {
-            const SpreadComponent = spread.Component
-            return [
-              <BookPage key={`left-${i}`}>
-                <BookLeftPage
-                  chapterNum={spread.chapterNum}
-                  chapterTitle={spread.chapterTitle}
-                />
-              </BookPage>,
-              <BookPage key={`right-${i}`}>
-                <BookRightPage>
-                  <SpreadComponent />
-                </BookRightPage>
-              </BookPage>,
-            ]
-          }).flat()}
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          <HTMLFlipBook
+            ref={book}
+            width={380}
+            height={490}
+            size="fixed"
+            minWidth={300}
+            maxWidth={480}
+            minHeight={400}
+            maxHeight={600}
+            showCover
+            drawShadow
+            flippingTime={680}
+            startPage={initPage}
+            useMouseEvents
+            onFlip={handleFlip}
+            className=""
+            style={{}}
+            startZIndex={10}
+            autoSize
+            maxShadowOpacity={0.5}
+            mobileScrollSupport={false}
+            clickEventForward={false}
+            usePortrait={false}
+            swipeDistance={0}
+            showPageCorners={false}
+            disableFlipByClick
+          >
+            {/* Page 0 — Front cover */}
+            <BookPage key="cover">
+              <BookCover onOpen={flipNext} />
+            </BookPage>
 
-          {/* Page 9 — Back cover */}
-          <BookPage key="back">
-            <BackCover />
-          </BookPage>
-        </HTMLFlipBook>
+            {/* Pages 1–8 — Four spreads */}
+            {SPREADS.map((spread, i) => {
+              const SpreadComponent = spread.Component
+              return [
+                <BookPage key={`left-${i}`}>
+                  <BookLeftPage
+                    chapterNum={spread.chapterNum}
+                    chapterTitle={spread.chapterTitle}
+                  />
+                </BookPage>,
+                <BookPage key={`right-${i}`}>
+                  <BookRightPage>
+                    <SpreadComponent />
+                  </BookRightPage>
+                </BookPage>,
+              ]
+            }).flat()}
 
-        {/* Right hardcover board — same logic as left */}
-        {(() => {
-          const bv = slidePage > 0 && slidePage < 9 && currentPage > 0 && currentPage < 9
-          return (
-            <div style={{ ...boardStyle('right'), opacity: bv ? 1 : 0, transition: bv ? 'opacity 0.2s ease' : 'none' }} />
-          )
-        })()}
-      </motion.div>
+            {/* Page 9 — Back cover */}
+            <BookPage key="back">
+              <BackCover />
+            </BookPage>
+          </HTMLFlipBook>
+
+          {(() => {
+            const bv = slidePage > 0 && slidePage < 9 && currentPage > 0 && currentPage < 9
+            return (
+              <div style={{ ...boardStyle('right'), opacity: bv ? 1 : 0, transition: bv ? 'opacity 0.2s ease' : 'none' }} />
+            )
+          })()}
+        </motion.div>
+      )}
 
       {/* Navigation row */}
-      <div className="flex items-center gap-6">
+      <div className="relative z-40 isolate flex items-center gap-6 pointer-events-auto touch-manipulation">
         <button
+          type="button"
           onClick={flipPrev}
           disabled={currentPage === 0}
           className="font-author text-ink-400 hover:text-ink-200 disabled:opacity-20 disabled:cursor-default transition-colors text-sm tracking-wide"
@@ -282,8 +381,9 @@ export default function BookPortfolio() {
         </button>
 
         <div className="flex items-center gap-2">
-          {[0, 1, 3, 5, 7, 9].map((p, idx) => (
+          {LOGICAL_PAGES.map((p, idx) => (
             <button
+              type="button"
               key={p}
               onClick={() => flipTo(p)}
               className="rounded-full transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure-400"
@@ -300,6 +400,7 @@ export default function BookPortfolio() {
         </div>
 
         <button
+          type="button"
           onClick={flipNext}
           disabled={currentPage >= TOTAL - 1}
           className="font-author text-ink-400 hover:text-ink-200 disabled:opacity-20 disabled:cursor-default transition-colors text-sm tracking-wide"
