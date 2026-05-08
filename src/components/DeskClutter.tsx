@@ -25,6 +25,9 @@ const GAME_MODE_MS = 4500
 const REALITY_HIT_MS = 2100
 const SWORD_BASE_CRIT_CHANCE = 0
 const SWORD_IDLE_TICK_MS = 1000
+const SWORD_POTION_HEAL = 18
+const SWORD_TNT_BASE_COST = 1000
+const SWORD_TNT_DAMAGE_MULTIPLIER = 1000
 const QTE_KEYS = ['E', 'F', 'SPACE', 'R'] as const
 const QTE_TICK_MS = 700
 
@@ -146,7 +149,7 @@ interface DamageFloat {
   crit: boolean
 }
 
-type SwordUpgradeKey = 'click' | 'dps' | 'crit' | 'goldps' | 'loot' | 'hp' | 'armor' | 'regen' | 'totem'
+type SwordUpgradeKey = 'click' | 'dps' | 'crit' | 'goldps' | 'loot' | 'hp' | 'armor' | 'regen' | 'totem' | 'minecart'
 
 const NOTE_COLORS = ['#a78bfa', '#f472b6', '#60a5fa', '#34d399', '#fbbf24', '#fb923c', '#2dd4bf', '#f87171']
 const NOTE_GLYPHS = ['♩', '♪', '♫', '♬']
@@ -669,12 +672,11 @@ function SwordIdleModal({ onClose, onSwordHit }: { onClose: () => void; onSwordH
   const [bossIndex, setBossIndex] = useState(0)
   const [bossHp, setBossHp] = useState(SWORD_BOSS_POOL[0].hp)
   const [maxHp, setMaxHp] = useState(SWORD_BOSS_POOL[0].hp)
-  const [kills, setKills] = useState(0)
   const [gold, setGold] = useState(0)
   const [clickDamage, setClickDamage] = useState(1)
   const [dps, setDps] = useState(0)
   const [critChance, setCritChance] = useState(SWORD_BASE_CRIT_CHANCE)
-  const [oreChance, setOreChance] = useState(0.08)
+  const [oreChance, setOreChance] = useState(0.03)
   const [goldPerSecond, setGoldPerSecond] = useState(0)
   const [lootBonus, setLootBonus] = useState(1)
   const [playerMaxHp, setPlayerMaxHp] = useState(24)
@@ -685,6 +687,7 @@ function SwordIdleModal({ onClose, onSwordHit }: { onClose: () => void; onSwordH
   const [deaths, setDeaths] = useState(0)
   const [totems, setTotems] = useState(0)
   const [potions, setPotions] = useState(0)
+  const [tntMinecarts, setTntMinecarts] = useState(0)
   const [shopLevelClick, setShopLevelClick] = useState(0)
   const [shopLevelDps, setShopLevelDps] = useState(0)
   const [shopLevelCrit, setShopLevelCrit] = useState(0)
@@ -695,20 +698,24 @@ function SwordIdleModal({ onClose, onSwordHit }: { onClose: () => void; onSwordH
   const [shopLevelArmor, setShopLevelArmor] = useState(0)
   const [shopLevelRegen, setShopLevelRegen] = useState(0)
   const [shopLevelTotem, setShopLevelTotem] = useState(0)
+  const [shopLevelMinecart, setShopLevelMinecart] = useState(0)
   const [combo, setCombo] = useState(0)
   const [victory, setVictory] = useState(false)
   const [statusText, setStatusText] = useState('Hunt mobs and build your gear.')
   const [floats, setFloats] = useState<DamageFloat[]>([])
   const floatIdRef = useRef(0)
+  const bossClearLockRef = useRef(false)
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const currentBoss = SWORD_BOSS_POOL[bossIndex]
+  const kills = bossIndex + (victory ? 1 : 0)
   const hpPct = Math.max(0, Math.min(100, (bossHp / maxHp) * 100))
   const playerHpPct = Math.max(0, Math.min(100, (playerHp / playerMaxHp) * 100))
   const progressPct = Math.round((bossIndex / (SWORD_BOSS_POOL.length - 1)) * 100)
   const enemyAttackMs = Math.max(1000, 2200 - bossIndex * 5)
   const potionCost = Math.ceil(8 + playerMaxHp * 0.14)
-  const potionHeal = Math.ceil(playerMaxHp * 0.35)
+  const potionHeal = SWORD_POTION_HEAL
+  const armorReductionPct = Math.min(72, armor * 4.5)
 
   const costs: Record<SwordUpgradeKey | 'ore', number> = {
     click: Math.ceil(9 * (1.42 ** shopLevelClick)),
@@ -719,8 +726,9 @@ function SwordIdleModal({ onClose, onSwordHit }: { onClose: () => void; onSwordH
     loot: Math.ceil(26 * (1.58 ** shopLevelLoot)),
     hp: Math.ceil(18 * (1.55 ** shopLevelHp)),
     armor: Math.ceil(16 * (1.52 ** shopLevelArmor)),
-    regen: Math.ceil(20 * (1.56 ** shopLevelRegen)),
+    regen: Math.ceil(26 * (1.68 ** shopLevelRegen)),
     totem: Math.ceil(34 * (1.7 ** shopLevelTotem)),
+    minecart: Math.ceil(SWORD_TNT_BASE_COST * (1.92 ** shopLevelMinecart)),
   }
 
   const queueStatus = useCallback((text: string) => {
@@ -734,12 +742,12 @@ function SwordIdleModal({ onClose, onSwordHit }: { onClose: () => void; onSwordH
 
   const spawnNextBoss = useCallback(() => {
     const isLastBoss = bossIndex >= SWORD_BOSS_POOL.length - 1
+    const nextKills = bossIndex + 1
     const reward = Math.round((6 + maxHp * 0.085) * lootBonus)
-    setKills((prev) => prev + 1)
     setGold((prev) => prev + reward)
     setCombo((prev) => prev + 1)
     setPlayerHp((prev) => Math.min(playerMaxHp, prev + Math.ceil(playerMaxHp * 0.12)))
-    if ((kills + 1) % 5 === 0) {
+    if (nextKills % 5 === 0) {
       const chest = Math.round(22 * lootBonus)
       setGold((prev) => prev + chest)
       queueStatus(`Loot chest found: +${chest} gold`)
@@ -751,7 +759,7 @@ function SwordIdleModal({ onClose, onSwordHit }: { onClose: () => void; onSwordH
       return
     }
     setBossIndex((prev) => prev + 1)
-  }, [bossIndex, kills, lootBonus, maxHp, playerMaxHp, queueStatus])
+  }, [bossIndex, lootBonus, maxHp, playerMaxHp, queueStatus])
 
   useEffect(() => {
     if (victory) return
@@ -772,23 +780,31 @@ function SwordIdleModal({ onClose, onSwordHit }: { onClose: () => void; onSwordH
     setTimeout(() => {
       setFloats((prev) => prev.filter((f) => f.id !== id))
     }, 700)
-    setBossHp((prev) => {
-      const next = Math.max(0, prev - amount)
-      if (next === 0 && prev > 0) {
-        spawnNextBoss()
-      }
-      return next
-    })
-  }, [spawnNextBoss, victory])
+    setBossHp((prev) => Math.max(0, prev - amount))
+  }, [victory])
+
+  useEffect(() => {
+    if (victory || bossHp > 0) return
+    if (bossClearLockRef.current) return
+    bossClearLockRef.current = true
+    spawnNextBoss()
+  }, [bossHp, spawnNextBoss, victory])
+
+  useEffect(() => {
+    if (bossHp > 0) {
+      bossClearLockRef.current = false
+    }
+  }, [bossHp])
 
   const handleHit = useCallback(() => {
     if (victory) return
     onSwordHit()
     const crit = Math.random() < critChance
+    const hitDamage = crit ? Math.ceil(clickDamage * 1.5) : clickDamage
     dealDamage(clickDamage, crit)
     if (Math.random() < oreChance) {
-      setGold((prev) => prev + 1)
-      queueStatus('Lucky drop: +1 gold')
+      setGold((prev) => prev + hitDamage)
+      queueStatus(`Lucky drop: +${hitDamage} gold`)
     }
   }, [clickDamage, critChance, dealDamage, onSwordHit, oreChance, queueStatus, victory])
 
@@ -828,8 +844,8 @@ function SwordIdleModal({ onClose, onSwordHit }: { onClose: () => void; onSwordH
       return
     }
     if (kind === 'hp') {
-      setPlayerMaxHp((prev) => prev + 10)
-      setPlayerHp((prev) => prev + 10)
+      setPlayerMaxHp((prev) => prev + 8)
+      setPlayerHp((prev) => prev + 8)
       setShopLevelHp((prev) => prev + 1)
       queueStatus('Max HP increased')
       return
@@ -852,7 +868,13 @@ function SwordIdleModal({ onClose, onSwordHit }: { onClose: () => void; onSwordH
       queueStatus('Totem of Undying acquired')
       return
     }
-    setOreChance((prev) => Math.min(0.35, prev + 0.02))
+    if (kind === 'minecart') {
+      setTntMinecarts((prev) => prev + 1)
+      setShopLevelMinecart((prev) => prev + 1)
+      queueStatus('TNT Minecart added to inventory')
+      return
+    }
+    setOreChance((prev) => Math.min(0.55, prev + 0.03))
     setShopLevelOre((prev) => prev + 1)
     queueStatus('Lucky drop chance increased')
   }, [costs, gold, queueStatus, victory])
@@ -870,6 +892,14 @@ function SwordIdleModal({ onClose, onSwordHit }: { onClose: () => void; onSwordH
     setPotions((prev) => prev + 1)
     queueStatus('Potion added to inventory')
   }, [gold, potionCost, queueStatus, victory])
+
+  const handleTntMinecart = useCallback(() => {
+    if (victory || tntMinecarts <= 0) return
+    const minecartDamage = Math.max(Math.ceil(maxHp * 0.24), clickDamage * SWORD_TNT_DAMAGE_MULTIPLIER)
+    setTntMinecarts((prev) => prev - 1)
+    dealDamage(minecartDamage, false)
+    queueStatus(`TNT Minecart detonated: -${minecartDamage} HP`)
+  }, [clickDamage, dealDamage, maxHp, queueStatus, tntMinecarts, victory])
 
   useEffect(() => {
     if (victory || dps <= 0) return
@@ -965,14 +995,12 @@ function SwordIdleModal({ onClose, onSwordHit }: { onClose: () => void; onSwordH
             </div>
           </div>
           <div className="sword-idle-info-card">
-            <p className="sword-idle-info-title">Build</p>
+            <p className="sword-idle-info-title">Inventory</p>
             <div className="sword-idle-kv-grid">
-              <span>Click</span><span>{clickDamage}</span>
-              <span>DPS</span><span>{dps}</span>
-              <span>GPS</span><span>{goldPerSecond}</span>
-              <span>Crit</span><span>{(critChance * 100).toFixed(0)}%</span>
-              <span>Armor</span><span>{armor}</span>
-              <span>Regen</span><span>{hpRegen}</span>
+              <span>Potions</span><span>{potions}</span>
+              <span>Totems</span><span>{totems}</span>
+              <span>Minecarts</span><span>{tntMinecarts}</span>
+              <span>Atk Speed</span><span>{(1000 / enemyAttackMs).toFixed(2)}/s</span>
             </div>
           </div>
         </div>
@@ -996,6 +1024,10 @@ function SwordIdleModal({ onClose, onSwordHit }: { onClose: () => void; onSwordH
             <span className="sword-idle-boss-fill" style={{ width: `${hpPct}%` }} />
           </div>
           <p className="sword-idle-bar-label sword-idle-bar-label--player">Your HP</p>
+          <div className="sword-idle-boss-row sword-idle-boss-row--player">
+            <span>Current</span>
+            <span className="sword-idle-boss-hp">{playerHp} / {playerMaxHp}</span>
+          </div>
           <div className="sword-idle-boss-bar sword-idle-boss-bar--player">
             <span className="sword-idle-boss-fill sword-idle-boss-fill--player" style={{ width: `${playerHpPct}%` }} />
           </div>
@@ -1016,6 +1048,9 @@ function SwordIdleModal({ onClose, onSwordHit }: { onClose: () => void; onSwordH
             <button type="button" className="sword-idle-hit-btn sword-idle-hit-btn--alt" onClick={handlePotion} disabled={victory || potions <= 0 || playerHp >= playerMaxHp}>
               USE POTION ({potions})
             </button>
+            <button type="button" className="sword-idle-hit-btn sword-idle-hit-btn--danger" onClick={handleTntMinecart} disabled={victory || tntMinecarts <= 0}>
+              TNT MINECART ({tntMinecarts})
+            </button>
           </div>
           <p className="sword-idle-help">Enemy HP bar is red. Your HP bar is green. Enemy attacks automatically.</p>
           <p className="sword-idle-status">{statusText}</p>
@@ -1027,47 +1062,47 @@ function SwordIdleModal({ onClose, onSwordHit }: { onClose: () => void; onSwordH
               <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('click')} disabled={gold < costs.click || victory}>
                 +1 Click Damage
                 <small>Boosts manual hit strength.</small>
-                <span>Cost: {costs.click}</span>
+                <span>Cost: {costs.click} | Current: {clickDamage}</span>
               </button>
               <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('dps')} disabled={gold < costs.dps || victory}>
                 +3 Passive Damage
                 <small>Auto damage every second.</small>
-                <span>Cost: {costs.dps}</span>
+                <span>Cost: {costs.dps} | Current: {dps}</span>
               </button>
               <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('crit')} disabled={gold < costs.crit || victory}>
                 +2% Crit Chance
                 <small>Raises chance for x1.5 hits.</small>
-                <span>Cost: {costs.crit}</span>
+                <span>Cost: {costs.crit} | Current: {(critChance * 100).toFixed(0)}%</span>
               </button>
               <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('ore')} disabled={gold < costs.ore || victory}>
-                +2% Lucky Drop
-                <small>Chance for +1 gold on hit.</small>
-                <span>Cost: {costs.ore}</span>
+                +3% Lucky Drop
+                <small>Chance for +{clickDamage} gold on hit.</small>
+                <span>Cost: {costs.ore} | Current: {(oreChance * 100).toFixed(0)}%</span>
               </button>
               <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('goldps')} disabled={gold < costs.goldps || victory}>
                 +3 Passive Gold
                 <small>Auto gold income per second.</small>
-                <span>Cost: {costs.goldps}</span>
+                <span>Cost: {costs.goldps} | Current: {goldPerSecond}</span>
               </button>
               <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('loot')} disabled={gold < costs.loot || victory}>
                 +8% Bounty Bonus
                 <small>More boss and chest rewards.</small>
-                <span>Cost: {costs.loot}</span>
+                <span>Cost: {costs.loot} | Current: x{lootBonus.toFixed(2)}</span>
               </button>
               <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('hp')} disabled={gold < costs.hp || victory}>
-                +10 Max HP
+                +8 Max HP
                 <small>Increases survival pool.</small>
-                <span>Cost: {costs.hp}</span>
+                <span>Cost: {costs.hp} | Current: {playerMaxHp}</span>
               </button>
               <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('armor')} disabled={gold < costs.armor || victory}>
-                +1 Armor
+                +4.5% Damage Reduction
                 <small>Reduces incoming damage.</small>
-                <span>Cost: {costs.armor}</span>
+                <span>Cost: {costs.armor} | Current: {armorReductionPct.toFixed(1)}%</span>
               </button>
               <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('regen')} disabled={gold < costs.regen || victory}>
                 +1 HP Regen
                 <small>Restores HP each second.</small>
-                <span>Cost: {costs.regen}</span>
+                <span>Cost: {costs.regen} | Current: {hpRegen}</span>
               </button>
           </div>
         </div>
@@ -1077,13 +1112,18 @@ function SwordIdleModal({ onClose, onSwordHit }: { onClose: () => void; onSwordH
           <div className="sword-idle-shop-grid sword-idle-shop-grid--items">
               <button type="button" className="sword-idle-shop-btn" onClick={handleBuyPotion} disabled={victory || gold < potionCost}>
                 +1 Potion
-                <small>Inventory heal item. Use any time.</small>
+                <small>Heals +{potionHeal} HP. Use any time.</small>
                 <span>Buy: {potionCost}g</span>
               </button>
               <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('totem')} disabled={gold < costs.totem || victory}>
                 +1 Totem
                 <small>Auto-revive once at lethal damage.</small>
                 <span>Cost: {costs.totem} | Owned: {totems}</span>
+              </button>
+              <button type="button" className="sword-idle-shop-btn" onClick={() => buyUpgrade('minecart')} disabled={gold < costs.minecart || victory}>
+                +1 TNT Minecart
+                <small>One-use explosive for massive burst damage.</small>
+                <span>Cost: {costs.minecart} | Owned: {tntMinecarts}</span>
               </button>
             </div>
           </div>

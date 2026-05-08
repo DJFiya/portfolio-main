@@ -1593,6 +1593,12 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   text-transform: uppercase;
 }
 
+.sword-idle-boss-row--player {
+  margin-top: 2px;
+  font-size: 0.62rem;
+  color: rgba(187, 247, 208, 0.92);
+}
+
 .sword-idle-bar-label {
   margin: 6px 0 3px;
   font-size: 0.58rem;
@@ -1719,6 +1725,16 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   background: #92400e;
 }
 
+.sword-idle-hit-btn--danger {
+  border-color: #ef4444;
+  background: #7f1d1d;
+  color: #fee2e2;
+}
+
+.sword-idle-hit-btn--danger:hover {
+  background: #991b1b;
+}
+
 .sword-idle-help {
   margin: 0;
   font-size: 0.64rem;
@@ -1784,13 +1800,18 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
 
 .sword-idle-shop-btn span {
   color: rgba(187, 247, 208, 0.8);
-  font-size: 0.56rem;
-  letter-spacing: 0.08em;
+  font-size: 0.5rem;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sword-idle-shop-btn small {
   color: rgba(226, 232, 240, 0.78);
-  font-size: 0.53rem;
+  font-size: 0.5rem;
   line-height: 1.25;
   letter-spacing: 0.02em;
   text-transform: none;
@@ -1812,7 +1833,7 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
 }
 
 .sword-idle-shop-grid--items {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .sword-idle-shop-btn--use {
