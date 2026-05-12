@@ -3,7 +3,7 @@ export default function BackCover() {
     <div
       className="relative w-full h-full"
       style={{
-        background: 'linear-gradient(155deg, #181824 0%, #0e0e18 55%, #1c1c26 100%)',
+        background: 'linear-gradient(155deg, #181a20 0%, #12141a 55%, #1c1e22 100%)',
         boxShadow: 'inset 2px 0 8px rgba(255,255,255,0.03)',
       }}
     >

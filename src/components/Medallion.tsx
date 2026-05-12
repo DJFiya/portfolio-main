@@ -40,14 +40,14 @@ const CFG: Record<
     valleyR: 20,
     diskR: 15,
     ringR: 12.5,
-    burstFill: '#1e3a8a',
-    diskFill: '#1e4fa0',
-    ringColor: '#93c5fd',
-    textColor: '#dbeafe',
+    burstFill: '#3d4854',
+    diskFill: '#4d5a68',
+    ringColor: '#8a9aa8',
+    textColor: '#e8ecf0',
     label: 'W',
     labelSize: 13,
     ribbon: true,
-    ribbonFill: '#1e3a8a',
+    ribbonFill: '#3d4854',
     ribbonH: 16,
   },
   silver: {
@@ -57,14 +57,14 @@ const CFG: Record<
     valleyR: 16,
     diskR: 12,
     ringR: 10,
-    burstFill: '#172554',
-    diskFill: '#1a3a7a',
-    ringColor: '#60a5fa',
-    textColor: '#bfdbfe',
+    burstFill: '#323a42',
+    diskFill: '#3d4854',
+    ringColor: '#708290',
+    textColor: '#dbe3e8',
     label: 'W',
     labelSize: 11,
     ribbon: true,
-    ribbonFill: '#172554',
+    ribbonFill: '#323a42',
     ribbonH: 13,
   },
   bronze: {
@@ -74,10 +74,10 @@ const CFG: Record<
     valleyR: 13,
     diskR: 9.5,
     ringR: 8,
-    burstFill: '#0f172a',
-    diskFill: '#0f172a',
-    ringColor: '#3b82f6',
-    textColor: '#93c5fd',
+    burstFill: '#2a3038',
+    diskFill: '#323a42',
+    ringColor: '#5a6b78',
+    textColor: '#c5d0d8',
     label: 'SF',
     labelSize: 8.5,
     ribbon: false,
@@ -124,11 +124,11 @@ export default function Medallion({ tier }: { tier: AwardTier }) {
           {/* Notch V at ribbon bottom */}
           <polygon
             points={`${cx - 8},${totalH - 0.5} ${cx - 4.75},${totalH - 5} ${cx - 1.5},${totalH - 0.5}`}
-            fill="#0f172a"
+            fill="#2a3038"
           />
           <polygon
             points={`${cx + 1.5},${totalH - 0.5} ${cx + 4.75},${totalH - 5} ${cx + 8},${totalH - 0.5}`}
-            fill="#0f172a"
+            fill="#2a3038"
           />
         </>
       )}
@@ -154,7 +154,7 @@ export default function Medallion({ tier }: { tier: AwardTier }) {
         y={cy + c.labelSize * 0.36}
         textAnchor="middle"
         fontSize={c.labelSize}
-        fontFamily="system-ui, sans-serif"
+        fontFamily="'Author', system-ui, sans-serif"
         fontWeight="700"
         fill={c.textColor}
         letterSpacing="-0.3"

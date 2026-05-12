@@ -37,7 +37,7 @@ export default function BookSpread({
         className="flex-shrink-0 z-10"
         style={{
           width: 20,
-          background: 'linear-gradient(to right, #0e0e18, #181824)',
+          background: 'linear-gradient(to right, #12141a, #181a20)',
           boxShadow: 'inset -3px 0 6px rgba(0,0,0,0.5)',
           borderRight: '1px solid rgba(255,255,255,0.04)',
         }}
@@ -165,7 +165,7 @@ export default function BookSpread({
         className="flex-shrink-0 z-10"
         style={{
           width: 20,
-          background: 'linear-gradient(to left, #0e0e18, #181824)',
+          background: 'linear-gradient(to left, #12141a, #181a20)',
           boxShadow: 'inset 3px 0 6px rgba(0,0,0,0.5)',
           borderLeft: '1px solid rgba(255,255,255,0.04)',
         }}

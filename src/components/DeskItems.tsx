@@ -1,6 +1,8 @@
 // Inline SVG desk-prop illustrations.
 // All coordinates are in their own viewBox; rendered width/height ≈1.5× the original.
 
+const FF_UI = "'Author', system-ui, sans-serif"
+
 // ── Terminal window ───────────────────────────────────────────────────────────
 export function TerminalItem({ hacking }: { hacking?: boolean }) {
   return (
@@ -13,21 +15,21 @@ export function TerminalItem({ hacking }: { hacking?: boolean }) {
       <circle cx="37" cy="10" r="4" fill="#28c840" opacity="0.75" />
       {hacking ? (
         <>
-          <text x="8" y="34" fontFamily="monospace" fontSize="7" fill="#22d3ee">$ sudo nmap -sV 10.0.0.0/24</text>
-          <text x="8" y="46" fontFamily="monospace" fontSize="6.3" fill="#67e8f9">  host 10.0.0.7  ports: 22,80,443 open</text>
-          <text x="8" y="60" fontFamily="monospace" fontSize="7" fill="#4ade80">$ ssh root@10.0.0.7</text>
-          <text x="8" y="72" fontFamily="monospace" fontSize="6.3" fill="#fca5a5">  ACCESS DENIED // key mismatch</text>
-          <text x="8" y="84" fontFamily="monospace" fontSize="6.8" fill="#22d3ee">  brute-force blocked [trace detected]</text>
-          <rect x="8" y="89" width="6" height="8" fill="#22d3ee" opacity="0.95" />
+          <text x="8" y="34" fontFamily={FF_UI} fontSize="7" fill="#8a9eb0">$ sudo nmap -sV 10.0.0.0/24</text>
+          <text x="8" y="46" fontFamily={FF_UI} fontSize="6.3" fill="#7a8fa0">  host 10.0.0.7  ports: 22,80,443 open</text>
+          <text x="8" y="60" fontFamily={FF_UI} fontSize="7" fill="#7a9e8a">$ ssh root@10.0.0.7</text>
+          <text x="8" y="72" fontFamily={FF_UI} fontSize="6.3" fill="#b0908a">  ACCESS DENIED // key mismatch</text>
+          <text x="8" y="84" fontFamily={FF_UI} fontSize="6.8" fill="#8a9eb0">  brute-force blocked [trace detected]</text>
+          <rect x="8" y="89" width="6" height="8" fill="#8a9eb0" opacity="0.95" />
         </>
       ) : (
         <>
-          <text x="8" y="34" fontFamily="monospace" fontSize="7" fill="#4ade80">$ npm run dev</text>
-          <text x="8" y="46" fontFamily="monospace" fontSize="7" fill="#6b7280">  ➜  localhost:5173</text>
-          <text x="8" y="60" fontFamily="monospace" fontSize="7" fill="#4ade80">$ git log --oneline</text>
-          <text x="8" y="72" fontFamily="monospace" fontSize="7" fill="#6b7280">a3f2c1b feat: page flip</text>
-          <text x="8" y="84" fontFamily="monospace" fontSize="7" fill="#6b7280">9e1d0f2 fix: board sync</text>
-          <rect x="8" y="89" width="6" height="8" fill="#60a5fa" opacity="0.85" />
+          <text x="8" y="34" fontFamily={FF_UI} fontSize="7" fill="#7a9e8a">$ npm run dev</text>
+          <text x="8" y="46" fontFamily={FF_UI} fontSize="7" fill="#6b7280">  ➜  localhost:5173</text>
+          <text x="8" y="60" fontFamily={FF_UI} fontSize="7" fill="#7a9e8a">$ git log --oneline</text>
+          <text x="8" y="72" fontFamily={FF_UI} fontSize="7" fill="#6b7280">a3f2c1b feat: page flip</text>
+          <text x="8" y="84" fontFamily={FF_UI} fontSize="7" fill="#6b7280">9e1d0f2 fix: board sync</text>
+          <rect x="8" y="89" width="6" height="8" fill="#708290" opacity="0.85" />
         </>
       )}
     </svg>
@@ -38,15 +40,15 @@ export function TerminalItem({ hacking }: { hacking?: boolean }) {
 export function BlueprintItem() {
   // Helper for connector lines
   const conn = (x1: number, y1: number, x2: number, y2: number, key: string) => (
-    <line key={key} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#93c5fd" strokeWidth="0.8" markerEnd="url(#arr)" />
+    <line key={key} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#8a9aa8" strokeWidth="0.8" markerEnd="url(#arr)" />
   )
   const box = (x: number, y: number, w: number, h: number, label: string, sub?: string) => (
     <g key={label}>
-      <rect x={x} y={y} width={w} height={h} rx="2" fill="#0a1e4a" stroke="#60a5fa" strokeWidth="0.9" />
+      <rect x={x} y={y} width={w} height={h} rx="2" fill="#1a2228" stroke="#5a6b78" strokeWidth="0.9" />
       <text x={x + w / 2} y={y + h / 2 + (sub ? -1.5 : 2.5)} textAnchor="middle"
-        fontFamily="monospace" fontSize="5.5" fontWeight="700" fill="#93c5fd">{label}</text>
+        fontFamily={FF_UI} fontSize="5.5" fontWeight="700" fill="#9aa8b3">{label}</text>
       {sub && <text x={x + w / 2} y={y + h / 2 + 5.5} textAnchor="middle"
-        fontFamily="monospace" fontSize="3.8" fill="#60a5fa" opacity="0.65">{sub}</text>}
+        fontFamily={FF_UI} fontSize="3.8" fill="#708290" opacity="0.65">{sub}</text>}
     </g>
   )
 
@@ -54,23 +56,23 @@ export function BlueprintItem() {
     <svg width="162" height="207" viewBox="0 0 108 138" fill="none">
       <defs>
         <marker id="arr" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto">
-          <path d="M0,0 L0,4 L4,2 Z" fill="#60a5fa" />
+          <path d="M0,0 L0,4 L4,2 Z" fill="#708290" />
         </marker>
       </defs>
 
       {/* Background grid */}
-      <rect width="108" height="138" fill="#071430" />
+      <rect width="108" height="138" fill="#12161a" />
       {[10,20,30,40,50,60,70,80,90,100,110,120,130].map(y =>
-        <line key={`gy${y}`} x1="0" y1={y} x2="108" y2={y} stroke="#1e3a8a" strokeWidth="0.3" opacity="0.4" />
+        <line key={`gy${y}`} x1="0" y1={y} x2="108" y2={y} stroke="#2a343c" strokeWidth="0.3" opacity="0.5" />
       )}
       {[10,20,30,40,50,60,70,80,90,100].map(x =>
-        <line key={`gx${x}`} x1={x} y1="0" x2={x} y2="138" stroke="#1e3a8a" strokeWidth="0.3" opacity="0.4" />
+        <line key={`gx${x}`} x1={x} y1="0" x2={x} y2="138" stroke="#2a343c" strokeWidth="0.3" opacity="0.5" />
       )}
 
       {/* Title bar */}
-      <rect width="108" height="12" fill="#0d2452" />
-      <text x="54" y="8.5" textAnchor="middle" fontFamily="monospace" fontSize="5.5"
-        fontWeight="700" fill="#60a5fa" letterSpacing="1">SYS ARCH v2</text>
+      <rect width="108" height="12" fill="#1a2228" />
+      <text x="54" y="8.5" textAnchor="middle" fontFamily={FF_UI} fontSize="5.5"
+        fontWeight="700" fill="#8a9aa8" letterSpacing="1">SYS ARCH v2</text>
 
       {/* Layer: Client */}
       {box(35, 18, 38, 14, 'CLIENT', 'browser')}
@@ -82,8 +84,8 @@ export function BlueprintItem() {
       {box(28, 40, 52, 14, 'API GATEWAY', 'REST / WS')}
 
       {/* Branch lines from gateway */}
-      <line x1="28" y1="47" x2="18" y2="47" stroke="#93c5fd" strokeWidth="0.8" />
-      <line x1="80" y1="47" x2="90" y2="47" stroke="#93c5fd" strokeWidth="0.8" />
+      <line x1="28" y1="47" x2="18" y2="47" stroke="#8a9aa8" strokeWidth="0.8" />
+      <line x1="80" y1="47" x2="90" y2="47" stroke="#8a9aa8" strokeWidth="0.8" />
       {conn(18, 47, 18, 60, 'gw-auth')}
       {conn(90, 47, 90, 60, 'gw-svc')}
       {conn(54, 54, 54, 60, 'gw-db')}
@@ -104,9 +106,9 @@ export function BlueprintItem() {
       {box(29, 84, 50, 14, 'QUEUE', 'async jobs')}
 
       {/* Footer stamp */}
-      <rect y="126" width="108" height="12" fill="#0d2452" />
-      <text x="54" y="134" textAnchor="middle" fontFamily="monospace" fontSize="4"
-        fill="#3b82f6" letterSpacing="0.5" opacity="0.7">DJ · REV-A · 2025</text>
+      <rect y="126" width="108" height="12" fill="#1a2228" />
+      <text x="54" y="134" textAnchor="middle" fontFamily={FF_UI} fontSize="4"
+        fill="#556b78" letterSpacing="0.5" opacity="0.85">DJ · REV-A · 2025</text>
     </svg>
   )
 }
@@ -120,7 +122,7 @@ export function StickersItem() {
     ['#FF9900', '#111',    'AWS'     ],
     ['#FFD43B', '#3776AB', 'Python'  ],
     ['#3178C6', '#fff',    'TS'      ],
-    ['#20232a', '#61DAFB', 'React'   ],
+    ['#20232a', '#7a9aa8', 'React'   ],
     ['#336791', '#fff',    'postgres'],
     ['#47A248', '#fff',    'Mongo'   ],
     ['#DC382D', '#fff',    'Redis'   ],
@@ -135,7 +137,7 @@ export function StickersItem() {
     ['#C21325', '#fff',    'Jest'    ],
     ['#1b1f23', '#fff',    'GitHub'  ],
     ['#111111', '#f0f0f0', 'Linux'   ],
-    ['#00ED64', '#0a1f0a', 'Atlas'   ],
+    ['#2a3830', '#dce8de', 'Atlas'   ],
   ]
 
   return (
@@ -166,7 +168,7 @@ export function StickersItem() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontFamily: 'monospace',
+            fontFamily: FF_UI,
             fontSize: '5.5px',
             fontWeight: 700,
             letterSpacing: '0.02em',
@@ -209,9 +211,9 @@ export function VinylItem() {
         <circle key={r} cx="44" cy="44" r={r} stroke="#1a1a1a" strokeWidth="1.2" />
       ))}
       <circle cx="44" cy="44" r="16" fill="#1a1a2e" />
-      <circle cx="44" cy="44" r="14" fill="none" stroke="#1e3a8a" strokeWidth="0.8" />
-      <text x="44" y="41" textAnchor="middle" fontFamily="sans-serif" fontSize="4.5" fill="#60a5fa" fontWeight="600">SIDE A</text>
-      <text x="44" y="49" textAnchor="middle" fontFamily="sans-serif" fontSize="3.5" fill="#3b82f6" opacity="0.7">◈ 33 RPM ◈</text>
+      <circle cx="44" cy="44" r="14" fill="none" stroke="#3d4f5c" strokeWidth="0.8" />
+      <text x="44" y="41" textAnchor="middle" fontFamily={FF_UI} fontSize="4.5" fill="#8a9aa8" fontWeight="600">SIDE A</text>
+      <text x="44" y="49" textAnchor="middle" fontFamily={FF_UI} fontSize="3.5" fill="#556b78" opacity="0.85">◈ 33 RPM ◈</text>
       <circle cx="44" cy="44" r="2.5" fill="#0d0f14" />
     </svg>
   )
@@ -223,8 +225,8 @@ export function CassetteItem() {
     <svg width="135" height="87" viewBox="0 0 90 58" fill="none">
       <rect x="1" y="1" width="88" height="56" rx="5" fill="#1a1a2e" stroke="#2a2a40" strokeWidth="1" />
       <rect x="8" y="6" width="74" height="28" rx="2" fill="#f0ede8" />
-      <text x="45" y="18" textAnchor="middle" fontFamily="sans-serif" fontSize="5.5" fontWeight="700" fill="#1a1a2e">SIDE A</text>
-      <text x="45" y="28" textAnchor="middle" fontFamily="sans-serif" fontSize="3.8" fill="#555">lo-fi · study vibes · vol. 1</text>
+      <text x="45" y="18" textAnchor="middle" fontFamily={FF_UI} fontSize="5.5" fontWeight="700" fill="#1a1a2e">SIDE A</text>
+      <text x="45" y="28" textAnchor="middle" fontFamily={FF_UI} fontSize="3.8" fill="#555">lo-fi · study vibes · vol. 1</text>
       <circle cx="30" cy="45" r="10" fill="#0d0f14" stroke="#333" strokeWidth="1" />
       <circle cx="60" cy="45" r="10" fill="#0d0f14" stroke="#333" strokeWidth="1" />
       {[0, 120, 240].map((deg) => (
@@ -252,14 +254,14 @@ export function ControllerItem() {
         fill="#1a1a2e" stroke="#2a2a40" strokeWidth="1" />
       <rect x="20" y="37" width="5" height="14" rx="1" fill="#2a2a40" />
       <rect x="15" y="42" width="14" height="5" rx="1" fill="#2a2a40" />
-      <circle cx="72" cy="36" r="4.5" fill="#1e4fa0" opacity="0.9" />
-      <circle cx="80" cy="42" r="4.5" fill="#172554" opacity="0.9" />
-      <circle cx="72" cy="48" r="4.5" fill="#1e3a8a" opacity="0.9" />
-      <circle cx="64" cy="42" r="4.5" fill="#1a3a7a" opacity="0.9" />
-      <text x="72" y="39" textAnchor="middle" fontFamily="sans-serif" fontSize="5" fill="#93c5fd">▲</text>
-      <text x="80" y="45" textAnchor="middle" fontFamily="sans-serif" fontSize="5" fill="#93c5fd">●</text>
-      <text x="72" y="51" textAnchor="middle" fontFamily="sans-serif" fontSize="5" fill="#93c5fd">✕</text>
-      <text x="64" y="45" textAnchor="middle" fontFamily="sans-serif" fontSize="5" fill="#93c5fd">■</text>
+      <circle cx="72" cy="36" r="4.5" fill="#3d4f5c" opacity="0.95" />
+      <circle cx="80" cy="42" r="4.5" fill="#2f3d47" opacity="0.95" />
+      <circle cx="72" cy="48" r="4.5" fill="#243038" opacity="0.95" />
+      <circle cx="64" cy="42" r="4.5" fill="#2a343c" opacity="0.95" />
+      <text x="72" y="39" textAnchor="middle" fontFamily={FF_UI} fontSize="5" fill="#9aa8b3">▲</text>
+      <text x="80" y="45" textAnchor="middle" fontFamily={FF_UI} fontSize="5" fill="#9aa8b3">●</text>
+      <text x="72" y="51" textAnchor="middle" fontFamily={FF_UI} fontSize="5" fill="#9aa8b3">✕</text>
+      <text x="64" y="45" textAnchor="middle" fontFamily={FF_UI} fontSize="5" fill="#9aa8b3">■</text>
       <circle cx="35" cy="48" r="7" fill="#111" stroke="#333" strokeWidth="1" />
       <circle cx="58" cy="48" r="7" fill="#111" stroke="#333" strokeWidth="1" />
       <rect x="43" y="32" width="7" height="4" rx="2" fill="#222" />
@@ -282,7 +284,7 @@ export function PoemItem() {
         const y = 24 + i * 8 + (i >= 4 ? 5 : 0) + (i >= 7 ? 5 : 0)
         return <line key={i} x1="8" y1={y} x2={w} y2={y} stroke="#555" strokeWidth="0.75" opacity="0.7" />
       })}
-      <text x="38" y="104" textAnchor="middle" fontFamily="serif" fontSize="10" fill="#999" opacity="0.4">※</text>
+      <text x="38" y="104" textAnchor="middle" fontFamily="'Rosaline', Georgia, serif" fontSize="10" fill="#999" opacity="0.4">※</text>
     </svg>
   )
 }
@@ -344,45 +346,42 @@ interface PosterTheme {
 }
 
 const POSTER_THEMES: Record<string, PosterTheme> = {
-  // ATLA: Aang's robes + fire nation intensity → warm orange
+  // ATLA: warm earth tones — terracotta & smoke
   ATLA: {
-    bg: '#1a0800',
-    accent: '#f97316',
+    bg: '#18100a',
+    accent: '#b87848',
     lines: [
-      { text: 'AVATAR',     size: 9   },
-      { text: 'THE LAST',   size: 8.5 },
-      { text: 'AIRBENDER',  size: 7   },
+      { text: 'AVATAR',     size: 7.5 },
+      { text: 'THE LAST',   size: 7   },
+      { text: 'AIRBENDER',  size: 5.8 },
     ],
     sub: '— animated —',
   },
-  // Invincible: blue suit + yellow logo — the show's iconic palette
   Invincible: {
-    bg: '#38bdf8',
-    accent: '#020b18',
+    bg: '#161e2c',
+    accent: '#c8a85a',
     lines: [
-      { text: 'INVINCIBLE', size: 8 },
+      { text: 'INVINCIBLE', size: 6.5 },
     ],
     sub: '★ series ★',
   },
-  // Dead Poets Society: warm amber candlelight / autumn leaves
   'Dead Poets': {
-    bg: '#100900',
-    accent: '#f59e0b',
+    bg: '#100c06',
+    accent: '#b08840',
     lines: [
-      { text: 'DEAD',    size: 13  },
-      { text: 'POETS',   size: 13  },
-      { text: 'SOCIETY', size: 9   },
+      { text: 'DEAD',    size: 11  },
+      { text: 'POETS',   size: 11  },
+      { text: 'SOCIETY', size: 7.5 },
     ],
     sub: '· carpe diem ·',
   },
-  // Good Will Hunting: Boston-night deep blue / intellectual cool
   'Good Will Hunting': {
-    bg: '#020b18',
-    accent: '#38bdf8',
+    bg: '#0e1620',
+    accent: '#7898b0',
     lines: [
-      { text: 'GOOD',    size: 13  },
-      { text: 'WILL',    size: 13  },
-      { text: 'HUNTING', size: 9.5 },
+      { text: 'GOOD',    size: 11  },
+      { text: 'WILL',    size: 11  },
+      { text: 'HUNTING', size: 8   },
     ],
     sub: '— 1997 —',
   },
@@ -390,7 +389,7 @@ const POSTER_THEMES: Record<string, PosterTheme> = {
 
 export function PosterItem({ label }: { label: string }) {
   const theme = POSTER_THEMES[label] ?? {
-    bg: '#111', accent: '#60a5fa',
+    bg: '#111', accent: '#9aa8b3',
     lines: [{ text: label, size: 9 }],
     sub: '',
   }
@@ -415,7 +414,7 @@ export function PosterItem({ label }: { label: string }) {
           x="34"
           y={blockTop + i * 16 + line.size * 0.85}
           textAnchor="middle"
-          fontFamily="serif"
+          fontFamily="'Rowan', Georgia, serif"
           fontSize={line.size}
           fontWeight="700"
           fill={theme.accent}
@@ -427,17 +426,17 @@ export function PosterItem({ label }: { label: string }) {
 
       {/* Divider */}
       <line x1="18" y1={blockTop + theme.lines.length * 16 + 3} x2="50" y2={blockTop + theme.lines.length * 16 + 3}
-        stroke={theme.accent} strokeWidth="0.5" opacity="0.4" />
+        stroke={theme.accent} strokeWidth="0.5" opacity="0.35" />
 
       {/* Sub label */}
       <text
         x="34"
         y={blockTop + theme.lines.length * 16 + 12}
         textAnchor="middle"
-        fontFamily="serif"
+        fontFamily="'Author', system-ui, sans-serif"
         fontSize="4.8"
         fill={theme.accent}
-        opacity="0.65"
+        opacity="0.6"
         letterSpacing="0.4"
       >
         {theme.sub}
@@ -471,20 +470,20 @@ export function LaptopItem() {
       <g clipPath="url(#laptop-screen-clip)">
         <g className="laptop-log-stack">
           <g className="laptop-log-page laptop-log-page--current">
-            <text x="20" y="24" fontFamily="monospace" fontSize="7.5" fill="#4ade80">$ npm run dev</text>
-            <text x="20" y="37" fontFamily="monospace" fontSize="7" fill="#6b7280">  VITE v5  ready in 209ms</text>
-            <text x="20" y="50" fontFamily="monospace" fontSize="6.5" fill="#60a5fa">  ➜  http://localhost:5173/</text>
-            <text x="20" y="63" fontFamily="monospace" fontSize="6.5" fill="#4ade80">$ git log --oneline</text>
-            <text x="20" y="74" fontFamily="monospace" fontSize="6.5" fill="#6b7280">  a3f2c1 feat: board anim</text>
-            <text x="20" y="85" fontFamily="monospace" fontSize="6.5" fill="#6b7280">  9e1d0f fix: page flip</text>
+            <text x="20" y="24" fontFamily={FF_UI} fontSize="7.5" fill="#7a9e8a">$ npm run dev</text>
+            <text x="20" y="37" fontFamily={FF_UI} fontSize="7" fill="#6b7280">  VITE v5  ready in 209ms</text>
+            <text x="20" y="50" fontFamily={FF_UI} fontSize="6.5" fill="#708290">  ➜  http://localhost:5173/</text>
+            <text x="20" y="63" fontFamily={FF_UI} fontSize="6.5" fill="#7a9e8a">$ git log --oneline</text>
+            <text x="20" y="74" fontFamily={FF_UI} fontSize="6.5" fill="#6b7280">  a3f2c1 feat: board anim</text>
+            <text x="20" y="85" fontFamily={FF_UI} fontSize="6.5" fill="#6b7280">  9e1d0f fix: page flip</text>
           </g>
           <g className="laptop-log-page laptop-log-page--next">
-            <text x="20" y="108" fontFamily="monospace" fontSize="7.5" fill="#4ade80">$ npm run build</text>
-            <text x="20" y="121" fontFamily="monospace" fontSize="7" fill="#6b7280">  transforming modules...</text>
-            <text x="20" y="134" fontFamily="monospace" fontSize="6.5" fill="#6b7280">  rendering chunks...</text>
-            <text x="20" y="147" fontFamily="monospace" fontSize="6.5" fill="#4ade80">✓ built in 1.1s</text>
-            <text x="20" y="158" fontFamily="monospace" fontSize="6.5" fill="#60a5fa">$ git push origin main</text>
-            <text x="20" y="169" fontFamily="monospace" fontSize="6.5" fill="#6b7280">Everything up-to-date</text>
+            <text x="20" y="108" fontFamily={FF_UI} fontSize="7.5" fill="#7a9e8a">$ npm run build</text>
+            <text x="20" y="121" fontFamily={FF_UI} fontSize="7" fill="#6b7280">  transforming modules...</text>
+            <text x="20" y="134" fontFamily={FF_UI} fontSize="6.5" fill="#6b7280">  rendering chunks...</text>
+            <text x="20" y="147" fontFamily={FF_UI} fontSize="6.5" fill="#7a9e8a">✓ built in 1.1s</text>
+            <text x="20" y="158" fontFamily={FF_UI} fontSize="6.5" fill="#708290">$ git push origin main</text>
+            <text x="20" y="169" fontFamily={FF_UI} fontSize="6.5" fill="#6b7280">Everything up-to-date</text>
           </g>
         </g>
       </g>
@@ -522,10 +521,10 @@ export function LaptopItem() {
       <rect x="221" y="173" width="24" height={keyH} rx="1.5" fill="#2a2a2c" stroke="#3a3a3c" strokeWidth="0.35" />
 
       {/* Click glow targets: W, A, S, D */}
-      <rect className="laptop-key-glow laptop-key-glow--w" x="33.5" y="137" width="18" height={keyH} rx="1.5" fill="none" stroke="#67e8f9" strokeWidth="1.1" />
-      <rect className="laptop-key-glow laptop-key-glow--a" x="21" y="149" width="18.5" height={keyH} rx="1.5" fill="none" stroke="#67e8f9" strokeWidth="1.1" />
-      <rect className="laptop-key-glow laptop-key-glow--s" x="41" y="149" width="18.5" height={keyH} rx="1.5" fill="none" stroke="#67e8f9" strokeWidth="1.1" />
-      <rect className="laptop-key-glow laptop-key-glow--d" x="61" y="149" width="18.5" height={keyH} rx="1.5" fill="none" stroke="#67e8f9" strokeWidth="1.1" />
+      <rect className="laptop-key-glow laptop-key-glow--w" x="33.5" y="137" width="18" height={keyH} rx="1.5" fill="none" stroke="#8a9aa8" strokeWidth="1.1" />
+      <rect className="laptop-key-glow laptop-key-glow--a" x="21" y="149" width="18.5" height={keyH} rx="1.5" fill="none" stroke="#8a9aa8" strokeWidth="1.1" />
+      <rect className="laptop-key-glow laptop-key-glow--s" x="41" y="149" width="18.5" height={keyH} rx="1.5" fill="none" stroke="#8a9aa8" strokeWidth="1.1" />
+      <rect className="laptop-key-glow laptop-key-glow--d" x="61" y="149" width="18.5" height={keyH} rx="1.5" fill="none" stroke="#8a9aa8" strokeWidth="1.1" />
 
       {/* Trackpad */}
       <rect x="88" y="184" width="84" height="14" rx="5" fill="#232325" stroke="#3a3a3c" strokeWidth="0.4" />
@@ -545,23 +544,25 @@ export function LaptopItem() {
 export function DiamondSwordItem() {
   const P = 10 // px per pixel → 160×160 total
 
+  // Authentic Minecraft diamond sword palette — no neon
+  // Blade: muted teal spectrum | Guard/handle: warm wood browns
   const px: [number, number, string][] = [
-    [13,0,'#143b38'],[14,0,'#0d3e3a'],[15,0,'#0d3f36'],
-    [12,1,'#084234'],[13,1,'#adfef7'],[14,1,'#a0fff2'],[15,1,'#0c251f'],
-    [11,2,'#0e4035'],[12,2,'#aafcf0'],[13,2,'#31c9b0'],[14,2,'#acfff5'],[15,2,'#0f2523'],
-    [10,3,'#0d3f34'],[11,3,'#a6fcf1'],[12,3,'#28c8ae'],[13,3,'#aafaf1'],[14,3,'#072722'],
-    [9,4,'#084234'],[10,4,'#a9fbef'],[11,4,'#28c8ae'],[12,4,'#33ebc9'],[13,4,'#00291d'],
-    [8,5,'#133c36'],[9,5,'#a2fff8'],[10,5,'#2bc7af'],[11,5,'#36e9cc'],[12,5,'#0c231d'],
-    [2,6,'#0b3e37'],[3,6,'#0c3e35'],[7,6,'#094334'],[8,6,'#31edcc'],[9,6,'#33c9b0'],[10,6,'#2de8c9'],[11,6,'#082823'],
-    [2,7,'#0b3e37'],[3,7,'#196155'],[4,7,'#0b4036'],[6,7,'#094334'],[7,7,'#3de5cc'],[8,7,'#2cc6ac'],[9,7,'#30eccb'],[10,7,'#002b21'],
-    [3,8,'#0d3f34'],[4,8,'#1f8a78'],[5,8,'#07261e'],[6,8,'#2eedcb'],[7,8,'#238878'],[8,8,'#2feccc'],[9,8,'#0c231b'],
-    [3,9,'#0d3f34'],[4,9,'#1f8a78'],[5,9,'#23907d'],[6,9,'#1a614f'],[7,9,'#30ebcc'],[8,9,'#0c231b'],
-    [4,10,'#084233'],[5,10,'#146255'],[6,10,'#123b33'],[7,10,'#012b1d'],
-    [3,11,'#463718'],[4,11,'#694e19'],[5,11,'#06271e'],[6,11,'#0d3f36'],[7,11,'#0d3f36'],[8,11,'#0a2520'],
-    [2,12,'#4a3812'],[3,12,'#8a6820'],[4,12,'#271e0f'],[6,12,'#082520'],[7,12,'#082520'],[8,12,'#0d3f36'],[9,12,'#0b2621'],
-    [0,13,'#103d38'],[1,13,'#0c3f3a'],[2,13,'#6a4c1a'],[3,13,'#291e0a'],[8,13,'#092621'],[9,13,'#05261f'],
-    [0,14,'#0f3c39'],[1,14,'#116454'],[2,14,'#082721'],
-    [0,15,'#06271e'],[1,15,'#062720'],[2,15,'#07281f'],
+    [13,0,'#0c2c26'],[14,0,'#0a2820'],[15,0,'#0a2820'],
+    [12,1,'#082820'],[13,1,'#7ec0b6'],[14,1,'#7ec0b6'],[15,1,'#081c16'],
+    [11,2,'#0c2820'],[12,2,'#7ec0b6'],[13,2,'#267a6c'],[14,2,'#7ec0b6'],[15,2,'#0a1e1c'],
+    [10,3,'#0a2820'],[11,3,'#7ec0b6'],[12,3,'#267a6c'],[13,3,'#7ec0b6'],[14,3,'#061e16'],
+    [9,4,'#082820'],[10,4,'#7ec0b6'],[11,4,'#267a6c'],[12,4,'#369086'],[13,4,'#001c14'],
+    [8,5,'#0c2820'],[9,5,'#7ec0b6'],[10,5,'#267a6c'],[11,5,'#369086'],[12,5,'#0a1c10'],
+    [2,6,'#0a2820'],[3,6,'#0a2820'],[7,6,'#082820'],[8,6,'#369086'],[9,6,'#267a6c'],[10,6,'#369086'],[11,6,'#061e16'],
+    [2,7,'#0a2820'],[3,7,'#18604e'],[4,7,'#0a2820'],[6,7,'#082820'],[7,7,'#369086'],[8,7,'#267a6c'],[9,7,'#369086'],[10,7,'#021816'],
+    [3,8,'#0a2820'],[4,8,'#18604e'],[5,8,'#061e16'],[6,8,'#369086'],[7,8,'#18604e'],[8,8,'#369086'],[9,8,'#0a1814'],
+    [3,9,'#0a2820'],[4,9,'#18604e'],[5,9,'#18604e'],[6,9,'#154a3c'],[7,9,'#369086'],[8,9,'#0a1814'],
+    [4,10,'#082820'],[5,10,'#154a3c'],[6,10,'#0e2c22'],[7,10,'#021816'],
+    [3,11,'#3e2e14'],[4,11,'#5c3e18'],[5,11,'#061e16'],[6,11,'#0a2820'],[7,11,'#0a2820'],[8,11,'#081818'],
+    [2,12,'#3a2c10'],[3,12,'#785618'],[4,12,'#201608'],[6,12,'#081818'],[7,12,'#081818'],[8,12,'#0a2820'],[9,12,'#081e18'],
+    [0,13,'#0c2c28'],[1,13,'#0a2a26'],[2,13,'#5c3e18'],[3,13,'#201608'],[8,13,'#081e18'],[9,13,'#061e18'],
+    [0,14,'#0c2a26'],[1,14,'#124c42'],[2,14,'#061e18'],
+    [0,15,'#061e18'],[1,15,'#061e18'],[2,15,'#061e18'],
   ]
 
   return (
@@ -590,21 +591,21 @@ export function D20Item({ value }: { value?: number }) {
   const fs = value !== undefined && value >= 10 ? 13 : 14
   return (
     <svg width="65" height="65" viewBox="0 0 65 65" fill="none">
-      <polygon points={outerPts} fill="#1e3a8a" stroke="#60a5fa" strokeWidth="1.5" />
+      <polygon points={outerPts} fill="#2f3d47" stroke="#5a6b78" strokeWidth="1.5" />
       {verts.map(([x, y], i) => (
         <line key={i} x1={cx} y1={cy} x2={x} y2={y}
-          stroke="#93c5fd" strokeWidth="0.8" opacity="0.45" />
+          stroke="#8a9aa8" strokeWidth="0.8" opacity="0.45" />
       ))}
       {(() => {
         const inner = Array.from({ length: 5 }, (_, i) => {
           const a = (Math.PI * 2 * i) / 5 - Math.PI / 2
           return `${(cx + 12 * Math.cos(a)).toFixed(1)},${(cy + 12 * Math.sin(a)).toFixed(1)}`
         }).join(' ')
-        return <polygon points={inner} fill="none" stroke="#93c5fd" strokeWidth="0.6" opacity="0.3" />
+        return <polygon points={inner} fill="none" stroke="#708290" strokeWidth="0.6" opacity="0.35" />
       })()}
       {value !== undefined && (
-        <text x={cx} y={cy + 5.5} textAnchor="middle" fontFamily="serif"
-          fontSize={fs} fontWeight="700" fill="#bfdbfe" letterSpacing="-0.5">{value}</text>
+        <text x={cx} y={cy + 5.5} textAnchor="middle" fontFamily="'Rowan', Georgia, serif"
+          fontSize={fs} fontWeight="700" fill="#dbe3e8" letterSpacing="-0.5">{value}</text>
       )}
     </svg>
   )
@@ -623,11 +624,11 @@ export function D12Item({ value }: { value?: number }) {
   const fs = value !== undefined && value >= 10 ? 9.5 : 11
   return (
     <svg width="60" height="60" viewBox="0 0 40 40" fill="none">
-      <polygon points={pts} fill="#172554" stroke="#60a5fa" strokeWidth="1.5" />
-      <polygon points={inner} fill="none" stroke="#93c5fd" strokeWidth="0.7" opacity="0.4" />
+      <polygon points={pts} fill="#243038" stroke="#5a6b78" strokeWidth="1.5" />
+      <polygon points={inner} fill="none" stroke="#708290" strokeWidth="0.7" opacity="0.4" />
       {value !== undefined && (
-        <text x="20" y="24" textAnchor="middle" fontFamily="serif"
-          fontSize={fs} fontWeight="700" fill="#bfdbfe">{value}</text>
+        <text x="20" y="24" textAnchor="middle" fontFamily="'Rowan', Georgia, serif"
+          fontSize={fs} fontWeight="700" fill="#dbe3e8">{value}</text>
       )}
     </svg>
   )
@@ -647,9 +648,9 @@ export function D6Item({ value }: { value?: number }) {
   const dots = value !== undefined ? (D6_DOTS[value] ?? []) : []
   return (
     <svg width="54" height="54" viewBox="0 0 36 36" fill="none">
-      <rect x="1" y="1" width="34" height="34" rx="5" fill="#1e3a8a" stroke="#60a5fa" strokeWidth="1.5" />
+      <rect x="1" y="1" width="34" height="34" rx="5" fill="#2f3d47" stroke="#5a6b78" strokeWidth="1.5" />
       {dots.map(([cx, cy], i) => (
-        <circle key={i} cx={cx} cy={cy} r="2.5" fill="#93c5fd" />
+        <circle key={i} cx={cx} cy={cy} r="2.5" fill="#9aa8b3" />
       ))}
     </svg>
   )

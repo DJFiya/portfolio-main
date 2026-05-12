@@ -4,14 +4,14 @@ import HangTag from '../HangTag'
 
 const data = rawData as unknown as PortfolioData
 
-// Cycling blue palette — light fills, darker strokes
+// Cycling accent palette — muted fills, calm strokes (matches tailwind `azure`)
 const TAG_PALETTE = [
-  { fill: '#dbeafe', stroke: '#1e4fa0' },
-  { fill: '#bfdbfe', stroke: '#1a3a7a' },
-  { fill: '#eff6ff', stroke: '#2563c2' },
-  { fill: '#e0effe', stroke: '#1e4fa0' },
-  { fill: '#c8d8f8', stroke: '#0f2358' },
-  { fill: '#d4e8ff', stroke: '#2563c2' },
+  { fill: '#dbe3e8', stroke: '#2f3d47' },
+  { fill: '#c5d0d8', stroke: '#3d4f5c' },
+  { fill: '#eef2f5', stroke: '#556b78' },
+  { fill: '#d4dce2', stroke: '#2f3d47' },
+  { fill: '#b8c4cc', stroke: '#243038' },
+  { fill: '#ccd6dd', stroke: '#556b78' },
 ]
 
 const ROTATIONS = [-4, 3, -2, 5, -3, 4, -1, 2, -5, 3, -2, 4]

@@ -7,46 +7,47 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Primary palette — neutral grayscale
+        // Primary palette — warm neutral grayscale
         ink: {
-          950: '#0a0a0b',
-          900: '#111113',
-          800: '#1c1c20',
-          700: '#2a2a30',
-          600: '#3d3d45',
-          500: '#5a5a66',
-          400: '#7a7a88',
-          300: '#a0a0b0',
-          200: '#c8c8d8',
-          100: '#e8e8f0',
-          50:  '#f4f4f8',
+          950: '#111014',
+          900: '#18181c',
+          800: '#222226',
+          700: '#2e2e34',
+          600: '#42424a',
+          500: '#5c5c66',
+          400: '#787884',
+          300: '#9c9ca8',
+          200: '#c4c4ce',
+          100: '#e6e6ec',
+          50:  '#f3f3f6',
         },
-        // Accent — blue scale only
+        // Accent — desaturated slate-blue (calm on paper and on dark UI)
         azure: {
-          950: '#0d1b3e',
-          900: '#0f2358',
-          800: '#1a3a7a',
-          700: '#1e4fa0',
-          600: '#2563c2',
-          500: '#3b82f6',
-          400: '#60a5fa',
-          300: '#93c5fd',
-          200: '#bfdbfe',
-          100: '#dbeafe',
-          50:  '#eff6ff',
+          950: '#14191d',
+          900: '#1a2228',
+          800: '#243038',
+          700: '#2f3d47',
+          600: '#3d4f5c',
+          500: '#556b78',
+          400: '#708290',
+          300: '#8f9faa',
+          200: '#b4c0c9',
+          100: '#dbe3e8',
+          50:  '#eef2f5',
         },
         // Page / paper tones
         page: {
-          dark: '#f0ede8',
-          light: '#faf8f5',
-          line: '#e2ddd8',
+          dark: '#efeae4',
+          light: '#faf7f2',
+          line: '#e0d9d2',
         },
       },
       fontFamily: {
         rowan:    ['"Rowan"', 'Georgia', 'serif'],
         rosaline: ['"Rosaline"', 'Georgia', 'serif'],
         author:   ['"Author"', 'system-ui', 'sans-serif'],
-        mono:     ['"JetBrains Mono"', '"Fira Code"', 'monospace'],
+        // No separate mono file in /public/fonts — Author reads cleanly at small sizes
+        mono:     ['"Author"', 'ui-monospace', 'monospace'],
       },
       boxShadow: {
         book:  '8px 8px 24px rgba(0,0,0,0.55), 2px 2px 8px rgba(0,0,0,0.35)',

@@ -40,9 +40,9 @@
   }
 
   body {
-    background-color: #0a0a0b;
-    color: #f4f4f8;
-    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #111014;
+    color: #f3f3f6;
+    font-family: 'Author', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -148,16 +148,16 @@
 
   /* ── Dice critical hit / fail effects ───────────────────────────────────── */
   @keyframes crit-glow-hit {
-    0%   { filter: drop-shadow(0 0 0px  #f59e0b); }
-    10%  { filter: drop-shadow(0 0 16px #fbbf24) drop-shadow(0 0 8px #f59e0b); }
-    55%  { filter: drop-shadow(0 0 10px #fbbf24); }
-    100% { filter: drop-shadow(0 0 0px  #f59e0b); }
+    0%   { filter: drop-shadow(0 0 0px  #9a8060); }
+    10%  { filter: drop-shadow(0 0 10px #b8a078) drop-shadow(0 0 5px #8a7358); }
+    55%  { filter: drop-shadow(0 0 6px #a89070); }
+    100% { filter: drop-shadow(0 0 0px  #9a8060); }
   }
   @keyframes crit-glow-fail {
-    0%   { filter: drop-shadow(0 0 0px  #ef4444); }
-    10%  { filter: drop-shadow(0 0 16px #f87171) drop-shadow(0 0 8px #ef4444); }
-    55%  { filter: drop-shadow(0 0 10px #ef4444); }
-    100% { filter: drop-shadow(0 0 0px  #ef4444); }
+    0%   { filter: drop-shadow(0 0 0px  #9a6a62); }
+    10%  { filter: drop-shadow(0 0 10px #b89088) drop-shadow(0 0 5px #8a5c54); }
+    55%  { filter: drop-shadow(0 0 6px #a07870); }
+    100% { filter: drop-shadow(0 0 0px  #9a6a62); }
   }
   @keyframes crit-label {
     0%   { opacity: 0; transform: translateX(-50%) translateY(4px) scale(0.75); }
@@ -185,12 +185,12 @@
     animation: crit-label 2.6s ease-out forwards;
   }
   .dice-crit-label--hit  {
-    color: #fbbf24;
-    text-shadow: 0 0 6px #f59e0b, 0 0 14px #f59e0b99;
+    color: #c4a882;
+    text-shadow: 0 0 4px rgba(154, 128, 96, 0.45);
   }
   .dice-crit-label--fail {
-    color: #f87171;
-    text-shadow: 0 0 6px #ef4444, 0 0 14px #ef444499;
+    color: #c49a92;
+    text-shadow: 0 0 4px rgba(154, 108, 100, 0.45);
   }
 
   /* ── Desk item hover expand ─────────────────────────────────────────────── */
@@ -207,10 +207,10 @@
 
   /* ── Laptop click-only interaction ────────────────────────────────────────── */
   @keyframes laptop-key-outline-glow {
-    0%   { opacity: 0; filter: drop-shadow(0 0 0 rgba(103, 232, 249, 0)); }
-    28%  { opacity: 1; filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.9)); }
-    64%  { opacity: 0.7; filter: drop-shadow(0 0 8px rgba(74, 222, 128, 0.75)); }
-    100% { opacity: 0; filter: drop-shadow(0 0 0 rgba(74, 222, 128, 0)); }
+    0%   { opacity: 0; filter: drop-shadow(0 0 0 rgba(130, 145, 158, 0)); }
+    28%  { opacity: 1; filter: drop-shadow(0 0 4px rgba(115, 132, 148, 0.55)); }
+    64%  { opacity: 0.7; filter: drop-shadow(0 0 6px rgba(120, 138, 128, 0.4)); }
+    100% { opacity: 0; filter: drop-shadow(0 0 0 rgba(120, 138, 128, 0)); }
   }
 
   .desk-item--laptop {
@@ -232,8 +232,8 @@
   border-radius: 6px;
   background: repeating-linear-gradient(
     to bottom,
-    rgba(34, 211, 238, 0.12) 0px,
-    rgba(34, 211, 238, 0.12) 2px,
+    rgba(120, 138, 152, 0.12) 0px,
+    rgba(120, 138, 152, 0.12) 2px,
     transparent 2px,
     transparent 5px
   );
@@ -311,7 +311,7 @@
   position: fixed;
   border-radius: 0;
   background:
-    linear-gradient(90deg, #e2e8f0 0 34%, #7dd3fc 34% 67%, #0ea5e9 67% 100%);
+    linear-gradient(90deg, #e2e4e8 0 34%, #9eb0bc 34% 67%, #6d7d8a 67% 100%);
   box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.35);
   image-rendering: pixelated;
   animation: reality-shard-rise 1.3s steps(5, end) forwards;
@@ -417,7 +417,7 @@
 
 .cassette-note {
   position: fixed;
-  font-family: serif;
+  font-family: 'Rosaline', Georgia, serif;
   /* color is set inline per note */
   text-shadow:
     0 0 6px currentColor,
@@ -433,8 +433,8 @@
 
 /* Pulsing glow on the cassette while it's playing */
 @keyframes cassette-playing-glow {
-  0%, 100% { filter: drop-shadow(0 0 4px rgba(167, 139, 250, 0.5)); }
-  50%       { filter: drop-shadow(0 0 12px rgba(244, 114, 182, 0.7)) drop-shadow(0 0 6px rgba(167, 139, 250, 0.5)); }
+  0%, 100% { filter: drop-shadow(0 0 3px rgba(140, 130, 160, 0.28)); }
+  50%       { filter: drop-shadow(0 0 8px rgba(160, 145, 175, 0.38)); }
 }
 .cassette-playing {
   animation: cassette-playing-glow 1.8s ease-in-out infinite;
@@ -462,7 +462,7 @@
     0 0 32px rgba(29, 185, 84, 0.08);
   z-index: 99997;
   animation: cassette-player-in 0.3s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
-  font-family: 'Author', 'Inter', sans-serif;
+  font-family: 'Author', system-ui, sans-serif;
 }
 
 .cassette-player-header {
@@ -542,7 +542,7 @@
   line-height: 1.5;
 }
 .cassette-player-placeholder code {
-  font-family: monospace;
+  font-family: 'Author', ui-monospace, monospace;
   font-size: 10px;
   color: #1DB954;
   background: rgba(29, 185, 84, 0.1);
@@ -584,7 +584,7 @@
     0 24px 64px rgba(0, 0, 0, 0.72),
     0 0 40px rgba(29, 185, 84, 0.06);
   animation: spotify-modal-in 0.26s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
-  font-family: 'Author', 'Inter', sans-serif;
+  font-family: 'Author', system-ui, sans-serif;
   color: #f4f4f8;
   display: flex;
   flex-direction: column;
@@ -690,7 +690,7 @@
   gap: 8px;
   background: #1DB954;
   color: #000;
-  font-family: 'Author', 'Inter', sans-serif;
+  font-family: 'Author', system-ui, sans-serif;
   font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -724,10 +724,10 @@
   position: fixed;
   font-family: 'Rosaline', 'Georgia', serif;
   font-weight: 600;
-  color: #ffffff;
+  color: #f8f6f2;
   text-shadow:
-    0 0 10px rgba(255, 255, 255, 0.6),
-    0 0 24px rgba(245, 200, 120, 0.35);
+    0 0 6px rgba(255, 255, 255, 0.25),
+    0 0 14px rgba(200, 180, 150, 0.2);
   white-space: nowrap;
   pointer-events: none;
   z-index: 99999;
@@ -758,10 +758,10 @@
   z-index: 99999;
   animation: atla-label-in 0.9s ease-out forwards;
 }
-.atla-label-popup--fire  { color: #fb923c; text-shadow: 0 0 8px #f97316, 0 0 16px #f9731688; }
-.atla-label-popup--earth { color: #92400e; text-shadow: 0 0 6px #78350f; }
-.atla-label-popup--water { color: #7dd3fc; text-shadow: 0 0 8px #38bdf8, 0 0 16px #38bdf888; }
-.atla-label-popup--air   { color: #e0f2fe; text-shadow: 0 0 8px #bfdbfe, 0 0 16px #bfdbfe88; }
+.atla-label-popup--fire  { color: #c49a78; text-shadow: 0 0 4px rgba(160, 120, 90, 0.35); }
+.atla-label-popup--earth { color: #6b5344; text-shadow: 0 0 3px rgba(90, 72, 58, 0.35); }
+.atla-label-popup--water { color: #8aa4b4; text-shadow: 0 0 4px rgba(100, 120, 135, 0.35); }
+.atla-label-popup--air   { color: #c8d2dc; text-shadow: 0 0 4px rgba(160, 175, 190, 0.3); }
 
 /* shared particle base */
 .atla-particle {
@@ -986,9 +986,9 @@
 }
 
 .poem-burst-line {
-  font-family: "Cormorant Garamond", "Times New Roman", serif;
-  color: #f1e7d3;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 0 8px rgba(251, 191, 36, 0.25);
+  font-family: 'Rosaline', Georgia, serif;
+  color: #ebe4d8;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 0 6px rgba(140, 125, 100, 0.2);
   opacity: 0;
   animation: poem-rise 1.6s ease-out forwards;
 }
@@ -1176,13 +1176,13 @@
    ───────────────────────────────────────────────────────────────────────── */
 
 body.desk-game-mode .desk-item {
-  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.55));
+  filter: drop-shadow(0 0 6px rgba(105, 118, 132, 0.55));
   transition: filter 0.45s ease;
 }
 body.desk-game-mode .desk-item[data-game-variant="rare"] {
   filter:
-    drop-shadow(0 0 8px rgba(251, 191, 36, 0.85))
-    drop-shadow(0 0 18px rgba(251, 191, 36, 0.45));
+    drop-shadow(0 0 6px rgba(180, 155, 110, 0.5))
+    drop-shadow(0 0 14px rgba(180, 155, 110, 0.28));
   animation: gm-rare-pulse 1.6s ease-in-out infinite;
 }
 body.desk-game-mode .desk-item[data-game-variant="quest"] {
@@ -1192,25 +1192,25 @@ body.desk-game-mode .desk-item[data-game-variant="quest"] {
 }
 body.desk-game-mode .desk-item[data-game-variant="action"] {
   filter:
-    drop-shadow(0 0 4px rgba(239, 68, 68, 0.7))
-    drop-shadow(0 0 12px rgba(239, 68, 68, 0.35));
+    drop-shadow(0 0 3px rgba(180, 110, 105, 0.55))
+    drop-shadow(0 0 10px rgba(180, 110, 105, 0.22));
 }
 body.desk-game-mode .desk-item[data-game-variant="heal"] {
   filter:
-    drop-shadow(0 0 6px rgba(74, 222, 128, 0.75))
-    drop-shadow(0 0 14px rgba(74, 222, 128, 0.35));
+    drop-shadow(0 0 5px rgba(120, 155, 125, 0.5))
+    drop-shadow(0 0 12px rgba(120, 155, 125, 0.22));
 }
 body.desk-game-mode .desk-item[data-game-variant="active"] {
   animation: gm-active-pulse 0.9s ease-in-out infinite;
 }
 
 @keyframes gm-rare-pulse {
-  0%, 100% { filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.85)) drop-shadow(0 0 18px rgba(251, 191, 36, 0.45)); }
-  50%      { filter: drop-shadow(0 0 12px rgba(251, 191, 36, 1))   drop-shadow(0 0 26px rgba(251, 191, 36, 0.65)); }
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(180, 155, 110, 0.5)) drop-shadow(0 0 14px rgba(180, 155, 110, 0.28)); }
+  50%      { filter: drop-shadow(0 0 9px rgba(190, 165, 120, 0.55)) drop-shadow(0 0 18px rgba(190, 165, 120, 0.38)); }
 }
 @keyframes gm-active-pulse {
-  0%, 100% { filter: drop-shadow(0 0 8px  rgba(56, 189, 248, 0.7)) drop-shadow(0 0 18px rgba(56, 189, 248, 0.35)); }
-  50%      { filter: drop-shadow(0 0 14px rgba(56, 189, 248, 1))   drop-shadow(0 0 28px rgba(56, 189, 248, 0.55)); }
+  0%, 100% { filter: drop-shadow(0 0 8px  rgba(105, 118, 132, 0.7)) drop-shadow(0 0 18px rgba(105, 118, 132, 0.35)); }
+  50%      { filter: drop-shadow(0 0 14px rgba(105, 118, 132, 1))   drop-shadow(0 0 28px rgba(105, 118, 132, 0.55)); }
 }
 
 /* ── Overlay container ──────────────────────────────────────────────────── */
@@ -1220,8 +1220,8 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   z-index: 99950;        /* below SpotifyModal (99998+) and GwhPlane (100001) */
   pointer-events: none;  /* clicks fall through to desk items */
   overflow: hidden;
-  font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, monospace;
-  color: #67e8f9;
+  font-family: 'Author', system-ui, sans-serif;
+  color: #9aa8b3;
   text-transform: uppercase;
   letter-spacing: 0.12em;
 }
@@ -1250,8 +1250,8 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   inset: 0;
   background: repeating-linear-gradient(
     to bottom,
-    rgba(34, 211, 238, 0.04) 0px,
-    rgba(34, 211, 238, 0.04) 1px,
+    rgba(115, 128, 142, 0.04) 0px,
+    rgba(115, 128, 142, 0.04) 1px,
     transparent 1px,
     transparent 3px
   );
@@ -1270,7 +1270,7 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   right: 0;
   height: 5vh;
   background: linear-gradient(rgba(0,0,0,0.95), rgba(0,0,0,0.85));
-  border-color: rgba(34, 211, 238, 0.35);
+  border-color: rgba(115, 128, 142, 0.35);
   border-style: solid;
   border-width: 0;
 }
@@ -1296,11 +1296,11 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.4em;
-  color: #e0f2fe;
-  text-shadow: 0 0 8px rgba(34, 211, 238, 0.9), 0 0 18px rgba(34, 211, 238, 0.5);
+  color: #d4dae1;
+  text-shadow: 0 0 4px rgba(115, 128, 142, 0.35);
   animation: gm-banner 1700ms ease-out forwards;
 }
-.game-mode-banner-bracket { color: #67e8f9; margin: 0 0.4em; }
+.game-mode-banner-bracket { color: #9aa8b3; margin: 0 0.4em; }
 @keyframes gm-banner {
   0%   { opacity: 0; transform: translate(-50%, -8px); letter-spacing: 0.18em; }
   18%  { opacity: 1; transform: translate(-50%,  0);   letter-spacing: 0.4em; }
@@ -1318,15 +1318,15 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   gap: 4px;
   font-size: 0.72rem;
   letter-spacing: 0.18em;
-  color: #67e8f9;
-  text-shadow: 0 0 6px rgba(34, 211, 238, 0.6);
+  color: #9aa8b3;
+  text-shadow: 0 0 3px rgba(115, 128, 142, 0.25);
   animation: gm-hud-in 380ms ease-out 120ms both;
 }
 .game-mode-hud-row { display: flex; gap: 10px; justify-content: flex-end; }
-.game-mode-hud-key { color: rgba(165, 243, 252, 0.55); }
-.game-mode-hud-val { color: #e0f2fe; }
-.game-mode-hud-val--ok  { color: #4ade80; }
-.game-mode-hud-val--dim { color: rgba(165, 243, 252, 0.45); }
+.game-mode-hud-key { color: rgba(150, 158, 168, 0.55); }
+.game-mode-hud-val { color: #d4dae1; }
+.game-mode-hud-val--ok  { color: #8aab90; }
+.game-mode-hud-val--dim { color: rgba(150, 158, 168, 0.45); }
 @keyframes gm-hud-in { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: translateX(0); } }
 
 /* Per-item floating chip — anchored above the item, stays upright. */
@@ -1337,42 +1337,42 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   font-size: 0.62rem;
   letter-spacing: 0.22em;
   font-weight: 700;
-  color: #e0f2fe;
-  background: rgba(8, 47, 73, 0.85);
-  border: 1px solid rgba(34, 211, 238, 0.7);
+  color: #d4dae1;
+  background: rgba(28, 34, 40, 0.88);
+  border: 1px solid rgba(130, 145, 158, 0.45);
   border-radius: 3px;
-  box-shadow: 0 0 10px rgba(34, 211, 238, 0.35);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.25);
   white-space: nowrap;
   animation: gm-chip-in 320ms ease-out both;
 }
 .game-mode-chip--rare {
-  color: #fde68a;
-  background: rgba(120, 53, 15, 0.85);
-  border-color: rgba(251, 191, 36, 0.85);
-  box-shadow: 0 0 12px rgba(251, 191, 36, 0.55);
+  color: #e8dcc4;
+  background: rgba(72, 58, 42, 0.88);
+  border-color: rgba(180, 155, 110, 0.55);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
 }
 .game-mode-chip--quest {
-  color: #fef3c7;
-  background: rgba(120, 53, 15, 0.7);
-  border-color: rgba(217, 180, 119, 0.85);
+  color: #ebe4d8;
+  background: rgba(70, 60, 48, 0.82);
+  border-color: rgba(160, 145, 120, 0.5);
 }
 .game-mode-chip--action {
-  color: #fee2e2;
-  background: rgba(127, 29, 29, 0.85);
-  border-color: rgba(248, 113, 113, 0.85);
-  box-shadow: 0 0 10px rgba(248, 113, 113, 0.45);
+  color: #e8ddd8;
+  background: rgba(72, 48, 48, 0.88);
+  border-color: rgba(170, 120, 115, 0.5);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.22);
 }
 .game-mode-chip--heal {
-  color: #dcfce7;
-  background: rgba(20, 83, 45, 0.85);
-  border-color: rgba(74, 222, 128, 0.85);
-  box-shadow: 0 0 10px rgba(74, 222, 128, 0.45);
+  color: #dce8de;
+  background: rgba(38, 58, 44, 0.88);
+  border-color: rgba(120, 155, 125, 0.5);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
 }
 .game-mode-chip--active {
-  color: #cffafe;
-  background: rgba(8, 47, 73, 0.9);
-  border-color: rgba(56, 189, 248, 0.95);
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.55);
+  color: #d8e4e8;
+  background: rgba(28, 38, 46, 0.9);
+  border-color: rgba(105, 118, 132, 0.65);
+  box-shadow: 0 0 8px rgba(105, 118, 132, 0.2);
 }
 @keyframes gm-chip-in {
   from { opacity: 0; transform: translate(-50%, -90%) scale(0.92); }
@@ -1395,27 +1395,27 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, monospace;
+  font-family: 'Author', system-ui, sans-serif;
   font-size: 0.85rem;
   font-weight: 800;
-  color: #ecfeff;
-  background: linear-gradient(180deg, rgba(8, 47, 73, 0.95) 0%, rgba(7, 89, 133, 0.95) 100%);
-  border: 1.5px solid rgba(56, 189, 248, 0.85);
+  color: #e8ecef;
+  background: linear-gradient(180deg, rgba(32, 38, 44, 0.96) 0%, rgba(42, 52, 60, 0.96) 100%);
+  border: 1.5px solid rgba(130, 145, 158, 0.5);
   border-radius: 6px;
   box-shadow:
-    0 0 14px rgba(56, 189, 248, 0.55),
+    0 0 8px rgba(0, 0, 0, 0.35),
     inset 0 -2px 0 rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
   animation: gm-qte-press 700ms ease-out;
 }
 .game-mode-qte-label {
   font-size: 0.6rem;
   letter-spacing: 0.22em;
-  color: rgba(165, 243, 252, 0.75);
-  text-shadow: 0 0 6px rgba(34, 211, 238, 0.5);
+  color: rgba(150, 158, 168, 0.8);
+  text-shadow: none;
 }
 @keyframes gm-qte-press {
-  0%   { transform: translateY(-4px) scale(0.92); opacity: 0; box-shadow: 0 0 22px rgba(56, 189, 248, 0.85), inset 0 -2px 0 rgba(0,0,0,0.4); }
+  0%   { transform: translateY(-4px) scale(0.92); opacity: 0; box-shadow: 0 0 12px rgba(0, 0, 0, 0.35), inset 0 -2px 0 rgba(0,0,0,0.4); }
   35%  { transform: translateY(0)    scale(1.05); opacity: 1; }
   100% { transform: translateY(0)    scale(1);    opacity: 1; }
 }
@@ -1428,34 +1428,37 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   right: 22px;
   pointer-events: auto;
   padding: 6px 12px;
-  font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, monospace;
+  font-family: 'Author', system-ui, sans-serif;
   font-size: 0.7rem;
   letter-spacing: 0.22em;
   font-weight: 700;
-  color: #e0f2fe;
-  background: rgba(8, 47, 73, 0.85);
-  border: 1px solid rgba(34, 211, 238, 0.7);
+  color: #d4dae1;
+  background: rgba(28, 34, 40, 0.9);
+  border: 1px solid rgba(130, 145, 158, 0.45);
   border-radius: 999px;
   cursor: pointer;
   text-transform: uppercase;
-  box-shadow: 0 0 10px rgba(34, 211, 238, 0.4);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.25);
   transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
   animation: gm-hud-in 380ms ease-out 200ms both;
 }
 .game-mode-exit-pill:hover {
-  background: rgba(8, 47, 73, 1);
+  background: rgba(34, 40, 48, 1);
   transform: translateY(-1px);
-  box-shadow: 0 0 14px rgba(34, 211, 238, 0.7);
+  box-shadow: 0 0 10px rgba(105, 118, 132, 0.25);
 }
 .game-mode-exit-pill:active { transform: translateY(0); }
 
 /* ── Sword modal idle game ───────────────────────────────────────────────────── */
+/* ── Sword idle modal — Minecraft UI style ─────────────────────────────────── */
+/* Palette inspired by vanilla MC inventory: stone, dirt, grass, wood */
+
 .sword-idle-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(3, 7, 18, 0.78);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   z-index: 100007;
   display: flex;
   align-items: center;
@@ -1464,13 +1467,17 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
 
 .sword-idle-modal {
   width: min(500px, 92vw);
-  border: 3px solid #65a30d;
-  border-radius: 4px;
+  /* Outer bevel — MC button look: light top-left, dark bottom-right */
+  border: 3px solid #4A3E2C;
+  border-radius: 2px;
   padding: 16px;
-  background: #1f2937;
-  box-shadow: 0 0 0 3px #0b1220, 0 14px 0 rgba(0, 0, 0, 0.35);
-  color: #ecfeff;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: #1E1B14;
+  box-shadow:
+    inset 2px 2px 0 #5E5038,
+    inset -2px -2px 0 #0E0C08,
+    0 16px 0 rgba(0, 0, 0, 0.4);
+  color: #F0EBD4;
+  font-family: 'Author', system-ui, sans-serif;
   image-rendering: pixelated;
   max-height: 88vh;
   overflow: auto;
@@ -1482,31 +1489,36 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   align-items: flex-start;
 }
 
+/* Grass-green title — desaturated MC grass (#5D9A2A), not neon */
 .sword-idle-title {
   margin: 0;
   font-size: 0.95rem;
-  letter-spacing: 0.16em;
-  color: #a3e635;
+  letter-spacing: 0.14em;
+  color: #76A840;
   font-weight: 800;
+  text-shadow: 2px 2px 0 #1A2A0A;
 }
 
 .sword-idle-subtitle {
   margin: 4px 0 0;
   font-size: 0.68rem;
-  letter-spacing: 0.08em;
-  color: rgba(226, 232, 240, 0.66);
+  letter-spacing: 0.06em;
+  color: rgba(200, 190, 160, 0.65);
   text-transform: uppercase;
 }
 
+/* Stone-button close — beveled like MC buttons */
 .sword-idle-close {
-  border: 2px solid #84cc16;
-  background: #14532d;
-  color: #d9f99d;
+  border: 2px solid #4A3E2C;
+  background: #3A3028;
+  color: #E8DFC8;
   width: 30px;
   height: 30px;
-  border-radius: 6px;
+  border-radius: 1px;
   cursor: pointer;
+  box-shadow: inset 1px 1px 0 #5A4C38, inset -1px -1px 0 #1A1510;
 }
+.sword-idle-close:hover { background: #4A4030; }
 
 .sword-idle-top-grid {
   margin-top: 10px;
@@ -1515,17 +1527,19 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   gap: 8px;
 }
 
+/* Inventory-slot style panel */
 .sword-idle-info-card {
-  border: 2px solid #4d7c0f;
-  background: #1f3a2a;
-  border-radius: 3px;
+  border: 2px solid #4A3E2C;
+  background: #28221A;
+  border-radius: 1px;
   padding: 7px 8px;
+  box-shadow: inset 1px 1px 0 #584830, inset -1px -1px 0 #0E0C08;
 }
 
 .sword-idle-info-title {
   margin: 0 0 6px;
   font-size: 0.62rem;
-  color: #bef264;
+  color: #A89C74;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-weight: 700;
@@ -1540,12 +1554,12 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
 }
 
 .sword-idle-kv-grid span:nth-child(odd) {
-  color: rgba(209, 250, 229, 0.75);
+  color: rgba(170, 158, 120, 0.82);
   text-transform: uppercase;
 }
 
 .sword-idle-kv-grid span:nth-child(even) {
-  color: #ecfeff;
+  color: #F0EBD4;
   text-align: right;
 }
 
@@ -1556,33 +1570,37 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   font-size: 0.64rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(209, 250, 229, 0.9);
+  color: rgba(190, 182, 150, 0.9);
 }
 
+/* XP-bar style */
 .sword-idle-run-bar {
   margin-top: 4px;
   height: 10px;
-  border-radius: 4px;
-  border: 2px solid #4d7c0f;
-  background: #1e293b;
+  border-radius: 1px;
+  border: 2px solid #2E2820;
+  background: #141008;
   overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(0,0,0,0.35);
 }
 
 .sword-idle-run-fill {
   display: block;
   height: 100%;
-  background: #84cc16;
+  background: #629030;
   transition: width 0.2s linear;
 }
 
+/* Boss panel — nether-brick warmth */
 .sword-idle-boss-panel {
   margin-top: 14px;
-  border: 2px solid #b91c1c;
-  border-radius: 4px;
-  background: #3f2323;
+  border: 2px solid #4A2E24;
+  border-radius: 1px;
+  background: #28180E;
   padding: 12px;
   position: relative;
   overflow: hidden;
+  box-shadow: inset 1px 1px 0 #5E3A2C, inset -1px -1px 0 #0E0806;
 }
 
 .sword-idle-boss-row {
@@ -1596,58 +1614,55 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
 .sword-idle-boss-row--player {
   margin-top: 2px;
   font-size: 0.62rem;
-  color: rgba(187, 247, 208, 0.92);
+  color: rgba(168, 190, 148, 0.9);
 }
 
 .sword-idle-bar-label {
   margin: 6px 0 3px;
   font-size: 0.58rem;
   letter-spacing: 0.06em;
-  color: rgba(226, 232, 240, 0.75);
+  color: rgba(200, 190, 158, 0.72);
   text-transform: uppercase;
 }
 
-.sword-idle-bar-label--enemy {
-  color: #fecaca;
-}
-
-.sword-idle-bar-label--player {
-  color: #bbf7d0;
-}
+.sword-idle-bar-label--enemy { color: #B08078; }
+.sword-idle-bar-label--player { color: #88A870; }
 
 .sword-idle-boss-name {
-  color: #fda4af;
+  color: #C09088;
   font-weight: 700;
 }
 
 .sword-idle-boss-hp {
-  color: rgba(226, 232, 240, 0.9);
+  color: rgba(230, 222, 200, 0.9);
 }
 
+/* Health-bar style */
 .sword-idle-boss-bar {
   margin-top: 8px;
   height: 14px;
-  border-radius: 2px;
-  border: 2px solid #991b1b;
-  background: #111827;
+  border-radius: 1px;
+  border: 2px solid #2E1A14;
+  background: #100808;
   overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(0,0,0,0.35);
 }
 
 .sword-idle-boss-bar--player {
   margin-top: 6px;
-  border-color: #166534;
+  border-color: #22321A;
   height: 10px;
 }
 
 .sword-idle-boss-fill {
   display: block;
   height: 100%;
-  background: #ef4444;
+  background: #8C3028;
   transition: width 0.22s linear;
 }
 
 .sword-idle-boss-fill--player {
-  background: #22c55e;
+  background: #5A9028;
 }
 
 .sword-idle-float-layer {
@@ -1668,14 +1683,14 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
 
 .sword-idle-float {
   font-size: 0.74rem;
-  color: #fca5a5;
-  text-shadow: 0 0 8px rgba(248, 113, 113, 0.48);
+  color: #C09090;
+  text-shadow: 1px 1px 0 #1A0806;
   animation: sword-float-up 0.2s ease-out;
 }
 
 .sword-idle-float--crit {
-  color: #fef08a;
-  text-shadow: 0 0 10px rgba(253, 224, 71, 0.8);
+  color: #C8B478;
+  text-shadow: 1px 1px 0 #1A1006;
 }
 
 .sword-idle-actions {
@@ -1693,59 +1708,65 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   justify-content: center;
 }
 
+/* Stone button — the classic MC look */
 .sword-idle-hit-btn {
-  border: 2px solid #84cc16;
-  border-radius: 3px;
-  background: #166534;
-  color: #ecfdf5;
+  border: 2px solid #4A3E2C;
+  border-radius: 1px;
+  background: #3A3028;
+  color: #F0EBD4;
   padding: 10px 18px;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   cursor: pointer;
+  box-shadow: inset 1px 1px 0 #5A4C38, inset -1px -1px 0 #1A1510;
+  text-shadow: 1px 1px 0 #0E0C08;
 }
 
 .sword-idle-hit-btn:hover {
-  background: #15803d;
+  background: #4A4038;
+  box-shadow: inset 1px 1px 0 #6A5C48, inset -1px -1px 0 #1A1510;
 }
 
 .sword-idle-hit-btn:disabled {
-  opacity: 0.7;
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
+/* Gold/amber variant (TNT / special) */
 .sword-idle-hit-btn--alt {
-  border-color: #eab308;
-  background: #78350f;
-  color: #fef3c7;
+  border-color: #5C4820;
+  background: #3C2E16;
+  color: #E8D8A0;
+  box-shadow: inset 1px 1px 0 #705A28, inset -1px -1px 0 #1A1208;
+  text-shadow: 1px 1px 0 #0E0A04;
 }
 
-.sword-idle-hit-btn--alt:hover {
-  background: #92400e;
-}
+.sword-idle-hit-btn--alt:hover { background: #4A3820; }
 
+/* Red variant (danger) */
 .sword-idle-hit-btn--danger {
-  border-color: #ef4444;
-  background: #7f1d1d;
-  color: #fee2e2;
+  border-color: #5C2E24;
+  background: #3C2018;
+  color: #E8C8C0;
+  box-shadow: inset 1px 1px 0 #703428, inset -1px -1px 0 #1A0E0A;
+  text-shadow: 1px 1px 0 #0E0604;
 }
 
-.sword-idle-hit-btn--danger:hover {
-  background: #991b1b;
-}
+.sword-idle-hit-btn--danger:hover { background: #4A2820; }
 
 .sword-idle-help {
   margin: 0;
   font-size: 0.64rem;
   letter-spacing: 0.06em;
-  color: rgba(209, 250, 229, 0.72);
+  color: rgba(178, 168, 130, 0.72);
   text-transform: uppercase;
 }
 
 .sword-idle-help--shop {
   margin-top: 8px;
-  color: rgba(217, 249, 157, 0.82);
+  color: rgba(188, 178, 138, 0.85);
   letter-spacing: 0.04em;
   text-transform: none;
 }
@@ -1754,16 +1775,19 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   margin: 0;
   font-size: 0.65rem;
   letter-spacing: 0.06em;
-  color: #fde68a;
+  color: #C8B878;
   text-transform: uppercase;
+  text-shadow: 1px 1px 0 #0E0A04;
 }
 
+/* Shop — crafting-table style */
 .sword-idle-shop {
   margin-top: 14px;
-  border: 2px solid #4d7c0f;
-  border-radius: 4px;
-  background: #1d3324;
+  border: 2px solid #4A3E2C;
+  border-radius: 1px;
+  background: #22201A;
   padding: 10px;
+  box-shadow: inset 1px 1px 0 #584830, inset -1px -1px 0 #0E0C08;
 }
 
 .sword-idle-shop-title {
@@ -1771,22 +1795,24 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #bbf7d0;
+  color: #A89840;
   font-weight: 700;
+  text-shadow: 1px 1px 0 #1A1408;
 }
 
 .sword-idle-shop-grid {
   margin-top: 8px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  gap: 6px;
 }
 
+/* Inventory slot buttons */
 .sword-idle-shop-btn {
-  border: 2px solid #65a30d;
-  background: #1f4a2b;
-  color: #d1fae5;
-  border-radius: 3px;
+  border: 2px solid #4A3E2C;
+  background: #2E2820;
+  color: #E8DFC8;
+  border-radius: 1px;
   padding: 7px 7px;
   font-size: 0.6rem;
   text-transform: uppercase;
@@ -1796,10 +1822,11 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
+  box-shadow: inset 1px 1px 0 #5A4830, inset -1px -1px 0 #0E0C08;
 }
 
 .sword-idle-shop-btn span {
-  color: rgba(187, 247, 208, 0.8);
+  color: rgba(168, 152, 112, 0.88);
   font-size: 0.5rem;
   letter-spacing: 0.02em;
   line-height: 1.2;
@@ -1810,7 +1837,7 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
 }
 
 .sword-idle-shop-btn small {
-  color: rgba(226, 232, 240, 0.78);
+  color: rgba(200, 192, 162, 0.78);
   font-size: 0.5rem;
   line-height: 1.25;
   letter-spacing: 0.02em;
@@ -1824,7 +1851,7 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
 }
 
 .sword-idle-shop-btn:hover {
-  background: #225a33;
+  background: #3A3228;
 }
 
 .sword-idle-shop-btn:disabled {
@@ -1837,13 +1864,14 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
 }
 
 .sword-idle-shop-btn--use {
-  border-color: #eab308;
-  background: #78350f;
-  color: #fef3c7;
+  border-color: #5C4820;
+  background: #3C2E16;
+  color: #E8D8A0;
+  box-shadow: inset 1px 1px 0 #705A28, inset -1px -1px 0 #1A1208;
 }
 
 .sword-idle-shop-btn--use:hover {
-  background: #92400e;
+  background: #4A3820;
 }
 
 @media (max-width: 820px) {

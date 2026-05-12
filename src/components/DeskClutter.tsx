@@ -151,7 +151,7 @@ interface DamageFloat {
 
 type SwordUpgradeKey = 'click' | 'dps' | 'crit' | 'goldps' | 'loot' | 'hp' | 'armor' | 'regen' | 'totem' | 'minecart'
 
-const NOTE_COLORS = ['#a78bfa', '#f472b6', '#60a5fa', '#34d399', '#fbbf24', '#fb923c', '#2dd4bf', '#f87171']
+const NOTE_COLORS = ['#9b8fb8', '#c49a9e', '#7a8fa3', '#7a9e8a', '#c4a882', '#b89a82', '#7a9a9a', '#b0908a']
 const NOTE_GLYPHS = ['♩', '♪', '♫', '♬']
 
 // Build a weighted pool from portfolio.json — no IDs hardcoded here
@@ -1682,10 +1682,10 @@ function EarthParticles({ cx, cy }: { cx: number; cy: number }) {
 
 function WaterParticles({ cx, cy }: { cx: number; cy: number }) {
   const rings = [
-    { size: 40,  delay: '0s',    color: '#38bdf8', bw: '2.5px' },
-    { size: 70,  delay: '0.1s',  color: '#7dd3fc', bw: '2px'   },
-    { size: 100, delay: '0.2s',  color: '#bae6fd', bw: '1.5px' },
-    { size: 130, delay: '0.3s',  color: '#e0f2fe', bw: '1px'   },
+    { size: 40,  delay: '0s',    color: '#5a7284', bw: '2.5px' },
+    { size: 70,  delay: '0.1s',  color: '#7a8fa0', bw: '2px'   },
+    { size: 100, delay: '0.2s',  color: '#a8b8c4', bw: '1.5px' },
+    { size: 130, delay: '0.3s',  color: '#d4dce2', bw: '1px'   },
   ]
   return <>
     {rings.map((r, i) => (

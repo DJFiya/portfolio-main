@@ -9,8 +9,7 @@ export default function ClubsSpread() {
       {data.clubs.map((club) => (
         <div
           key={club.org}
-          className="flex flex-col gap-1 pl-4"
-          style={{ borderLeft: '2px solid #1e4fa0' }}
+          className="flex flex-col gap-1 pl-4 border-l-2 border-azure-600"
         >
           <span className="font-author font-semibold text-ink-900 text-sm leading-snug">
             {club.role}

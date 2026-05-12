@@ -10,8 +10,8 @@ const CHAR_WIDTH = 7.8
 export default function HangTag({
   skill,
   rotate = 0,
-  fillColor = '#dbeafe',
-  strokeColor = '#1e4fa0',
+  fillColor = '#dbe3e8',
+  strokeColor = '#3d4f5c',
 }: HangTagProps) {
   const tagW = Math.max(52, Math.ceil(skill.length * CHAR_WIDTH) + 18)
   const tagH = 28
@@ -56,7 +56,7 @@ export default function HangTag({
         x={cx}
         y={13 + tagH / 2 + 4}
         textAnchor="middle"
-        fontFamily="'JetBrains Mono', 'Fira Code', monospace"
+        fontFamily="'Author', system-ui, sans-serif"
         fontSize="8.5"
         fontWeight="500"
         fill="#111113"
