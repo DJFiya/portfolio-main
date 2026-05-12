@@ -53,7 +53,7 @@ export default function BookCover({ onOpen }: BookCoverProps) {
         <div
           className="absolute inset-0 rounded-sm overflow-hidden"
           style={{
-            background: '#16141c',
+            background: '#111111',
             boxShadow:
               '10px 10px 30px rgba(0,0,0,0.7), 2px 2px 6px rgba(0,0,0,0.4), inset -2px 0 5px rgba(255,255,255,0.03)',
           }}

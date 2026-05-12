@@ -37,7 +37,7 @@ export default function BookSpread({
         className="flex-shrink-0 z-10"
         style={{
           width: 20,
-          background: 'linear-gradient(to right, #12141a, #181a20)',
+          background: '#111111',
           boxShadow: 'inset -3px 0 6px rgba(0,0,0,0.5)',
           borderRight: '1px solid rgba(255,255,255,0.04)',
         }}
@@ -57,7 +57,7 @@ export default function BookSpread({
             style={{
               width: 40,
               height: 1,
-              background: 'linear-gradient(to right, transparent, rgba(30,79,160,0.35), transparent)',
+              background: 'linear-gradient(to right, transparent, rgba(160, 140, 108, 0.32), transparent)',
             }}
           />
 
@@ -79,12 +79,12 @@ export default function BookSpread({
 
           {/* Bottom ornament */}
           <div className="flex items-center gap-2">
-            <div style={{ width: 22, height: 1, background: 'rgba(30,79,160,0.3)' }} />
+            <div style={{ width: 22, height: 1, background: 'rgba(160, 140, 108, 0.3)' }} />
             <div
               className="w-1 h-1 rounded-full"
-              style={{ background: 'rgba(30,79,160,0.45)' }}
+              style={{ background: 'rgba(160, 140, 108, 0.45)' }}
             />
-            <div style={{ width: 22, height: 1, background: 'rgba(30,79,160,0.3)' }} />
+            <div style={{ width: 22, height: 1, background: 'rgba(160, 140, 108, 0.3)' }} />
           </div>
         </div>
 
@@ -165,7 +165,7 @@ export default function BookSpread({
         className="flex-shrink-0 z-10"
         style={{
           width: 20,
-          background: 'linear-gradient(to left, #12141a, #181a20)',
+          background: '#111111',
           boxShadow: 'inset 3px 0 6px rgba(0,0,0,0.5)',
           borderLeft: '1px solid rgba(255,255,255,0.04)',
         }}

@@ -99,10 +99,7 @@ function boardStyle(side: 'left' | 'right') {
     bottom: 0,
     width: 22,
     [side]: -22,
-    background:
-      side === 'left'
-        ? 'linear-gradient(to right, #1e2228, #282c34)'
-        : 'linear-gradient(to left, #1e2228, #282c34)',
+    background: '#111111',
     boxShadow:
       side === 'left'
         ? 'inset -3px 0 6px rgba(0,0,0,0.45)'

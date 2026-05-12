@@ -21,8 +21,8 @@ export default function DeskScene({ children }: { children: ReactNode }) {
 
   return (
     <div
-      className="relative w-full min-h-screen bg-ink-950 overflow-hidden flex items-center justify-center desk-grain transition-opacity duration-300"
-      style={{ opacity: sceneReady ? 1 : 0 }}
+      className="relative w-full min-h-screen overflow-hidden flex items-center justify-center desk-grain transition-opacity duration-300"
+      style={{ opacity: sceneReady ? 1 : 0, backgroundColor: '#1a1208' }}
     >
       {/* Keep mobile focused on the book only. */}
       {!isMobile ? <DeskClutter /> : null}
