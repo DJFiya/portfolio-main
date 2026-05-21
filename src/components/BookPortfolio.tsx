@@ -1,6 +1,6 @@
 import HTMLFlipBook from 'react-pageflip'
 import { motion } from 'framer-motion'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import BookPage from './BookPage'
@@ -12,6 +12,7 @@ import ExperiencesSpread from './spreads/ExperiencesSpread'
 import ProjectsSpread from './spreads/ProjectsSpread'
 import ClubsSpread from './spreads/ClubsSpread'
 import LinksSpread from './spreads/LinksSpread'
+import ResumeModal from './ResumeModal'
 
 // ─── Page map ────────────────────────────────────────────────────────────────
 //  0  front cover
@@ -34,8 +35,12 @@ const ROUTE_TO_PAGE: Record<string, number> = {
   '/projects': 3,
   '/clubs': 5,
   '/links': 7,
+  '/links/resume': 7,  // modal sub-route — same page as /links
   '/back': 9,
 }
+
+// Routes that show a modal overlay on top of a page (do not change the active page URL)
+const MODAL_ROUTES = new Set(['/links/resume'])
 
 function pageToRoute(page: number): string {
   if (page <= 0) return '/'
@@ -124,6 +129,7 @@ export default function BookPortfolio() {
   const [mobileFrameWidth, setMobileFrameWidth] = useState(() =>
     Math.min(380, Math.max(280, window.innerWidth - 24)),
   )
+  const [resumeOpen, setResumeOpen] = useState(location.pathname === '/links/resume')
 
   // slidePage drives the centering slide — set pre-flip so it animates
   // concurrently with the page turn.
@@ -216,7 +222,29 @@ export default function BookPortfolio() {
   // ── URL sync (browser back/forward) ──────────────────────────────────────
 
   useEffect(() => {
+    const isModalRoute = MODAL_ROUTES.has(location.pathname)
     const target = ROUTE_TO_PAGE[location.pathname] ?? 0
+
+    // Sync resume modal state
+    setResumeOpen(location.pathname === '/links/resume')
+
+    if (isModalRoute) {
+      // Navigate the book to the underlying page without touching the URL
+      if (isMobile) {
+        const resolved = normalizeLogicalPage(target)
+        if (resolved !== currentPageRef.current) {
+          currentPageRef.current = resolved
+          setCurrentPage(resolved)
+          setSlidePage(resolved)
+        }
+      } else if (book.current && target !== currentPageRef.current) {
+        prepareFlip(target)
+        isProgrammatic.current = true
+        book.current.pageFlip().flip(target)
+      }
+      return
+    }
+
     if (isMobile) {
       if (target !== currentPageRef.current) setPageAndRoute(target)
       return
@@ -227,6 +255,28 @@ export default function BookPortfolio() {
       book.current.pageFlip().flip(target)
     }
   }, [location.pathname, isMobile]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Resume modal open / close ─────────────────────────────────────────────
+
+  const openResume = useCallback(() => {
+    // Ensure the book is on the links page first (page 7)
+    if (currentPageRef.current < 7 || currentPageRef.current > 8) {
+      if (isMobile) {
+        currentPageRef.current = 7
+        setCurrentPage(7)
+        setSlidePage(7)
+      } else {
+        prepareFlip(7)
+        isProgrammatic.current = true
+        book.current?.pageFlip().flip(7)
+      }
+    }
+    navigate('/links/resume')
+  }, [isMobile, navigate])
+
+  const closeResume = useCallback(() => {
+    navigate('/links')
+  }, [navigate])
 
   // ── Keyboard navigation ───────────────────────────────────────────────────
 
@@ -260,6 +310,9 @@ export default function BookPortfolio() {
   const ActiveSpreadComponent = activeSpread?.Component
   const mobileFrameHeight = Math.round((mobileFrameWidth * 490) / 380)
 
+  // Extra props for LinksSpread
+  const linksProps = { onResumeClick: openResume }
+
   return (
     <div className="flex flex-col items-center gap-4">
       {isMobile ? (
@@ -282,7 +335,12 @@ export default function BookPortfolio() {
                     {activeSpread?.chapterTitle}
                   </h2>
                 </div>
-                {ActiveSpreadComponent ? <ActiveSpreadComponent /> : null}
+                {ActiveSpreadComponent ? (
+                  ActiveSpreadComponent === LinksSpread
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    ? <LinksSpread {...(linksProps as any)} />
+                    : <ActiveSpreadComponent />
+                ) : null}
               </BookRightPage>
             )}
           </div>
@@ -336,6 +394,7 @@ export default function BookPortfolio() {
             {/* Pages 1–8 — Four spreads */}
             {SPREADS.map((spread, i) => {
               const SpreadComponent = spread.Component
+              const isLinks = SpreadComponent === LinksSpread
               return [
                 <BookPage key={`left-${i}`}>
                   <BookLeftPage
@@ -345,7 +404,10 @@ export default function BookPortfolio() {
                 </BookPage>,
                 <BookPage key={`right-${i}`}>
                   <BookRightPage>
-                    <SpreadComponent />
+                    {isLinks
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      ? <LinksSpread {...(linksProps as any)} />
+                      : <SpreadComponent />}
                   </BookRightPage>
                 </BookPage>,
               ]
@@ -405,6 +467,9 @@ export default function BookPortfolio() {
           Next →
         </button>
       </div>
+
+      {/* Resume PDF modal — rendered via portal in ResumeModal */}
+      {resumeOpen && <ResumeModal onClose={closeResume} />}
     </div>
   )
 }

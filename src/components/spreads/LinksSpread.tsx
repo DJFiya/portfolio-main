@@ -28,7 +28,24 @@ function Icon({ type }: { type: LinkIcon }) {
   return null
 }
 
-export default function LinksSpread() {
+function ResumeIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {/* ID card / contact card — person silhouette on a card */}
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <circle cx="9" cy="10" r="2.5" />
+      <path d="M5 19c0-2.21 1.79-4 4-4" />
+      <line x1="14" y1="9" x2="19" y2="9" />
+      <line x1="14" y1="13" x2="19" y2="13" />
+    </svg>
+  )
+}
+
+interface LinksSpreadProps {
+  onResumeClick?: () => void
+}
+
+export default function LinksSpread({ onResumeClick }: LinksSpreadProps) {
   return (
     <div className="flex flex-col gap-4 h-full justify-center">
       {data.links.map((link) => (
@@ -56,6 +73,29 @@ export default function LinksSpread() {
           </div>
         </a>
       ))}
+
+      {/* Resume entry */}
+      <button
+        type="button"
+        onClick={onResumeClick}
+        className="flex items-center gap-3 group focus-visible:outline-none text-left w-full"
+      >
+        <div
+          className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center text-azure-400 group-hover:text-azure-300 transition-colors"
+          style={{
+            background: 'rgba(30,79,160,0.12)',
+            border: '1px solid rgba(30,79,160,0.28)',
+          }}
+        >
+          <ResumeIcon />
+        </div>
+        <div className="flex flex-col">
+          <span className="font-author text-xs text-ink-400">Resume</span>
+          <span className="font-author font-medium text-ink-800 text-sm group-hover:text-azure-700 transition-colors">
+            swe_resume.pdf ↗
+          </span>
+        </div>
+      </button>
     </div>
   )
 }
