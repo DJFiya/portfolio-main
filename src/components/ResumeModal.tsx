@@ -1,7 +1,9 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 
-const RESUME_URL = '/resume/swe_resume.pdf'
+import resumePdfUrl from '../assets/resume/swe_resume.pdf'
+
+const RESUME_URL = resumePdfUrl
 
 function DownloadIcon() {
   return (
