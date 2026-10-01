@@ -47,7 +47,7 @@
       "org": "Watolink"
     },
     {
-      "role": "Simulations Developer",
+      "role": "ML Engineer",
       "org": "Biomechatronic Club"
     }
   ],
@@ -66,12 +66,6 @@
       "label": "GitHub",
       "handle": "DJFiya",
       "url": "https://github.com/DJFiya",
-      "icon": "github"
-    },
-    {
-      "label": "GitHub (Work)",
-      "handle": "rel-Daevik-Jain",
-      "url": "https://github.com/rel-Daevik-Jain",
       "icon": "github"
     },
     {
