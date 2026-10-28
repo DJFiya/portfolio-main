@@ -14,6 +14,7 @@ import ClubsSpread from './spreads/ClubsSpread'
 import LinksSpread from './spreads/LinksSpread'
 import ResumeModal from './ResumeModal'
 import { useMediaQuery } from '../hooks/useMediaQuery'
+import { useRouteMeta } from '../hooks/useRouteMeta'
 
 // ─── Page map ────────────────────────────────────────────────────────────────
 //  0  front cover
@@ -131,6 +132,7 @@ export default function BookPortfolio() {
     Math.min(380, Math.max(280, window.innerWidth - 24)),
   )
   const resumeOpen = location.pathname === '/links/resume'
+  useRouteMeta(location.pathname)
 
   // slidePage drives the centering slide — set pre-flip so it animates
   // concurrently with the page turn.
