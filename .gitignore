@@ -24,3 +24,9 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# Locally installed agent skills
+.agents/
+.claude/
+.codex/
+skills-lock.json
