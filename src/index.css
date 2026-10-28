@@ -205,9 +205,15 @@
     transition: transform 0.22s ease, z-index 0s;
     cursor: default;
   }
-  .desk-item:hover {
+  .desk-item:hover,
+  .desk-item:focus-visible {
     transform: rotate(var(--item-rotate, 0deg)) scale(1.12);
     z-index: 999 !important;
+  }
+  .desk-item:focus-visible {
+    outline: 2px solid rgba(96, 165, 250, 0.9);
+    outline-offset: 4px;
+    border-radius: 4px;
   }
 
   /* ── Laptop click-only interaction ────────────────────────────────────────── */

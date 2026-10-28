@@ -8,6 +8,7 @@ import SwordIdleModal from './desk/SwordIdleModal'
 import RealityHitOverlay, { type RealityHitBurst, type RealityShard } from './desk/RealityHitOverlay'
 import GameModeOverlay from './desk/GameModeOverlay'
 import { gameLabelFor } from './desk/gameLabels'
+import { actionLabelFor } from './desk/itemLabels'
 import SpotifyMiniPlayer from './desk/SpotifyMiniPlayer'
 import SpotifyModal from './desk/SpotifyModal'
 import PoemParticles, { type PoemBurst } from './desk/PoemParticles'
@@ -222,6 +223,13 @@ export default function DeskClutter() {
     setTimeout(() => setPoemBurst(null), POEM_MS)
   }, [])
 
+  // Desk items act as buttons: Enter or Space triggers the same click handler
+  const activateOnKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return
+    e.preventDefault()
+    e.currentTarget.click()
+  }
+
   return (
     <>
       <div className="desk-clutter-layer">
@@ -250,6 +258,24 @@ export default function DeskClutter() {
             crit === 'fail' ? 'dice-crit-fail' : undefined,
           ].filter(Boolean).join(' ') || undefined
 
+          const onActivate: React.MouseEventHandler<HTMLDivElement> | undefined =
+            isDice         ? () => roll(item.id, item.type)
+            : isAtlaPoster ? handleAtla
+            : isDpsPoster  ? handleDps
+            : isGwhPoster  ? handleGwh
+            : isInvPoster  ? handleInvincible
+            : isTerminal   ? handleTerminalClick
+            : isVinyl      ? () => setSpotifyOpen(true)
+            : isCassette   ? cassette.toggle
+            : isLaptop     ? handleLaptopClick
+            : isPoem       ? e => handlePoemClick(e.currentTarget)
+            : isMug        ? coffee.sip
+            : isController ? handleController
+            : isSword      ? handleSwordGameOpen
+            : undefined
+
+          const actionLabel = actionLabelFor(item.type, item.label)
+
           return (
             <div
               key={item.id}
@@ -266,30 +292,20 @@ export default function DeskClutter() {
               data-item-type={item.type}
               data-game-label={gl?.label}
               data-game-variant={gl?.variant}
+              role={actionLabel ? 'button' : undefined}
+              tabIndex={actionLabel ? 0 : undefined}
+              aria-label={actionLabel}
+              aria-pressed={isCassette ? cassette.active : isController ? gameMode : undefined}
               className={`absolute select-none desk-item${isLaptop ? ' desk-item--laptop' : ''}${isLaptop && laptopClicking ? ' desk-item--laptop-click' : ''}${isCassette && cassette.active ? ' cassette-playing' : ''}${isPoem ? ' desk-item--poem' : ''}${isPoem && poemBurst ? ' desk-item--poem-active' : ''}${isTerminal ? ' desk-item--terminal' : ''}${isTerminal && terminalHacking ? ' desk-item--terminal-hack' : ''}${isController ? ' desk-item--controller' : ''}${isController && gameMode ? ' desk-item--controller-active' : ''}${isSword && realityHitBurst ? ' desk-item--sword-reality-hit' : ''}`}
               style={{
                 left: `${item.x}%`,
                 top:  `${item.y}%`,
                 '--item-rotate': `${item.rotate}deg`,
                 zIndex: item.zIndex,
-                cursor: isDice || isAtlaPoster || isDpsPoster || isGwhPoster || isInvPoster || isVinyl || isCassette || isLaptop || isPoem || isTerminal || isMug || isController || isSword ? 'pointer' : undefined,
+                cursor: actionLabel ? 'pointer' : undefined,
               } as React.CSSProperties}
-              onClick={
-                isDice         ? () => roll(item.id, item.type)
-                : isAtlaPoster ? handleAtla
-                : isDpsPoster  ? handleDps
-                : isGwhPoster  ? handleGwh
-                : isInvPoster  ? handleInvincible
-                : isTerminal   ? handleTerminalClick
-                : isVinyl      ? () => setSpotifyOpen(true)
-                : isCassette   ? cassette.toggle
-                : isLaptop     ? handleLaptopClick
-                : isPoem       ? (e) => handlePoemClick(e.currentTarget)
-                : isMug        ? coffee.sip
-                : isController ? handleController
-                : isSword      ? handleSwordGameOpen
-                : undefined
-              }
+              onClick={onActivate}
+              onKeyDown={actionLabel ? activateOnKey : undefined}
             >
               {crit && (
                 <div className={`dice-crit-label dice-crit-label--${crit}`}>
