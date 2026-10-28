@@ -19,22 +19,15 @@ import { useCoffeeMug } from './desk/useCoffeeMug'
 import { CoffeeSteam, CoffeeBlink } from './desk/CoffeeOverlays'
 import { useCassette } from './desk/useCassette'
 import CassetteNotes from './desk/CassetteNotes'
+import { useDiceRolls } from './desk/useDiceRolls'
 
 const data = rawData as unknown as PortfolioData
 
-const ROLL_MS = 820
-const CRIT_MS = 2600
 const ATLA_MS = 900
 const DPS_MS  = 4500
 const TERMINAL_HACK_MS = 1900
 const GAME_MODE_MS = 4500
 const REALITY_HIT_MS = 2100
-
-const DICE_MAX: Record<string, number> = {
-  'dice-d6': 6, 'dice-d12': 12, 'dice-d20': 20,
-}
-
-type CritState  = 'hit' | 'fail'
 
 const ATLA_EFFECTS: AtlaEffect[] = ['fire', 'earth', 'water', 'air']
 const POEM_MS = 1700
@@ -46,13 +39,7 @@ const POEM_VERSES: [string, string][] = [
 ]
 
 export default function DeskClutter() {
-  const [rolling,       setRolling]       = useState<Set<string>>(new Set())
-  const [diceValues,    setDiceValues]    = useState<Record<string, number>>(
-    Object.fromEntries(
-      data.desk.filter(i => i.type.startsWith('dice-')).map(i => [i.id, DICE_MAX[i.type]])
-    )
-  )
-  const [criticals,     setCriticals]     = useState<Record<string, CritState>>({})
+  const { rolling, diceValues, criticals, roll } = useDiceRolls(data.desk)
   const [atlaBurst,     setAtlaBurst]     = useState<AtlaBurst | null>(null)
   const [dpsBurst,      setDpsBurst]      = useState<DpsBurst  | null>(null)
   const [poemBurst,     setPoemBurst]     = useState<PoemBurst | null>(null)
@@ -76,24 +63,6 @@ export default function DeskClutter() {
   const gameModeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const coffee = useCoffeeMug(mugRef)
   const cassette = useCassette(cassetteRef)
-
-  const handleRoll = useCallback((id: string, type: string) => {
-    if (rolling.has(id)) return
-    const max    = DICE_MAX[type] ?? 6
-    const result = Math.floor(Math.random() * max) + 1
-    setRolling(prev => new Set(prev).add(id))
-    setTimeout(() => {
-      setDiceValues(prev => ({ ...prev, [id]: result }))
-      setRolling(prev => { const s = new Set(prev); s.delete(id); return s })
-      const crit: CritState | null = result === max ? 'hit' : result === 1 ? 'fail' : null
-      if (crit) {
-        setCriticals(prev => ({ ...prev, [id]: crit }))
-        setTimeout(() => {
-          setCriticals(prev => { const s = { ...prev }; delete s[id]; return s })
-        }, CRIT_MS)
-      }
-    }, ROLL_MS)
-  }, [rolling])
 
   const handleDps = useCallback(() => {
     if (dpsBurst) return
@@ -306,7 +275,7 @@ export default function DeskClutter() {
                 cursor: isDice || isAtlaPoster || isDpsPoster || isGwhPoster || isInvPoster || isVinyl || isCassette || isLaptop || isPoem || isTerminal || isMug || isController || isSword ? 'pointer' : undefined,
               } as React.CSSProperties}
               onClick={
-                isDice         ? () => handleRoll(item.id, item.type)
+                isDice         ? () => roll(item.id, item.type)
                 : isAtlaPoster ? handleAtla
                 : isDpsPoster  ? handleDps
                 : isGwhPoster  ? handleGwh
