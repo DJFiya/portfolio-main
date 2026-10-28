@@ -130,7 +130,7 @@ export default function BookPortfolio() {
   const [mobileFrameWidth, setMobileFrameWidth] = useState(() =>
     Math.min(380, Math.max(280, window.innerWidth - 24)),
   )
-  const [resumeOpen, setResumeOpen] = useState(location.pathname === '/links/resume')
+  const resumeOpen = location.pathname === '/links/resume'
 
   // slidePage drives the centering slide — set pre-flip so it animates
   // concurrently with the page turn.
@@ -217,9 +217,6 @@ export default function BookPortfolio() {
   useEffect(() => {
     const isModalRoute = MODAL_ROUTES.has(location.pathname)
     const target = ROUTE_TO_PAGE[location.pathname] ?? 0
-
-    // Sync resume modal state
-    setResumeOpen(location.pathname === '/links/resume')
 
     if (isModalRoute) {
       // Navigate the book to the underlying page without touching the URL
@@ -351,7 +348,6 @@ export default function BookPortfolio() {
             )
           })()}
 
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           <HTMLFlipBook
             ref={book}
             width={380}

@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import swordEnemiesData from '../../data/swordEnemies.json'
 
 const SWORD_BASE_CRIT_CHANCE = 0
@@ -24,10 +24,16 @@ const SWORD_BOSS_POOL: SwordBoss[] = (swordEnemiesData as SwordBoss[]).length > 
   ? (swordEnemiesData as SwordBoss[])
   : [{ name: 'Zombie', hp: 30 }]
 
+// Bosses scale 7% per stage; their hit damage tracks both stage and HP.
+function bossStats(index: number) {
+  const hp = Math.max(1, Math.round(SWORD_BOSS_POOL[index].hp * 1.07 ** index))
+  const damage = Math.max(1, Math.round(1 + index * 0.18 + hp * 0.0018))
+  return { hp, damage }
+}
+
 export default function SwordIdleModal({ onClose, onSwordHit }: { onClose: () => void; onSwordHit: () => void }) {
   const [bossIndex, setBossIndex] = useState(0)
-  const [bossHp, setBossHp] = useState(SWORD_BOSS_POOL[0].hp)
-  const [maxHp, setMaxHp] = useState(SWORD_BOSS_POOL[0].hp)
+  const [bossHp, setBossHp] = useState(() => bossStats(0).hp)
   const [gold, setGold] = useState(0)
   const [clickDamage, setClickDamage] = useState(1)
   const [dps, setDps] = useState(0)
@@ -39,7 +45,6 @@ export default function SwordIdleModal({ onClose, onSwordHit }: { onClose: () =>
   const [playerHp, setPlayerHp] = useState(24)
   const [armor, setArmor] = useState(0)
   const [hpRegen, setHpRegen] = useState(0)
-  const [enemyDamage, setEnemyDamage] = useState(1)
   const [deaths, setDeaths] = useState(0)
   const [totems, setTotems] = useState(0)
   const [potions, setPotions] = useState(0)
@@ -64,6 +69,7 @@ export default function SwordIdleModal({ onClose, onSwordHit }: { onClose: () =>
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const currentBoss = SWORD_BOSS_POOL[bossIndex]
+  const { hp: maxHp, damage: enemyDamage } = bossStats(bossIndex)
   const kills = bossIndex + (victory ? 1 : 0)
   const hpPct = Math.max(0, Math.min(100, (bossHp / maxHp) * 100))
   const playerHpPct = Math.max(0, Math.min(100, (playerHp / playerMaxHp) * 100))
@@ -73,7 +79,7 @@ export default function SwordIdleModal({ onClose, onSwordHit }: { onClose: () =>
   const potionHeal = SWORD_POTION_HEAL
   const armorReductionPct = Math.min(72, armor * 4.5)
 
-  const costs: Record<SwordUpgradeKey | 'ore', number> = {
+  const costs: Record<SwordUpgradeKey | 'ore', number> = useMemo(() => ({
     click: Math.ceil(9 * (1.42 ** shopLevelClick)),
     dps: Math.ceil(20 * (1.6 ** shopLevelDps)),
     crit: Math.ceil(16 * (1.54 ** shopLevelCrit)),
@@ -85,7 +91,7 @@ export default function SwordIdleModal({ onClose, onSwordHit }: { onClose: () =>
     regen: Math.ceil(26 * (1.68 ** shopLevelRegen)),
     totem: Math.ceil(34 * (1.7 ** shopLevelTotem)),
     minecart: Math.ceil(SWORD_TNT_BASE_COST * (1.92 ** shopLevelMinecart)),
-  }
+  }), [shopLevelClick, shopLevelDps, shopLevelCrit, shopLevelOre, shopLevelGoldps, shopLevelLoot, shopLevelHp, shopLevelArmor, shopLevelRegen, shopLevelTotem, shopLevelMinecart])
 
   const queueStatus = useCallback((text: string) => {
     if (statusTimerRef.current) clearTimeout(statusTimerRef.current)
@@ -115,18 +121,8 @@ export default function SwordIdleModal({ onClose, onSwordHit }: { onClose: () =>
       return
     }
     setBossIndex((prev) => prev + 1)
+    setBossHp(bossStats(bossIndex + 1).hp)
   }, [bossIndex, lootBonus, maxHp, playerMaxHp, queueStatus])
-
-  useEffect(() => {
-    if (victory) return
-    const boss = SWORD_BOSS_POOL[bossIndex]
-    const exponentialScale = 1.07 ** bossIndex
-    const nextHp = Math.max(1, Math.round(boss.hp * exponentialScale))
-    const nextEnemyDamage = Math.max(1, Math.round(1 + bossIndex * 0.18 + nextHp * 0.0018))
-    setMaxHp(nextHp)
-    setBossHp(nextHp)
-    setEnemyDamage(nextEnemyDamage)
-  }, [bossIndex, victory])
 
   const dealDamage = useCallback((base: number, crit: boolean) => {
     if (victory || base <= 0) return

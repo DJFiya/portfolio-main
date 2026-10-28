@@ -37,10 +37,8 @@ export function useCoffeeMug(mugRef: RefObject<HTMLDivElement | null>) {
       const next = Math.min(prev + 1, MUG_MAX_SIPS)
       if (next >= MUG_MAX_SIPS) {
         setBlinking(true)
-        setTimeout(() => {
-          setSips(0)
-          setSteam([])
-        }, COFFEE_REFILL_SYNC_MS)
+        setSteam([])
+        setTimeout(() => setSips(0), COFFEE_REFILL_SYNC_MS)
         setTimeout(() => {
           setBlinking(false)
         }, COFFEE_BLINK_MS)
@@ -52,10 +50,7 @@ export function useCoffeeMug(mugRef: RefObject<HTMLDivElement | null>) {
   const fillLevel = 1 - sips / MUG_MAX_SIPS
 
   useEffect(() => {
-    if (fillLevel <= 0 || blinking) {
-      setSteam([])
-      return
-    }
+    if (fillLevel <= 0 || blinking) return
 
     const interval = setInterval(() => {
       const rect = mugRef.current?.getBoundingClientRect()
