@@ -147,12 +147,8 @@ export default function DeskClutter() {
     setSwordGameOpen(true)
   }, [])
 
-  // ── Controller "Split Screen Reality" toggle ──────────────────────────────
-  // Pain-point removals:
-  //  • Second click immediately exits (no trapping the user)
-  //  • Won't trigger if a major modal/scene is already running (avoids stacked overlays)
-  //  • Auto-reverts at GAME_MODE_MS so it never overstays its welcome
-  //  • ESC handler below is the keyboard escape hatch
+  // Game mode ends on a second click, Esc, or after GAME_MODE_MS, and won't
+  // start over another open overlay.
   const exitGameMode = useCallback(() => {
     if (gameModeTimerRef.current) {
       clearTimeout(gameModeTimerRef.current)

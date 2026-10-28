@@ -9,15 +9,9 @@ const data = rawData as unknown as PortfolioData
 const QTE_KEYS = ['E', 'F', 'SPACE', 'R'] as const
 const QTE_TICK_MS = 700
 
-// ── "Split Screen Reality" overlay ────────────────────────────────────────────
-// Layered, non-destructive HUD that runs while the controller is engaged.
-// Pain-point removals baked into the component:
-//   • The whole tree has pointer-events:none so it never blocks dice / sword /
-//     laptop clicks — keeping those handlers reachable IS the payoff
-//   • Only the floating "EXIT" pill captures clicks (escape hatch with mouse)
-//   • Per-item HUD chips are anchored via getBoundingClientRect and re-read on
-//     resize/scroll so they stay aligned even if layout shifts
-//   • prefers-reduced-motion suppresses the heavier animations (handled in CSS)
+// HUD shown while game mode is on. It ignores pointer events so desk items stay
+// clickable underneath; only the exit pill takes clicks. Chips re-measure their
+// items on resize and scroll.
 interface GameLabelInfo {
   id:      string
   label:   string
