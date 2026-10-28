@@ -1,5 +1,5 @@
 import HTMLFlipBook from 'react-pageflip'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { useRef, useState, useEffect, useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -120,6 +120,7 @@ export default function BookPortfolio() {
     Math.min(380, Math.max(280, window.innerWidth - 24)),
   )
   const resumeOpen = location.pathname === '/links/resume'
+  const reduceMotion = useReducedMotion()
   useRouteMeta(location.pathname)
 
   // slidePage drives the centering slide — set pre-flip so it animates
@@ -328,7 +329,7 @@ export default function BookPortfolio() {
       ) : (
         <motion.div
           animate={{ x: slideX }}
-          transition={{ duration: 0.65, ease: 'easeInOut' }}
+          transition={{ duration: reduceMotion ? 0 : 0.65, ease: 'easeInOut' }}
           style={{ position: 'relative', display: 'inline-block' }}
         >
           {(() => {
@@ -349,7 +350,7 @@ export default function BookPortfolio() {
             maxHeight={600}
             showCover
             drawShadow
-            flippingTime={680}
+            flippingTime={reduceMotion ? 250 : 680}
             startPage={initPage}
             useMouseEvents
             onFlip={handleFlip}
