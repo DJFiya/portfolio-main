@@ -10,6 +10,7 @@ import GameModeOverlay from './desk/GameModeOverlay'
 import { gameLabelFor } from './desk/gameLabels'
 import SpotifyMiniPlayer from './desk/SpotifyMiniPlayer'
 import SpotifyModal from './desk/SpotifyModal'
+import PoemParticles, { type PoemBurst } from './desk/PoemParticles'
 import InvincibleSequence from './desk/InvincibleSequence'
 import GwhPlane from './desk/GwhPlane'
 import DeadPoetsParticles, { type DpsBurst } from './desk/DeadPoetsParticles'
@@ -43,15 +44,6 @@ const POEM_VERSES: [string, string][] = [
   ['small words fall like rain', 'and bloom into quiet'],
   ['every margin holds a moon', 'for thoughts that missed their train'],
 ]
-
-interface PoemBurst {
-  left: number
-  top: number
-  width: number
-  height: number
-  lines: [string, string]
-  tick: number
-}
 
 interface NoteParticle {
   id: number
@@ -588,15 +580,3 @@ export default function DeskClutter() {
     </>
   )
 }
-
-function PoemParticles({ burst }: { burst: PoemBurst }) {
-  const { left, top, width, lines } = burst
-  return (
-    <div className="poem-burst" style={{ left: left + width / 2, top: top - 8 }}>
-      <div className="poem-burst-line poem-burst-line--1">{lines[0]}</div>
-      <div className="poem-burst-line poem-burst-line--2">{lines[1]}</div>
-    </div>
-  )
-}
-
-
