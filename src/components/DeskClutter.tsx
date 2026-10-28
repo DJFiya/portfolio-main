@@ -10,11 +10,10 @@ import GameModeOverlay from './desk/GameModeOverlay'
 import { gameLabelFor } from './desk/gameLabels'
 import SpotifyMiniPlayer from './desk/SpotifyMiniPlayer'
 import SpotifyModal from './desk/SpotifyModal'
+import InvincibleSequence from './desk/InvincibleSequence'
 import GwhPlane from './desk/GwhPlane'
 import DeadPoetsParticles, { type DpsBurst } from './desk/DeadPoetsParticles'
 import AtlaParticles, { type AtlaBurst, type AtlaEffect } from './desk/AtlaParticles'
-import invincibleFlying from '../assets/invincible/invincible-flying.png'
-import invincibleTitleCard from '../assets/invincible/title-card.png'
 
 const data = rawData as unknown as PortfolioData
 
@@ -27,8 +26,6 @@ const MUG_MAX_SIPS = 6
 const MUG_SIP_MS = 260
 const COFFEE_BLINK_MS = 1100
 const COFFEE_REFILL_SYNC_MS = 550
-const INVINCIBLE_FLY_MS = 2200
-const INVINCIBLE_TITLE_MS = 2000
 const GAME_MODE_MS = 4500
 const REALITY_HIT_MS = 2100
 
@@ -589,46 +586,6 @@ export default function DeskClutter() {
         document.body
       )}
     </>
-  )
-}
-
-type InvinciblePhase = 'fly' | 'title'
-
-function InvincibleSequence({ onDone }: { onDone: () => void }) {
-  const [phase, setPhase] = useState<InvinciblePhase>('fly')
-
-  useEffect(() => {
-    const toTitle = setTimeout(() => setPhase('title'), INVINCIBLE_FLY_MS)
-    const toDone = setTimeout(() => onDone(), INVINCIBLE_FLY_MS + INVINCIBLE_TITLE_MS)
-    return () => {
-      clearTimeout(toTitle)
-      clearTimeout(toDone)
-    }
-  }, [onDone])
-
-  return (
-    <div className="invincible-overlay" aria-hidden="true">
-      {phase === 'fly' && (
-        <div className="invincible-fly-stage">
-          <div className="invincible-fly-grow">
-            <img
-              src={invincibleFlying}
-              alt=""
-              className="invincible-fly-image"
-              draggable={false}
-            />
-          </div>
-        </div>
-      )}
-      {phase === 'title' && (
-        <img
-          src={invincibleTitleCard}
-          alt=""
-          className="invincible-title-image"
-          draggable={false}
-        />
-      )}
-    </div>
   )
 }
 
