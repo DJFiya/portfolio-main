@@ -424,7 +424,7 @@ export default function BookPortfolio() {
               type="button"
               key={p}
               onClick={() => flipTo(p)}
-              className="rounded-full transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure-400"
+              className="rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-azure-400"
               style={{
                 width: idx === 0 || idx === 5 ? 5 : 6,
                 height: idx === 0 || idx === 5 ? 5 : 6,
