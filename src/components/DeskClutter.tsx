@@ -15,6 +15,8 @@ import InvincibleSequence from './desk/InvincibleSequence'
 import GwhPlane from './desk/GwhPlane'
 import DeadPoetsParticles, { type DpsBurst } from './desk/DeadPoetsParticles'
 import AtlaParticles, { type AtlaBurst, type AtlaEffect } from './desk/AtlaParticles'
+import { useCoffeeMug } from './desk/useCoffeeMug'
+import { CoffeeSteam, CoffeeBlink } from './desk/CoffeeOverlays'
 
 const data = rawData as unknown as PortfolioData
 
@@ -23,10 +25,6 @@ const CRIT_MS = 2600
 const ATLA_MS = 900
 const DPS_MS  = 4500
 const TERMINAL_HACK_MS = 1900
-const MUG_MAX_SIPS = 6
-const MUG_SIP_MS = 260
-const COFFEE_BLINK_MS = 1100
-const COFFEE_REFILL_SYNC_MS = 550
 const GAME_MODE_MS = 4500
 const REALITY_HIT_MS = 2100
 
@@ -54,16 +52,6 @@ interface NoteParticle {
   size: number
   drift: number
   spin: number
-  dur: number
-  removeAt: number
-}
-
-interface SteamParticle {
-  id: number
-  x: number
-  y: number
-  drift: number
-  size: number
   dur: number
   removeAt: number
 }
@@ -97,10 +85,6 @@ export default function DeskClutter() {
   const [laptopClicking, setLaptopClicking] = useState(false)
   const [terminalHacking, setTerminalHacking] = useState(false)
   const [invincibleActive, setInvincibleActive] = useState(false)
-  const [coffeeSips, setCoffeeSips] = useState(0)
-  const [mugSipping, setMugSipping] = useState(false)
-  const [coffeeBlinking, setCoffeeBlinking] = useState(false)
-  const [steam, setSteam] = useState<SteamParticle[]>([])
   const [realityHitBurst, setRealityHitBurst] = useState<RealityHitBurst | null>(null)
   const [gameMode, setGameMode] = useState(false)
   const [gameModeTick, setGameModeTick] = useState(0)
@@ -112,10 +96,10 @@ export default function DeskClutter() {
   const laptopRef   = useRef<HTMLDivElement | null>(null)
   const swordRef    = useRef<HTMLDivElement | null>(null)
   const noteIdRef   = useRef(0)
-  const steamIdRef  = useRef(0)
   const atlaEffectIndexRef = useRef(0)
   const poemVerseIndexRef = useRef(0)
   const gameModeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const coffee = useCoffeeMug(mugRef)
 
   const handleRoll = useCallback((id: string, type: string) => {
     if (rolling.has(id)) return
@@ -236,14 +220,14 @@ export default function DeskClutter() {
       exitGameMode()
       return
     }
-    if (spotifyOpen || gwhActive || invincibleActive || coffeeBlinking) return
+    if (spotifyOpen || gwhActive || invincibleActive || coffee.blinking) return
     setGameMode(true)
     setGameModeTick(t => t + 1)
     gameModeTimerRef.current = setTimeout(() => {
       setGameMode(false)
       gameModeTimerRef.current = null
     }, GAME_MODE_MS)
-  }, [gameMode, exitGameMode, spotifyOpen, gwhActive, invincibleActive, coffeeBlinking])
+  }, [gameMode, exitGameMode, spotifyOpen, gwhActive, invincibleActive, coffee.blinking])
 
   // body class drives all per-item CSS (HUD glow, rarity, parchment, etc.)
   useEffect(() => {
@@ -277,30 +261,6 @@ export default function DeskClutter() {
   const handleGwhDone = useCallback(() => {
     setGwhActive(false)
   }, [])
-
-  const handleMugClick = useCallback(() => {
-    if (coffeeBlinking) return
-    setMugSipping(false)
-    requestAnimationFrame(() => {
-      setMugSipping(true)
-      setTimeout(() => setMugSipping(false), MUG_SIP_MS)
-    })
-
-    setCoffeeSips(prev => {
-      const next = Math.min(prev + 1, MUG_MAX_SIPS)
-      if (next >= MUG_MAX_SIPS) {
-        setCoffeeBlinking(true)
-        setTimeout(() => {
-          setCoffeeSips(0)
-          setSteam([])
-        }, COFFEE_REFILL_SYNC_MS)
-        setTimeout(() => {
-          setCoffeeBlinking(false)
-        }, COFFEE_BLINK_MS)
-      }
-      return next
-    })
-  }, [coffeeBlinking])
 
   const handlePoemClick = useCallback((target: HTMLDivElement) => {
     const rect = target.getBoundingClientRect()
@@ -359,34 +319,6 @@ export default function DeskClutter() {
     }, 330)
     return () => clearInterval(interval)
   }, [cassetteActive, cassetteRect])
-
-  const coffeeFillLevel = 1 - coffeeSips / MUG_MAX_SIPS
-
-  useEffect(() => {
-    if (coffeeFillLevel <= 0 || coffeeBlinking) {
-      setSteam([])
-      return
-    }
-
-    const interval = setInterval(() => {
-      const rect = mugRef.current?.getBoundingClientRect()
-      if (!rect) return
-      const now = Date.now()
-      const count = Math.random() < 0.7 ? 2 : 1
-      const fresh: SteamParticle[] = Array.from({ length: count }, () => ({
-        id: steamIdRef.current++,
-        x: rect.left + rect.width * (0.30 + Math.random() * 0.34),
-        y: rect.top + rect.height * (0.20 + Math.random() * 0.11),
-        drift: (Math.random() - 0.5) * 24,
-        size: 7 + Math.random() * 8,
-        dur: 1.8 + Math.random() * 0.9,
-        removeAt: now + 2400,
-      }))
-      setSteam(prev => [...prev.filter(p => p.removeAt > now), ...fresh].slice(-18))
-    }, 240)
-
-    return () => clearInterval(interval)
-  }, [coffeeFillLevel, coffeeBlinking])
 
   return (
     <>
@@ -451,7 +383,7 @@ export default function DeskClutter() {
                 : isCassette   ? handleCassette
                 : isLaptop     ? handleLaptopClick
                 : isPoem       ? (e) => handlePoemClick(e.currentTarget)
-                : isMug        ? handleMugClick
+                : isMug        ? coffee.sip
                 : isController ? handleController
                 : isSword      ? handleSwordGameOpen
                 : undefined
@@ -468,9 +400,9 @@ export default function DeskClutter() {
                   label={item.label}
                   diceValue={isRolling ? undefined : diceValues[item.id]}
                   terminalHacking={isTerminal ? terminalHacking : undefined}
-                  mugFillLevel={isMug ? coffeeFillLevel : undefined}
-                  mugSipping={isMug ? mugSipping : undefined}
-                  mugEmpty={isMug ? coffeeFillLevel <= 0 : undefined}
+                  mugFillLevel={isMug ? coffee.fillLevel : undefined}
+                  mugSipping={isMug ? coffee.sipping : undefined}
+                  mugEmpty={isMug ? coffee.fillLevel <= 0 : undefined}
                 />
               </div>
             </div>
@@ -535,33 +467,12 @@ export default function DeskClutter() {
         document.body
       )}
 
-      {steam.length > 0 && createPortal(
-        <div className="coffee-steam-layer">
-          {steam.map(s => (
-            <span
-              key={s.id}
-              className="coffee-steam-particle"
-              style={{
-                left: s.x,
-                top: s.y,
-                width: s.size,
-                height: s.size * 1.6,
-                animationDuration: `${s.dur}s`,
-                ['--steam-drift' as string]: `${s.drift}px`,
-              }}
-            />
-          ))}
-        </div>,
+      {coffee.steam.length > 0 && createPortal(
+        <CoffeeSteam steam={coffee.steam} />,
         document.body
       )}
 
-      {coffeeBlinking && createPortal(
-        <div className="coffee-blink-overlay">
-          <div className="coffee-eyelid coffee-eyelid--top" />
-          <div className="coffee-eyelid coffee-eyelid--bottom" />
-        </div>,
-        document.body
-      )}
+      {coffee.blinking && createPortal(<CoffeeBlink />, document.body)}
 
       {gameMode && createPortal(
         <GameModeOverlay key={gameModeTick} laptopRef={laptopRef} onExit={exitGameMode} />,
