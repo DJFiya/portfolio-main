@@ -1,22 +1,15 @@
 import type { ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 import DeskClutter from './DeskClutter'
+import { useMediaQuery } from '../hooks/useMediaQuery'
 
 export default function DeskScene({ children }: { children: ReactNode }) {
   const [sceneReady, setSceneReady] = useState(false)
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 900)
+  const isMobile = useMediaQuery('(max-width: 900px)')
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => setSceneReady(true))
     return () => cancelAnimationFrame(frame)
-  }, [])
-
-  useEffect(() => {
-    const media = window.matchMedia('(max-width: 900px)')
-    const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches)
-    setIsMobile(media.matches)
-    media.addEventListener('change', onChange)
-    return () => media.removeEventListener('change', onChange)
   }, [])
 
   return (

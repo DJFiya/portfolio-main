@@ -13,6 +13,7 @@ import ProjectsSpread from './spreads/ProjectsSpread'
 import ClubsSpread from './spreads/ClubsSpread'
 import LinksSpread from './spreads/LinksSpread'
 import ResumeModal from './ResumeModal'
+import { useMediaQuery } from '../hooks/useMediaQuery'
 
 // ─── Page map ────────────────────────────────────────────────────────────────
 //  0  front cover
@@ -125,7 +126,7 @@ export default function BookPortfolio() {
   const initPage = ROUTE_TO_PAGE[location.pathname] ?? 0
 
   const [currentPage, setCurrentPage] = useState(initPage)
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 900)
+  const isMobile = useMediaQuery('(max-width: 900px)')
   const [mobileFrameWidth, setMobileFrameWidth] = useState(() =>
     Math.min(380, Math.max(280, window.innerWidth - 24)),
   )
@@ -139,14 +140,6 @@ export default function BookPortfolio() {
   const isProgrammatic = useRef(false)
   const currentPageRef = useRef(initPage)
   const TOTAL = 10
-
-  useEffect(() => {
-    const media = window.matchMedia('(max-width: 900px)')
-    const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches)
-    setIsMobile(media.matches)
-    media.addEventListener('change', onChange)
-    return () => media.removeEventListener('change', onChange)
-  }, [])
 
   useEffect(() => {
     const updateMobileFrame = () => {
