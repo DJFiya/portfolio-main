@@ -17,6 +17,8 @@ import DeadPoetsParticles, { type DpsBurst } from './desk/DeadPoetsParticles'
 import AtlaParticles, { type AtlaBurst, type AtlaEffect } from './desk/AtlaParticles'
 import { useCoffeeMug } from './desk/useCoffeeMug'
 import { CoffeeSteam, CoffeeBlink } from './desk/CoffeeOverlays'
+import { useCassette } from './desk/useCassette'
+import CassetteNotes from './desk/CassetteNotes'
 
 const data = rawData as unknown as PortfolioData
 
@@ -43,28 +45,6 @@ const POEM_VERSES: [string, string][] = [
   ['every margin holds a moon', 'for thoughts that missed their train'],
 ]
 
-interface NoteParticle {
-  id: number
-  x: number
-  y: number
-  color: string
-  glyph: string
-  size: number
-  drift: number
-  spin: number
-  dur: number
-  removeAt: number
-}
-
-const NOTE_COLORS = ['#9b8fb8', '#c49a9e', '#7a8fa3', '#7a9e8a', '#c4a882', '#b89a82', '#7a9a9a', '#b0908a']
-const NOTE_GLYPHS = ['♩', '♪', '♫', '♬']
-
-// Build a weighted pool from portfolio.json — no IDs hardcoded here
-const CASSETTE_PLAYLIST_POOL: string[] = data.spotify.playlists.flatMap(p => {
-  const id = p.url.split('/playlist/')[1]
-  return Array.from({ length: p.weight }, () => id)
-})
-
 export default function DeskClutter() {
   const [rolling,       setRolling]       = useState<Set<string>>(new Set())
   const [diceValues,    setDiceValues]    = useState<Record<string, number>>(
@@ -77,10 +57,6 @@ export default function DeskClutter() {
   const [dpsBurst,      setDpsBurst]      = useState<DpsBurst  | null>(null)
   const [poemBurst,     setPoemBurst]     = useState<PoemBurst | null>(null)
   const [spotifyOpen,    setSpotifyOpen]    = useState(false)
-  const [cassetteActive, setCassetteActive] = useState(false)
-  const [cassetteRect,   setCassetteRect]   = useState<{ left: number; top: number; width: number; height: number } | null>(null)
-  const [notes,          setNotes]          = useState<NoteParticle[]>([])
-  const [playlistId,     setPlaylistId]     = useState<string | null>(null)
   const [gwhActive,      setGwhActive]      = useState(false)
   const [laptopClicking, setLaptopClicking] = useState(false)
   const [terminalHacking, setTerminalHacking] = useState(false)
@@ -95,11 +71,11 @@ export default function DeskClutter() {
   const mugRef      = useRef<HTMLDivElement | null>(null)
   const laptopRef   = useRef<HTMLDivElement | null>(null)
   const swordRef    = useRef<HTMLDivElement | null>(null)
-  const noteIdRef   = useRef(0)
   const atlaEffectIndexRef = useRef(0)
   const poemVerseIndexRef = useRef(0)
   const gameModeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const coffee = useCoffeeMug(mugRef)
+  const cassette = useCassette(cassetteRef)
 
   const handleRoll = useCallback((id: string, type: string) => {
     if (rolling.has(id)) return
@@ -277,49 +253,6 @@ export default function DeskClutter() {
     setTimeout(() => setPoemBurst(null), POEM_MS)
   }, [])
 
-  const stopCassette = useCallback(() => {
-    setCassetteActive(false)
-    setNotes([])
-    setPlaylistId(null)
-  }, [])
-
-  const handleCassette = useCallback(() => {
-    if (cassetteActive) {
-      stopCassette()
-      return
-    }
-    const rect = cassetteRef.current?.getBoundingClientRect()
-    if (!rect) return
-    setCassetteRect({ left: rect.left, top: rect.top, width: rect.width, height: rect.height })
-    if (CASSETTE_PLAYLIST_POOL.length > 0) {
-      setPlaylistId(CASSETTE_PLAYLIST_POOL[Math.floor(Math.random() * CASSETTE_PLAYLIST_POOL.length)])
-    }
-    setCassetteActive(true)
-  }, [cassetteActive, stopCassette])
-
-  useEffect(() => {
-    if (!cassetteActive || !cassetteRect) return
-    const { left, top, width, height } = cassetteRect
-    const interval = setInterval(() => {
-      const now   = Date.now()
-      const count = Math.random() < 0.55 ? 1 : 2
-      const fresh: NoteParticle[] = Array.from({ length: count }, () => ({
-        id:       noteIdRef.current++,
-        x:        left + width  * (0.05 + Math.random() * 0.88),
-        y:        top  + height * (0.1  + Math.random() * 0.55),
-        color:    NOTE_COLORS[Math.floor(Math.random() * NOTE_COLORS.length)],
-        glyph:    NOTE_GLYPHS[Math.floor(Math.random() * NOTE_GLYPHS.length)],
-        size:     13 + Math.random() * 10,
-        drift:    (Math.random() - 0.5) * 46,
-        spin:     (Math.random() - 0.5) * 38,
-        dur:      2.3 + Math.random() * 0.9,
-        removeAt: now + 3400,
-      }))
-      setNotes(prev => [...prev.filter(n => n.removeAt > now), ...fresh].slice(-20))
-    }, 330)
-    return () => clearInterval(interval)
-  }, [cassetteActive, cassetteRect])
-
   return (
     <>
       <div className="desk-clutter-layer">
@@ -364,7 +297,7 @@ export default function DeskClutter() {
               data-item-type={item.type}
               data-game-label={gl?.label}
               data-game-variant={gl?.variant}
-              className={`absolute select-none desk-item${isLaptop ? ' desk-item--laptop' : ''}${isLaptop && laptopClicking ? ' desk-item--laptop-click' : ''}${isCassette && cassetteActive ? ' cassette-playing' : ''}${isPoem ? ' desk-item--poem' : ''}${isPoem && poemBurst ? ' desk-item--poem-active' : ''}${isTerminal ? ' desk-item--terminal' : ''}${isTerminal && terminalHacking ? ' desk-item--terminal-hack' : ''}${isController ? ' desk-item--controller' : ''}${isController && gameMode ? ' desk-item--controller-active' : ''}${isSword && realityHitBurst ? ' desk-item--sword-reality-hit' : ''}`}
+              className={`absolute select-none desk-item${isLaptop ? ' desk-item--laptop' : ''}${isLaptop && laptopClicking ? ' desk-item--laptop-click' : ''}${isCassette && cassette.active ? ' cassette-playing' : ''}${isPoem ? ' desk-item--poem' : ''}${isPoem && poemBurst ? ' desk-item--poem-active' : ''}${isTerminal ? ' desk-item--terminal' : ''}${isTerminal && terminalHacking ? ' desk-item--terminal-hack' : ''}${isController ? ' desk-item--controller' : ''}${isController && gameMode ? ' desk-item--controller-active' : ''}${isSword && realityHitBurst ? ' desk-item--sword-reality-hit' : ''}`}
               style={{
                 left: `${item.x}%`,
                 top:  `${item.y}%`,
@@ -380,7 +313,7 @@ export default function DeskClutter() {
                 : isInvPoster  ? handleInvincible
                 : isTerminal   ? handleTerminalClick
                 : isVinyl      ? () => setSpotifyOpen(true)
-                : isCassette   ? handleCassette
+                : isCassette   ? cassette.toggle
                 : isLaptop     ? handleLaptopClick
                 : isPoem       ? (e) => handlePoemClick(e.currentTarget)
                 : isMug        ? coffee.sip
@@ -436,28 +369,10 @@ export default function DeskClutter() {
         document.body
       )}
 
-      {cassetteActive && createPortal(
+      {cassette.active && createPortal(
         <>
-          <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 99998, overflow: 'visible' }}>
-            {notes.map(n => (
-              <div
-                key={n.id}
-                className="cassette-note"
-                style={{
-                  left:              n.x,
-                  top:               n.y,
-                  fontSize:          n.size,
-                  color:             n.color,
-                  animationDuration: `${n.dur}s`,
-                  ['--note-drift' as string]: `${n.drift}px`,
-                  ['--note-spin'  as string]: `${n.spin}deg`,
-                }}
-              >
-                {n.glyph}
-              </div>
-            ))}
-          </div>
-          <SpotifyMiniPlayer playlistId={playlistId} onStop={stopCassette} />
+          <CassetteNotes notes={cassette.notes} />
+          <SpotifyMiniPlayer playlistId={cassette.playlistId} onStop={cassette.stop} />
         </>,
         document.body
       )}
