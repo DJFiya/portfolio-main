@@ -511,7 +511,10 @@
   color: rgba(244, 244, 248, 0.35);
   font-size: 10px;
   cursor: pointer;
-  padding: 3px 6px;
+  min-width: 24px;
+  min-height: 24px;
+  display: inline-grid;
+  place-items: center;
   border-radius: 5px;
   transition: color 0.15s, background 0.15s;
   line-height: 1;
@@ -616,7 +619,10 @@
   color: rgba(244, 244, 248, 0.4);
   font-size: 14px;
   cursor: pointer;
-  padding: 4px 6px;
+  min-width: 28px;
+  min-height: 28px;
+  display: grid;
+  place-items: center;
   border-radius: 6px;
   transition: color 0.15s ease, background 0.15s ease;
   line-height: 1;
@@ -1438,6 +1444,9 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   border-radius: 999px;
   cursor: pointer;
   text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.25);
   transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
   animation: gm-hud-in 380ms ease-out 200ms both;
@@ -1514,6 +1523,9 @@ body.desk-game-mode .desk-item[data-game-variant="active"] {
   color: #E8DFC8;
   width: 30px;
   height: 30px;
+  padding: 0;
+  display: grid;
+  place-items: center;
   border-radius: 1px;
   cursor: pointer;
   box-shadow: inset 1px 1px 0 #5A4C38, inset -1px -1px 0 #1A1510;

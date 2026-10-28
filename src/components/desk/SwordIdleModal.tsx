@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import swordEnemiesData from '../../data/swordEnemies.json'
+import { CloseIcon } from '../icons'
 
 const SWORD_BASE_CRIT_CHANCE = 0
 const SWORD_IDLE_TICK_MS = 1000
@@ -332,7 +333,7 @@ export default function SwordIdleModal({ onClose, onSwordHit }: { onClose: () =>
             <p className="sword-idle-subtitle">Minecraft sword training</p>
           </div>
           <button type="button" className="sword-idle-close" onClick={onClose} aria-label="Close">
-            ✕
+            <CloseIcon />
           </button>
         </div>
 

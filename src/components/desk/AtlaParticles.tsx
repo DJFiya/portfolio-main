@@ -11,10 +11,10 @@ export interface AtlaBurst {
 }
 
 const ATLA_LABELS: Record<AtlaEffect, string> = {
-  fire:  '🔥 FIRE',
-  earth: '🪨 EARTH',
-  water: '💧 WATER',
-  air:   '💨 AIR',
+  fire:  'FIRE',
+  earth: 'EARTH',
+  water: 'WATER',
+  air:   'AIR',
 }
 
 // ── Particle overlay rendered via portal (position:fixed, no parent clips) ────

@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { CloseIcon } from './icons'
 
 import resumePdfUrl from '../assets/resume/swe_resume.pdf'
 
@@ -89,7 +90,7 @@ export default function ResumeModal({ onClose }: { onClose: () => void }) {
               onClick={onClose}
               aria-label="Close"
             >
-              ✕
+              <CloseIcon />
             </button>
           </div>
         </div>

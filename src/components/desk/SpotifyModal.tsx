@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import rawData from '../../data/portfolio.json'
 import type { PortfolioData } from '../../types/portfolio'
 import SpotifyLogo from './SpotifyLogo'
+import { CloseIcon, NoteIcon } from '../icons'
 
 const data = rawData as unknown as PortfolioData
 
@@ -38,7 +39,7 @@ export default function SpotifyModal({ onClose }: { onClose: () => void }) {
             onClick={onClose}
             aria-label="Close"
           >
-            ✕
+            <CloseIcon />
           </button>
         </div>
 
@@ -67,7 +68,7 @@ export default function SpotifyModal({ onClose }: { onClose: () => void }) {
         <div className="spotify-modal-playlists">
           {SPOTIFY_PLAYLISTS.map((name) => (
             <div key={name} className="spotify-modal-playlist-chip">
-              <span className="spotify-modal-playlist-icon">♪</span>
+              <NoteIcon className="spotify-modal-playlist-icon" />
               {name}
             </div>
           ))}

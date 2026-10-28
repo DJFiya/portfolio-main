@@ -1,4 +1,5 @@
 import SpotifyLogo from './SpotifyLogo'
+import { StopIcon } from '../icons'
 
 // ── Spotify mini-player (bottom-left, slides in when cassette is active) ──────
 export default function SpotifyMiniPlayer({ playlistId, onStop }: { playlistId: string | null; onStop: () => void }) {
@@ -15,7 +16,7 @@ export default function SpotifyMiniPlayer({ playlistId, onStop }: { playlistId: 
           <SpotifyLogo size={14} />
           Spotify
         </span>
-        <button className="cassette-player-stop" onClick={onStop} aria-label="Stop">■</button>
+        <button className="cassette-player-stop" onClick={onStop} aria-label="Stop"><StopIcon /></button>
       </div>
       {hasPlaylist ? (
         <iframe

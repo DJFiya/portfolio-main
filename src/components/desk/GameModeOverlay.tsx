@@ -2,6 +2,7 @@ import type React from 'react'
 import { useState, useEffect } from 'react'
 import rawData from '../../data/portfolio.json'
 import type { PortfolioData } from '../../types/portfolio'
+import { CloseIcon } from '../icons'
 
 const data = rawData as unknown as PortfolioData
 
@@ -124,7 +125,8 @@ export default function GameModeOverlay({ laptopRef, onExit }: { laptopRef: Reac
         onClick={onExit}
         aria-label="Exit game mode"
       >
-        ✕ EXIT
+        <CloseIcon />
+        Exit
       </button>
     </div>
   )
