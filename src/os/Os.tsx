@@ -7,6 +7,7 @@ import DesktopItems from './DesktopItems'
 import { ObjectIcon } from './objects'
 import MenuStatus from './MenuStatus'
 import { OsContext, type OsApi } from './os-context'
+import { normalizeUrl, routeFor, syncHash } from './routes'
 import Wallpaper from './Wallpaper'
 import Window, { type Rect, type Win } from './Window'
 import './os.css'
@@ -91,6 +92,26 @@ export default function Os() {
       return { ...s, pos, trashed: s.trashed.filter(x => x !== id) }
     }),
   }), [open, sip, state.wall, state.trashed, setState])
+
+  useEffect(() => {
+    normalizeUrl()
+    const go = () => {
+      const route = routeFor(location.hash.slice(1))
+      if (route) open(...route)
+    }
+    go()
+    addEventListener('hashchange', go)
+    return () => removeEventListener('hashchange', go)
+  }, [open])
+
+  // Leave the incoming link alone until a window has actually opened or closed
+  const topId = top?.id
+  const lastTop = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    if (topId === lastTop.current) return
+    lastTop.current = topId
+    syncHash(topId)
+  }, [topId])
 
   useEffect(() => {
     if (!ctx) return
