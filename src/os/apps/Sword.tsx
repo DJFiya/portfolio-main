@@ -3,7 +3,7 @@ import { useMediaQuery } from '../../hooks/useMediaQuery'
 import './sword.css'
 
 // [name, hp, body colour]
-const BOSSES: [string, number, string][] = [['Baby Slime', 24, '#7FC46A'], ['Zombie', 28, '#4F8A4B'], ['Spider', 32, '#3A3236'], ['Skeleton', 36, '#D8D6CC'], ['Creeper', 40, '#5FB04C'], ['Husk', 44, '#B79B62'], ['Stray', 49, '#D8D6CC'], ['Drowned', 54, '#7D8A8C'], ['Pillager', 59, '#7F7F78'], ['Vindicator', 65, '#A7ACA8'], ['Witch', 72, '#9A6B4A'], ['Enderman', 79, '#1C1820']]
+const BOSSES: [string, number, string][] = [['Baby Slime', 24, '#7FC46A'], ['Zombie', 28, '#4F8A4B'], ['Spider', 32, '#3A3236'], ['Skeleton', 36, '#D8D6CC'], ['Creeper', 40, '#5FB04C'], ['Husk', 44, '#6E8F4E'], ['Stray', 49, '#D8D6CC'], ['Drowned', 54, '#7D8A8C'], ['Pillager', 59, '#7F7F78'], ['Vindicator', 65, '#A7ACA8'], ['Witch', 72, '#9A6B4A'], ['Enderman', 79, '#1C1820']]
 const UPGRADES = { dmg: ['Sharpness', '+1 damage'], auto: ['Auto-swing', '+1 damage per second'], loot: ['Looting', '+1 gold per kill'] } as const
 type Upgrade = keyof typeof UPGRADES
 
@@ -32,8 +32,9 @@ function drawBoss(cv: HTMLCanvasElement, i: number) {
   else px(5, 7, 2, 1, '#111')
   if (name === 'Creeper') { px(4, 6, 4, 2, '#111'); px(4, 8, 1, 1, '#111'); px(7, 8, 1, 1, '#111') }
   if (name === 'Spider') { px(0, 5, 2, 1, col); px(10, 5, 2, 1, col); px(0, 7, 2, 1, col); px(10, 7, 2, 1, col) }
-  if (name === 'Husk') { px(2, 1, 8, 2, '#E4D58E'); px(3, 0, 6, 1, '#E4D58E'); px(2, 2, 8, 1, 'rgba(120,100,40,0.35)') }
-  if (name === 'Stray') { px(1, 1, 10, 2, '#2B6468'); px(3, 0, 6, 1, '#2B6468') }
+  // Hats sit on the top of the head, inside the square
+  if (name === 'Husk') { px(2, 2, 8, 2, '#E4D58E'); px(2, 3, 8, 1, 'rgba(120,100,40,0.3)') }
+  if (name === 'Stray') { px(2, 2, 8, 2, '#2B6468'); px(2, 3, 8, 1, 'rgba(0,0,0,0.2)') }
   if (name === 'Drowned') { const kelp = '#3E8E3E'; px(2, 2, 1, 5, kelp); px(3, 2, 2, 1, kelp); px(9, 2, 1, 3, kelp); px(8, 8, 1, 2, kelp); px(3, 8, 1, 1, kelp) }
   if (name === 'Witch') { px(1, 2, 10, 1, '#4A2E5E'); px(3, 0, 6, 2, '#5B3F73'); px(3, 1, 6, 1, 'rgba(0,0,0,0.18)'); px(6, 7, 1, 1, '#3E8E3E') }
 }
