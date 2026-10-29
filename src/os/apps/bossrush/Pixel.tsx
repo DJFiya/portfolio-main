@@ -58,11 +58,11 @@ const ICONS: Record<string, string[]> = {
     'kooooooooooooook', 'kOOOOooOOooOOOOk', '.kkkkkooookkkkk.', '.....koOOok.....', '.....kooook.....', '.....kOooOk.....',
     '......koOk......', '......kkkk......', '................', '................',
   ],
-  // A head block turned 45°, lit face and shaded face meeting at a ridge, on a diagonal breeze-rod handle
+  // The head is a flat rectangle turned 45° across the handle: left half lit, right half shaded
   mace: [
-    '..........K.....', '.........KDK....', '........KLDSK...', '.......KLLDSSK..', '......KLLLDSdSK.', '.....KLLLLDSSSSK',
-    '......KLLLDSSdK.', '.......KLLDdSK..', '........KLDSK...', '......KhKKDK....', '.....KHK..K.....', '....KhK.........',
-    '...KHK..........', '..KhK...........', '.KHK............', 'KhK.............',
+    '........K.......', '.......KSK......', '......KSSSK.....', '.....KLSSSSK....', '....KLLLSSSSK...', '....KLLLLSSSSK..',
+    '.....KLLLLSSSSK.', '......KLLLLSSSSK', '.......KLLLLSSSK', '.....KhKKLLLLSK.', '....KHK..KLLLK..', '...KhK....KLK...',
+    '..KHK......K....', '.KhK............', 'KHK.............', 'hK..............',
   ],
 }
 export const ItemIcon = ({ item, size = 28 }: { item: string; size?: number }) => <Sprite map={ICONS[item]} size={size} />
