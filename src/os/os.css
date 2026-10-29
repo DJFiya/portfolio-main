@@ -41,7 +41,9 @@ a { color: var(--accent); text-underline-offset: 3px; }
 .mb.cta { background: var(--ink); color: #FFF; }
 .mb.cta:hover { background: #2B3132; }
 #active-app { font-weight: 600; color: var(--ink2); padding: 0 8px; }
-#clock { padding: 0 10px; color: var(--ink2); }
+#menubar .status { display: flex; align-items: center; gap: 4px; margin-left: 6px; color: var(--ink2); font-weight: 600; }
+.status .st { display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 6px; font-size: 13px; }
+#clock { padding: 0 8px 0 6px; white-space: pre; }
 
 /* ---------- desktop ---------- */
 #desk { position: relative; flex: 1 1 auto; overflow: hidden; }

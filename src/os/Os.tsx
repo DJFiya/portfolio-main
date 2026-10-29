@@ -5,20 +5,11 @@ import { WALLS } from './content'
 import { MUG_SIPS, useDesktopState } from './desktop-state'
 import DesktopItems from './DesktopItems'
 import { Icon } from './icons'
+import MenuStatus from './MenuStatus'
 import { OsContext, type OsApi } from './os-context'
 import Wallpaper from './Wallpaper'
 import Window, { type Rect, type Win } from './Window'
 import './os.css'
-
-function useClock() {
-  const fmt = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  const [now, setNow] = useState(fmt)
-  useEffect(() => {
-    const t = setInterval(() => setNow(fmt()), 15000)
-    return () => clearInterval(t)
-  }, [])
-  return now
-}
 
 export default function Os() {
   const [state, setState] = useDesktopState()
@@ -31,7 +22,6 @@ export default function Os() {
   const zTop = useRef(100)
   const mobile = useMediaQuery('(max-width: 820px)')
   const reduce = useMediaQuery('(prefers-reduced-motion: reduce)')
-  const clock = useClock()
 
   useLayoutEffect(() => {
     const el = deskRef.current
@@ -136,7 +126,7 @@ export default function Os() {
             <button className="mb cta" type="button" onClick={() => open('resume')}>Résumé</button>
             <a className="mb hide-sm" href="https://github.com/DJFiya" target="_blank" rel="noopener">GitHub</a>
             <a className="mb hide-sm" href="https://linkedin.com/in/daevik-jain" target="_blank" rel="noopener">LinkedIn</a>
-            <span id="clock" className="hide-sm" aria-label="Local time">{clock}</span>
+            <MenuStatus />
           </nav>
         </header>
         <main id="desk" ref={deskRef} aria-label="Desktop" onContextMenu={onContext}>
