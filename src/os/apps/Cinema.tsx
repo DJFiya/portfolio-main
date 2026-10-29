@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { PauseGlyph, PlayGlyph } from '../icons'
+import invincibleCard from '../../assets/invincible-title-card.png'
 import { sizeCanvas, type Screen } from './screen'
 import './media.css'
 import './cinema.css'
@@ -100,8 +101,11 @@ function script(id: string, stage: HTMLDivElement, sc: Scene, reduce: boolean) {
     })
   }
   if (id === 'inv') at(0, () => {
-    stage.style.background = '#1B3C8C'
-    stage.appendChild(el('p', 'inv-title', 'Invincible'))
+    stage.style.background = '#13A0EC'
+    const card = el('img', 'inv-card') as HTMLImageElement
+    card.src = invincibleCard
+    card.alt = ''
+    stage.appendChild(card)
     if (!reduce) stage.classList.add('shake')
   })
 }
