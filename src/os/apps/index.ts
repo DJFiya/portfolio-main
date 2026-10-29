@@ -3,6 +3,8 @@ import type { AppDef } from '../os-context'
 import Career from './Career'
 import Cinema from './Cinema'
 import Contact from './Contact'
+import Dice from './Dice'
+import Games from './Games'
 import Music from './Music'
 import Projects from './Projects'
 import Resume, { ResumeTools } from './Resume'
@@ -11,6 +13,8 @@ import Terminal from './Terminal'
 import Trash from './Trash'
 
 export const APPS: Record<string, AppDef> = {
+  dice: { title: 'Dice', icon: 'games', family: 'media', hidden: true, w: 560, h: 360, Component: Dice },
+  games: { title: 'Games', icon: 'games', w: 560, h: 330, Component: Games },
   music: { title: 'Music', icon: 'music', family: 'media', w: 760, h: 420, Component: Music },
   projects: { title: 'Projects', icon: 'projects', family: 'instrument', w: 1000, h: 620, Component: Projects },
   career: { title: 'Career', icon: 'career', family: 'instrument', w: 980, h: 600, Component: Career },
