@@ -57,4 +57,8 @@ export const CONTACTS: [string, string, string][] = [
 
 export const RESUME_PDF = '/resume/swe_resume.pdf'
 
-export const WALLS: [string, string][] = [['Moss', '#2E4A3A'], ['Ink', '#1D2742'], ['Slate', '#2B3036'], ['Plum', '#3A2438'], ['Clay', '#5A3B2B']]
+// The first is the default
+export const WALLS: [string, string][] = [
+  ['Slate Blue', '#3C4C6E'], ['Ink', '#1D2742'], ['Harbor', '#24505E'], ['Moss', '#2E4A3A'], ['Olive', '#4A4A2C'],
+  ['Dusk', '#4B3F6B'], ['Plum', '#3A2438'], ['Rosewood', '#6A3540'], ['Clay', '#5A3B2B'], ['Graphite', '#2B3036'],
+]
