@@ -2,16 +2,15 @@ import { DIMENSIONS } from './mobs'
 
 // Health is counted in half-hearts, like Minecraft: 20 is ten full hearts
 export const MAX_HP = 20
+// points sets the damage cut; bar is how full Minecraft's armour bar is for that tier (20 = full)
 export const ARMOR = [
-  { name: 'None', points: 0, cost: 0, col: '' },
-  { name: 'Leather', points: 15, cost: 15, col: '#8A5A33' },
-  { name: 'Chainmail', points: 30, cost: 30, col: '#9AA3AE' },
-  { name: 'Iron', points: 50, cost: 60, col: '#D8D8D8' },
-  { name: 'Diamond', points: 90, cost: 150, col: '#5FD8D0' },
-  { name: 'Netherite', points: 150, cost: 300, col: '#4A4246' },
+  { name: 'None', points: 0, bar: 0, cost: 0, col: '' },
+  { name: 'Leather', points: 15, bar: 7, cost: 15, col: '#8A5A33' },
+  { name: 'Chainmail', points: 30, bar: 12, cost: 30, col: '#9AA3AE' },
+  { name: 'Iron', points: 50, bar: 15, cost: 60, col: '#D8D8D8' },
+  { name: 'Diamond', points: 90, bar: 20, cost: 150, col: '#5FD8D0' },
+  { name: 'Netherite', points: 150, bar: 20, cost: 300, col: '#4A4246' },
 ]
-// How much less damage a tier takes, as a whole percent, for the shop to show
-export const armorCut = (tier: number) => Math.round(100 - 10000 / (100 + ARMOR[tier].points))
 export const ITEMS = {
   steak: { name: 'Steak', cost: 6 },
   gapple: { name: 'Golden apple', cost: 25 },

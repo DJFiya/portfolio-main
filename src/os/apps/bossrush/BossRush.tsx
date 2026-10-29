@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } f
 import { useMediaQuery } from '../../../hooks/useMediaQuery'
 import type { AppProps } from '../../os-context'
 import {
-  ARMOR, ITEMS, armorCut, MACE_COOLDOWN, MAX_HP, buyArmor, buyItem, buyUpgrade, canBuy, click, fresh, load, mobOf,
+  ARMOR, ITEMS, MACE_COOLDOWN, MAX_HP, buyArmor, buyItem, buyUpgrade, canBuy, click, fresh, load, mobOf,
   consume, respawn, save, tick, winding, type GameEvent, type Item, type Run, type Upgrade,
 } from './game'
 import { DIMENSIONS, drawMob } from './mobs'
@@ -91,11 +91,15 @@ export default function BossRush({ active }: AppProps) {
 
         <div className="br-hud">
           <div className="br-status">
+            {run.armor > 0 && (
+              <span className="br-armor" aria-label={`${ARMOR[run.armor].name} armour`}>
+                {Array.from({ length: 10 }, (_, k) => { const b = ARMOR[run.armor].bar; return <Chestplate key={k} col={ARMOR[run.armor].col} fill={b >= k * 2 + 2 ? 2 : b === k * 2 + 1 ? 1 : 0} /> })}
+              </span>
+            )}
             <span className="br-hearts" aria-label={`${(run.php / 2).toFixed(1)} of 10 hearts${gold ? `, ${gold / 2} extra` : ''}`}>
               {Array.from({ length: MAX_HP / 2 }, (_, k) => <Heart key={k} fill={full >= k * 2 + 2 ? 2 : full === k * 2 + 1 ? 1 : 0} />)}
               {Array.from({ length: Math.ceil(gold / 2) }, (_, k) => <Heart key={`g${k}`} gold fill={gold >= k * 2 + 2 ? 2 : 1} />)}
             </span>
-            {run.armor > 0 && <span className="br-armor" title={`${ARMOR[run.armor].name} armour: ${armorCut(run.armor)}% less damage`}><Chestplate col={ARMOR[run.armor].col} /></span>}
           </div>
           <div className="br-hotbar">
             {HOTBAR.map((it, k) => {
@@ -134,15 +138,15 @@ export default function BossRush({ active }: AppProps) {
           </button>
         ))}
         <h3>Armour</h3>
-        {ARMOR.slice(1).map((a, k) => {
-          const tier = k + 1, worn = tier === run.armor, past = tier < run.armor, next = tier === run.armor + 1
-          return (
-            <button key={a.name} type="button" className={`br-buy${worn ? ' worn' : ''}${past ? ' past' : ''}`} disabled={!next || run.gold < a.cost} onClick={() => apply(buyArmor)}>
-              <span className="br-buy-icon"><Chestplate col={a.col} /><span>{a.name}<small>{armorCut(tier)}% less damage</small></span></span>
-              <span>{worn ? 'Worn' : past ? '' : `${a.cost}g`}</span>
-            </button>
-          )
-        })}
+        {ARMOR[run.armor + 1] ? (
+          <button type="button" className="br-buy" disabled={run.gold < ARMOR[run.armor + 1].cost} onClick={() => apply(buyArmor)}>
+            <span className="br-buy-icon"><Chestplate col={ARMOR[run.armor + 1].col} fill={2} />{ARMOR[run.armor + 1].name}</span><span>{ARMOR[run.armor + 1].cost}g</span>
+          </button>
+        ) : (
+          <button type="button" className="br-buy worn" disabled>
+            <span className="br-buy-icon"><Chestplate col={ARMOR[run.armor].col} fill={2} />{ARMOR[run.armor].name}</span><span>Worn</span>
+          </button>
+        )}
         <h3>Items</h3>
         {HOTBAR.map(it => (
           <button key={it} type="button" className="br-buy" disabled={!canBuy(run, it)} onClick={() => apply(r => buyItem(r, it))}>

@@ -23,7 +23,7 @@ export const DIMENSIONS: { name: string; mobs: Mob[] }[] = [
   {
     name: 'Nether',
     mobs: [
-      { name: 'Magma Cube', hp: 140, atk: 3, every: 3, col: '#1A0A06' },
+      { name: 'Magma Cube', hp: 140, atk: 3, every: 3, col: '#6A2A1C' },
       { name: 'Blaze', hp: 230, atk: 5, every: 2.6, col: '#E9B83A' },
       { name: 'Ghast', hp: 210, atk: 9, every: 4.5, col: '#EDEDE8' },
       { name: 'Hoglin', hp: 280, atk: 7, every: 3, col: '#A8705A' },
@@ -69,7 +69,7 @@ export function drawMob(cv: HTMLCanvasElement, mob: Mob) {
   }
 
   px(2, 2, 8, 8, col); px(2, 2, 8, 1, light); px(2, 9, 8, 1, shade)
-  const EYES: Record<string, string> = { Enderman: '#B84DE0', Spider: '#C0242A', Stray: '#8FE3F5', Drowned: '#47C4EC', 'Magma Cube': '#FFD15C', Blaze: '#5A3A0A', 'Wither Skeleton': '#111', Hoglin: '#2A1A14', 'Piglin Brute': '#F2F2EC' }
+  const EYES: Record<string, string> = { Enderman: '#B84DE0', Spider: '#C0242A', Stray: '#8FE3F5', Drowned: '#47C4EC', Blaze: '#5A3A0A', 'Wither Skeleton': '#111', Hoglin: '#2A1A14', 'Piglin Brute': '#F2F2EC' }
   const illager = name === 'Pillager' || name === 'Vindicator'
   const snout = name === 'Hoglin' || name === 'Piglin Brute'
 
@@ -77,10 +77,8 @@ export function drawMob(cv: HTMLCanvasElement, mob: Mob) {
     px(3, 3, 6, 1, name === 'Vindicator' ? '#111' : '#3B3B36')
     px(3, 4, 2, 1, '#F2F2EC'); px(7, 4, 2, 1, '#F2F2EC'); px(4, 4, 1, 1, '#2F5A3A'); px(7, 4, 1, 1, '#2F5A3A')
   } else if (name === 'Magma Cube') {
-    // Dark layers with lava glowing through the seams, and orange eyes with red centres
-    px(2, 3, 8, 1, '#5E2416'); px(2, 7, 8, 1, '#2A100A')
+    // A slime in mahogany, with orange eyes and red centres
     px(3, 4, 2, 2, '#F2B02E'); px(7, 4, 2, 2, '#F2B02E'); px(4, 4, 1, 1, '#E2401C'); px(7, 4, 1, 1, '#E2401C')
-    px(2, 6, 2, 1, '#C2451E'); px(5, 6, 5, 1, '#F2862E'); px(2, 8, 4, 1, '#F2862E'); px(7, 8, 3, 1, '#C2451E')
   } else {
     const eye = EYES[name] ?? (name === 'Witch' ? '#3B7A3A' : '#111')
     px(3, 4, 2, snout ? 1 : 2, eye); px(7, 4, 2, snout ? 1 : 2, eye)
@@ -94,7 +92,7 @@ export function drawMob(cv: HTMLCanvasElement, mob: Mob) {
     px(3, 6, 6, 3, s); px(4, 7, 1, 1, '#5A2E24'); px(7, 7, 1, 1, '#5A2E24')
     px(2, 6, 1, 2, '#F2EDE0'); px(9, 6, 1, 2, '#F2EDE0')
   }
-  else if (name !== 'Magma Cube') px(5, 7, 2, 1, '#111')
+  else px(5, 7, 2, 1, '#111')
 
   if (name === 'Creeper') { px(4, 6, 4, 2, '#111'); px(4, 8, 1, 1, '#111'); px(7, 8, 1, 1, '#111') }
   if (name === 'Spider') { px(0, 5, 2, 1, col); px(10, 5, 2, 1, col); px(0, 7, 2, 1, col); px(10, 7, 2, 1, col) }

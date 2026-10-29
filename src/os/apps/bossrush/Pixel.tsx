@@ -3,7 +3,7 @@ const PAL: Record<string, string> = {
   r: '#D9332B', R: '#FF8A80', e: '#3B1E1A', y: '#F2C94C', Y: '#FFF2A8', l: '#5FB04C', s: '#6B4428',
   k: '#2B2118', N: '#7A4422', n: '#5A2E16', w: '#A86A3E',
   o: '#F2C94C', O: '#B8862A', G: '#3EAE5E',
-  D: '#9AA0A8', d: '#5E646C', b: '#B8D0DE', B: '#7F9AAC',
+  D: '#9AA0A8', d: '#5E646C', b: '#B8D0DE', B: '#7F9AAC', L: '#D3D8DE', S: '#6A7078', K: '#2A2E33', h: '#B8D0DE', H: '#6F8A9C',
 }
 
 function Sprite({ map, size, tint }: { map: string[]; size: number; tint?: string }) {
@@ -33,7 +33,16 @@ export function Heart({ fill, gold }: { fill: 0 | 1 | 2; gold?: boolean }) {
 }
 
 const CHEST = ['cc...cc', 'ccc.ccc', 'ccccccc', '.ccccc.', '.ccccc.', '.ccccc.']
-export const Chestplate = ({ col }: { col: string }) => <Sprite map={CHEST} size={16} tint={col} />
+const CHEST_HALF = CHEST.map(r => r.slice(0, 4).padEnd(7, '.'))
+// One point of Minecraft's armour bar: full, half, or an empty outline
+export function Chestplate({ col, fill }: { col: string; fill: 0 | 1 | 2 }) {
+  return (
+    <span className="br-heart">
+      <Sprite map={CHEST} size={14} tint="#2A2A2E" />
+      {fill > 0 && <span className="br-heart-fill"><Sprite map={fill === 2 ? CHEST : CHEST_HALF} size={14} tint={col} /></span>}
+    </span>
+  )
+}
 
 // Items on Minecraft's 16×16 grid; the golden apple is drawn at 8×8 and doubled
 const double = (rows: string[]) => rows.flatMap(r => { const d = [...r].map(c => c + c).join(''); return [d, d] })
@@ -49,10 +58,11 @@ const ICONS: Record<string, string[]> = {
     'kooooooooooooook', 'kOOOOooOOooOOOOk', '.kkkkkooookkkkk.', '.....koOOok.....', '.....kooook.....', '.....kOooOk.....',
     '......koOk......', '......kkkk......', '................', '................',
   ],
+  // A rotated head showing its lit face and its shaded face, on a diagonal breeze-rod handle
   mace: [
-    '.........kkkkkk.', '........kDDDDDDk', '........kDdDDdDk', '........kDDDDDDk', '........kDdDDdDk', '........kDDDDDDk',
-    '.........kkbkkk.', '.........kbk....', '........kbk.....', '.......kBk......', '......kbk.......', '.....kbk........',
-    '....kBk.........', '...kbk..........', '..kbk...........', '...k............',
+    '........KKKK....', '.......KLLLLKK..', '......KLLLLLLSK.', '.....KLLLLLLDSSK', '.....KLLLLLDSSSK', '.....KLLLLDSSSSK',
+    '.....KLLLDSSSdSK', '......KLDSSSSSK.', '......KKDSSSdK..', '.....KhKKSSSK...', '....KhK..KKK....', '...KHK..........',
+    '..KhK...........', '.KHK............', 'KhK.............', 'KK..............',
   ],
 }
 export const ItemIcon = ({ item, size = 28 }: { item: string; size?: number }) => <Sprite map={ICONS[item]} size={size} />
