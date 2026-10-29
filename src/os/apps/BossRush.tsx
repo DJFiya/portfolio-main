@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
-import './sword.css'
+import './boss-rush.css'
 
 // [name, hp, body colour]
 const BOSSES: [string, number, string][] = [['Baby Slime', 24, '#7FC46A'], ['Zombie', 28, '#4F8A4B'], ['Spider', 32, '#3A3236'], ['Skeleton', 36, '#D8D6CC'], ['Creeper', 40, '#5FB04C'], ['Husk', 44, '#6E8F4E'], ['Stray', 49, '#D8D6CC'], ['Drowned', 54, '#7D8A8C'], ['Pillager', 59, '#7F7F78'], ['Vindicator', 65, '#A7ACA8'], ['Witch', 72, '#9A6B4A'], ['Enderman', 79, '#1C1820']]
@@ -39,7 +39,7 @@ function drawBoss(cv: HTMLCanvasElement, i: number) {
   if (name === 'Witch') { px(1, 2, 10, 1, '#4A2E5E'); px(3, 0, 6, 2, '#5B3F73'); px(3, 1, 6, 1, 'rgba(0,0,0,0.18)'); px(6, 7, 1, 1, '#3E8E3E') }
 }
 
-export default function Sword() {
+export default function BossRush() {
   const reduce = useMediaQuery('(prefers-reduced-motion: reduce)')
   const [g, setG] = useState(START)
   const [floats, setFloats] = useState<Float[]>([])

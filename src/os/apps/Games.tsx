@@ -3,7 +3,7 @@ import { useOs } from '../os-context'
 import './games.css'
 
 const GAMES: { app: string; name: string; meta: string; icon: IconName; bg: string; fg: string }[] = [
-  { app: 'sword', name: 'Sword', meta: '12-boss rush', icon: 'sword', bg: '#1E2A1C', fg: '#F3F1E6' },
+  { app: 'bossrush', name: 'Boss Rush', meta: '12 mobs, gold upgrades', icon: 'sword', bg: '#1E2A1C', fg: '#F3F1E6' },
 ]
 
 export default function Games() {
