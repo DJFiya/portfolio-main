@@ -17,7 +17,7 @@
 .br-bar i { display: block; height: 100%; transform-origin: left; background: #D9473A; transition: transform 160ms ease-out; }
 .br-hp { font-size: 14px; color: var(--sub); }
 
-.br-mob { border: 0; background: transparent; padding: 0; cursor: crosshair; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: transform 120ms ease-out, filter 120ms ease-out; margin-bottom: 6px; }
+.br-mob { position: relative; border: 0; background: transparent; padding: 0; cursor: crosshair; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: transform 120ms ease-out, filter 120ms ease-out; margin-bottom: 6px; }
 .br-mob:disabled { cursor: default; }
 .br-mob:active:not(:disabled) canvas { transform: scale(0.94) rotate(-3deg); }
 .br-mob canvas { display: block; transition: transform 90ms ease-out; image-rendering: pixelated; }
@@ -79,6 +79,35 @@
 .br-buy.worn { opacity: 1; background: #3A4D34; box-shadow: inset 3px 0 0 #FFD15C; }
 .br-msg { margin: 6px 0 0; font-size: 13.5px; color: #C9C4AE; min-height: 36px; line-height: 1.4; }
 .br-new { align-self: flex-start; border: 0; background: transparent; color: #8EA497; font-family: var(--pixel); font-size: 13px; cursor: pointer; padding: 4px 0; text-decoration: underline; text-underline-offset: 3px; }
+
+/* Bosses: bigger sprite and a gold name */
+.br-mob.boss canvas { transform: scale(1.35); margin: 22px 0; }
+.br-mob.boss:active:not(:disabled) canvas { transform: scale(1.28) rotate(-3deg); }
+.br-name.boss { color: #FFD15C; text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.45); }
+.br-float.deflect { color: #9AA3AE; font-size: 18px; }
+.br-float.heal { color: #7FE08A; font-size: 18px; top: 30%; }
+
+/* Warden: the fight goes dark in slow pulses, and a sonic boom rings out of its chest before it fires */
+.br-darkness { position: absolute; inset: 0; z-index: 2; pointer-events: none; background: #020406; animation: br-darkness 6s ease-in-out infinite; }
+@keyframes br-darkness { 0%, 100% { opacity: 0; } 45%, 60% { opacity: 0.62; } }
+.br-ring { position: absolute; left: 50%; top: 50%; width: 80px; height: 80px; margin: -52px 0 0 -40px; border: 4px solid #29DFEB; border-radius: 50%; pointer-events: none; animation: br-ring linear both; }
+@keyframes br-ring { from { opacity: 0.2; transform: scale(0.3); } to { opacity: 0.95; transform: scale(2.4); } }
+.br-armor.cracked { animation: br-crack 600ms ease-out; }
+@keyframes br-crack { 0%, 60% { filter: sepia(1) saturate(6) hue-rotate(-40deg); transform: translateX(-2px); } 30% { transform: translateX(3px); } 100% { filter: none; transform: none; } }
+
+/* Wither below half health: a blue armour shimmer */
+.br-mob.shielded canvas { animation: br-shimmer 1.4s ease-in-out infinite; }
+@keyframes br-shimmer { 0%, 100% { filter: drop-shadow(0 0 3px #7FB8FF); } 50% { filter: drop-shadow(0 0 9px #BFE0FF); } }
+
+/* Ender Dragon: crystals on pillars, beaming health into it until they're broken */
+.br-beams { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+.br-beams line { stroke: #E68AD8; stroke-width: 2; vector-effect: non-scaling-stroke; stroke-dasharray: 6 4; animation: br-beam 600ms linear infinite; opacity: 0.8; }
+@keyframes br-beam { to { stroke-dashoffset: -10; } }
+.br-crystal { position: absolute; z-index: 2; transform: translate(-50%, 0); border: 0; background: transparent; padding: 0; cursor: crosshair; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.br-crystal:active:not(:disabled) .br-crystal-art { transform: scale(0.92); }
+.br-crystal-art { position: relative; display: inline-block; width: 44px; height: 44px; transition: transform 90ms ease-out; }
+.br-cage-bar { width: 44px; height: 4px; background: rgba(0, 0, 0, 0.4); }
+.br-cage-bar i { display: block; height: 100%; transform-origin: left; background: #BFC4C9; }
 
 @media (max-width: 820px) {
   .br-app { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(380px, 1fr) auto; }

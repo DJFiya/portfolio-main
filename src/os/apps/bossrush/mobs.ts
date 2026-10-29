@@ -1,9 +1,11 @@
 // Mobs by dimension. Each dimension opens on a gentler mob, so a player sent back after dying
 // can always win a fight and earn gold before the harder ones.
 // hp is health, atk is damage per hit in half-hearts, every is seconds between hits.
-export type Mob = { name: string; hp: number; atk: number; every: number; col: string }
+export type Boss = 'warden' | 'wither' | 'dragon'
+export type Mob = { name: string; hp: number; atk: number; every: number; col: string; boss?: Boss }
 
-export const DIMENSIONS: { name: string; mobs: Mob[] }[] = [
+// Each dimension ends with its boss
+export const DIMENSIONS: { name: string; mobs: Mob[]; boss: Mob }[] = [
   {
     name: 'Overworld',
     mobs: [
@@ -19,6 +21,7 @@ export const DIMENSIONS: { name: string; mobs: Mob[] }[] = [
       { name: 'Vindicator', hp: 122, atk: 5, every: 3, col: '#A7ACA8' },
       { name: 'Witch', hp: 138, atk: 4, every: 2.4, col: '#9A6B4A' },
     ],
+    boss: { name: 'Warden', hp: 480, atk: 4, every: 2.6, col: '#0E3B41', boss: 'warden' },
   },
   {
     name: 'Nether',
@@ -30,6 +33,7 @@ export const DIMENSIONS: { name: string; mobs: Mob[] }[] = [
       { name: 'Wither Skeleton', hp: 320, atk: 8, every: 2.8, col: '#2E2E2E' },
       { name: 'Piglin Brute', hp: 380, atk: 9, every: 3, col: '#E3A08A' },
     ],
+    boss: { name: 'Wither', hp: 1700, atk: 8, every: 2.6, col: '#26242A', boss: 'wither' },
   },
   {
     name: 'End',
@@ -38,6 +42,7 @@ export const DIMENSIONS: { name: string; mobs: Mob[] }[] = [
       { name: 'Enderman', hp: 460, atk: 10, every: 3, col: '#1C1820' },
       { name: 'Shulker', hp: 540, atk: 9, every: 3.2, col: '#8E6AA0' },
     ],
+    boss: { name: 'Ender Dragon', hp: 2400, atk: 10, every: 3, col: '#1A1520', boss: 'dragon' },
   },
 ]
 
@@ -48,6 +53,31 @@ export function drawMob(cv: HTMLCanvasElement, mob: Mob) {
   c.clearRect(0, 0, 144, 144)
   const px = (x: number, y: number, a: number, b: number, f: string) => { c.fillStyle = f; c.fillRect(x * 12, y * 12, a * 12, b * 12) }
   const shade = 'rgba(0,0,0,0.25)', light = 'rgba(255,255,255,0.18)'
+
+  // Bosses: blind Warden with glowing sculk horns, three-headed Wither, horned Ender Dragon
+  if (name === 'Warden') {
+    px(2, 2, 8, 8, col); px(2, 2, 8, 1, light); px(2, 9, 8, 1, shade)
+    px(0, 1, 2, 4, '#0B2E33'); px(10, 1, 2, 4, '#0B2E33'); px(0, 1, 1, 2, '#29DFEB'); px(11, 1, 1, 2, '#29DFEB')
+    px(3, 4, 2, 1, '#062226'); px(7, 4, 2, 1, '#062226'); px(3, 5, 1, 1, '#29DFEB'); px(8, 5, 1, 1, '#29DFEB')
+    px(4, 7, 4, 2, '#062226'); px(5, 6, 2, 1, '#123F46')
+    return
+  }
+  if (name === 'Wither') {
+    const bone = '#3A383E', hole = '#0B0A0D'
+    px(0, 4, 3, 3, bone); px(9, 4, 3, 3, bone); px(0.5, 5, 1, 1, hole); px(1.5, 5, 1, 1, hole); px(9.5, 5, 1, 1, hole); px(10.5, 5, 1, 1, hole)
+    px(3, 2, 6, 6, col); px(3, 2, 6, 1, '#4A474F')
+    px(4, 4, 1.5, 1.5, hole); px(6.5, 4, 1.5, 1.5, hole); px(4.5, 6.5, 3, 0.8, hole)
+    px(5, 8, 2, 3, bone); px(4, 9, 4, 0.6, bone); px(4, 10.2, 4, 0.6, bone)
+    return
+  }
+  if (name === 'Ender Dragon') {
+    px(2, 2, 8, 6, col); px(2, 2, 8, 1, '#2A2333')
+    px(2, 0, 1, 2, '#4A4452'); px(9, 0, 1, 2, '#4A4452')
+    px(3, 4, 2, 1, '#E07BFF'); px(7, 4, 2, 1, '#E07BFF')
+    px(3, 8, 6, 3, '#231C2B'); px(4, 9, 1, 1, '#0B0A0D'); px(7, 9, 1, 1, '#0B0A0D')
+    px(3, 10.5, 1, 0.5, '#E8E2D0'); px(5, 10.5, 1, 0.5, '#E8E2D0'); px(8, 10.5, 1, 0.5, '#E8E2D0')
+    return
+  }
 
   if (name === 'Shulker') {
     px(1, 2, 10, 4, col); px(1, 6, 10, 4, '#7A5A8C'); px(1, 2, 10, 1, light)

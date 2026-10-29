@@ -68,3 +68,16 @@ const MACE = [
 const MACE_PAL: Record<string, string> = { k: '#2A2E33', L: '#AEB6C2', M: '#7C8491', S: '#565C68', H: '#7F8CC4', D: '#3A4A78' }
 export const ItemIcon = ({ item, size = 28 }: { item: string; size?: number }) =>
   item === 'mace' ? <Sprite map={MACE} size={size} pal={MACE_PAL} /> : <Sprite map={ICONS[item]} size={size} />
+
+// End crystal, and the iron cage around it on the Dragon's pillars
+const CRYSTAL = ['....pp....', '...pPPp...', '..pPWPPp..', '.pPPPPPPp.', 'pPPPPPPPPp', '.pPPPPPPp.', '..pPPPPp..', '...pPPp...', '....pp....', '..bbbbbb..']
+const CAGE = ['gggggggggg', 'gG.G..G.Gg', 'g.G..G.G.g', 'gG.G..G.Gg', 'g.G..G.G.g', 'gggggggggg', 'gG.G..G.Gg', 'g.G..G.G.g', 'gG.G..G.Gg', 'gggggggggg']
+const CRYSTAL_PAL: Record<string, string> = { p: '#9E4A9A', P: '#E68AD8', W: '#FFFFFF', b: '#2A2430', g: '#BFC4C9', G: '#7D8288' }
+export function Crystal({ caged }: { caged: boolean }) {
+  return (
+    <span className="br-crystal-art">
+      <Sprite map={CRYSTAL} size={44} pal={CRYSTAL_PAL} />
+      {caged && <span className="br-heart-fill"><Sprite map={CAGE} size={44} pal={CRYSTAL_PAL} /></span>}
+    </span>
+  )
+}

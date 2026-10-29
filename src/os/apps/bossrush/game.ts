@@ -22,6 +22,13 @@ export const MACE_COOLDOWN = 15
 // Shared by all food, so stacking steaks can't heal faster than the later mobs hit
 export const FOOD_COOLDOWN = 3
 const WINDUP = 0.6
+// Warden: a sonic boom every BOOM_EVERY seconds that ignores armour, visibly charging for BOOM_CHARGE
+export const BOOM_EVERY = 9
+export const BOOM_CHARGE = 1.6
+const BOOM_ATK = 6
+// Ender Dragon: each standing crystal heals it every second until its cage is broken and it is tapped
+export const CAGE_HP = 60
+const DRAGON_HEAL = 14
 const DEATH_ANIM = 0.42
 
 export type Upgrade = 'sharp' | 'auto' | 'loot'
@@ -44,6 +51,10 @@ export type Run = {
   swing: number
   autoT: number
   dying: number
+  // Boss timer: the Warden's boom charge, or the Dragon's heal tick
+  sp: number
+  // Dragon crystals: cage health while caged, 0 once exposed, -1 once destroyed
+  crystals: number[]
   dead: boolean
   done: boolean
   msg: string
@@ -56,10 +67,18 @@ export type GameEvent =
   | { kind: 'totem' }
   | { kind: 'died' }
   | { kind: 'dimension' }
+  | { kind: 'boss' }
+  | { kind: 'boom' }
+  | { kind: 'deflect' }
+  | { kind: 'heal'; amount: number }
+  | { kind: 'crystal' }
 
 type Step = { run: Run; events: GameEvent[] }
 
-export const mobOf = (r: Run) => DIMENSIONS[r.dim]?.mobs[r.i]
+export const mobOf = (r: Run) => { const d = DIMENSIONS[r.dim]; return d && (r.i < d.mobs.length ? d.mobs[r.i] : d.boss) }
+// The Wither shrugs off auto-swing once it is below half health, like the real one does arrows
+export const shielded = (r: Run) => { const m = mobOf(r); return m?.boss === 'wither' && r.hp <= m.hp / 2 }
+export const charging = (r: Run) => mobOf(r)?.boss === 'warden' && !r.dying && r.sp > BOOM_EVERY - BOOM_CHARGE
 export const damage = (r: Run) => 1 + r.sharp
 export const winding = (r: Run) => { const m = mobOf(r); return !!m && !r.dying && r.swing > m.every - WINDUP }
 
@@ -68,21 +87,23 @@ export function fresh(): Run {
     v: 2, dim: 0, i: 0, hp: DIMENSIONS[0].mobs[0].hp, gold: 0, sharp: 0, auto: 0, loot: 0,
     cost: { sharp: 8, auto: 20, loot: 15 }, armor: 0, php: MAX_HP, absorb: 0,
     items: { steak: 0, gapple: 0, totem: 0, mace: false }, maceCd: 0, foodCd: 0, swing: 0, autoT: 0, dying: 0,
-    dead: false, done: false, msg: 'Click the mob to strike. It hits back, so watch your hearts.',
+    sp: 0, crystals: [], dead: false, done: false, msg: 'Click the mob to strike. It hits back, so watch your hearts.',
   }
 }
 
 // Armour divides damage rather than subtracting a percentage, so every tier adds about the same
 // number of extra hits you can take and nothing ever makes you immune
 const taken = (atk: number, armor: number) => atk * 100 / (100 + ARMOR[armor].points)
+// The sonic boom goes straight through armour
 
 function strike(r: Run, amount: number, crit: boolean, by: 'click' | 'auto' | 'mace'): Step {
   const m = mobOf(r)
   if (!m || r.dying || r.dead || r.done) return { run: r, events: [] }
+  if (by === 'auto' && shielded(r)) return { run: r, events: [{ kind: 'deflect' }] }
   const hp = Math.max(0, r.hp - amount)
   const events: GameEvent[] = [{ kind: 'hit', amount, crit, by }]
   if (hp > 0) return { run: { ...r, hp }, events }
-  const reward = (4 + r.dim * 11 + r.i + r.loot) * (1 + r.dim)
+  const reward = m.boss ? 50 * (1 + r.dim) : (4 + r.dim * 11 + r.i + r.loot) * (1 + r.dim)
   events.push({ kind: 'kill' })
   return { run: { ...r, hp, gold: r.gold + reward, dying: DEATH_ANIM, msg: `${m.name} defeated. +${reward} gold.` }, events }
 }
@@ -97,6 +118,10 @@ function nextMob(r: Run): Step {
   // A little health back between fights
   const healed = { ...r, dying: 0, swing: 0, php: Math.min(MAX_HP, r.php + 2) }
   if (r.i + 1 < dim.mobs.length) return { run: { ...healed, i: r.i + 1, hp: dim.mobs[r.i + 1].hp }, events: [] }
+  if (r.i + 1 === dim.mobs.length) {
+    const b = dim.boss
+    return { run: { ...healed, i: r.i + 1, hp: b.hp, sp: 0, crystals: b.boss === 'dragon' ? [CAGE_HP, CAGE_HP, CAGE_HP] : [], msg: `The ${b.name} appears.` }, events: [{ kind: 'boss' }] }
+  }
   if (r.dim + 1 < DIMENSIONS.length) {
     const nd = DIMENSIONS[r.dim + 1]
     return { run: { ...healed, dim: r.dim + 1, i: 0, hp: nd.mobs[0].hp, msg: `You enter the ${nd.name}.` }, events: [{ kind: 'dimension' }] }
@@ -104,8 +129,8 @@ function nextMob(r: Run): Step {
   return { run: { ...healed, done: true, msg: 'Every dimension cleared.' }, events: [] }
 }
 
-function hurt(r: Run, atk: number): Step {
-  const dmg = taken(atk, r.armor)
+function hurt(r: Run, atk: number, pierce = false): Step {
+  const dmg = pierce ? atk : taken(atk, r.armor)
   const fromAbsorb = Math.min(r.absorb, dmg)
   const php = r.php - (dmg - fromAbsorb)
   const run = { ...r, absorb: r.absorb - fromAbsorb, php }
@@ -143,14 +168,42 @@ export function tick(r: Run, dt: number): Step {
   if (run.swing >= m.every) {
     run.swing -= m.every
     const h = hurt(run, m.atk); run = h.run; events.push(...h.events)
+    if (run.dead) return { run, events }
+  }
+  if (m.boss === 'warden') {
+    run.sp += dt
+    if (run.sp >= BOOM_EVERY) {
+      run.sp = 0
+      events.push({ kind: 'boom' })
+      const h = hurt(run, BOOM_ATK, true); run = h.run; events.push(...h.events)
+    }
+  }
+  if (m.boss === 'dragon') {
+    const standing = run.crystals.filter(c => c >= 0).length
+    if (standing) {
+      run.hp = Math.min(m.hp, run.hp + DRAGON_HEAL * standing * dt)
+      run.sp += dt
+      if (run.sp >= 1) { run.sp -= 1; events.push({ kind: 'heal', amount: DRAGON_HEAL * standing }) }
+    }
   }
   return { run, events }
+}
+
+// Clicking a crystal hacks at its cage; once the cage breaks, one tap destroys the crystal
+export function hitCrystal(r: Run, k: number): Step {
+  if (mobOf(r)?.boss !== 'dragon' || r.dying || r.dead) return { run: r, events: [] }
+  const c = r.crystals[k]
+  if (c === undefined || c < 0) return { run: r, events: [] }
+  const crystals = [...r.crystals]
+  if (c > 0) { crystals[k] = Math.max(0, c - damage(r)); return { run: { ...r, crystals }, events: [] } }
+  crystals[k] = -1
+  return { run: { ...r, crystals }, events: [{ kind: 'crystal' }] }
 }
 
 // You died: back to the start of this dimension with your gear, half your gold dropped
 export function respawn(r: Run): Run {
   const dim = DIMENSIONS[r.dim]
-  return { ...r, dead: false, i: 0, hp: dim.mobs[0].hp, gold: Math.floor(r.gold / 2), php: MAX_HP, absorb: 0, swing: 0, autoT: 0, dying: 0, maceCd: 0, foodCd: 0, msg: `You dropped ${Math.ceil(r.gold / 2)} gold.` }
+  return { ...r, dead: false, i: 0, hp: dim.mobs[0].hp, gold: Math.floor(r.gold / 2), php: MAX_HP, absorb: 0, swing: 0, autoT: 0, dying: 0, maceCd: 0, foodCd: 0, sp: 0, crystals: [], msg: `You dropped ${Math.ceil(r.gold / 2)} gold.` }
 }
 
 export function buyUpgrade(r: Run, u: Upgrade): Run {
@@ -181,8 +234,9 @@ export function consume(r: Run, it: Item): Step {
   if (r.dead || r.done) return { run: r, events: [] }
   if (it === 'mace') {
     if (!r.items.mace || r.maceCd > 0) return { run: r, events: [] }
-    // A smash takes a third of the mob's health plus a heavy hit, so it matters even when you can't spam it
-    const smash = Math.round((mobOf(r)?.hp ?? 0) / 3) + damage(r) * 4
+    // A smash takes a third of a mob's health (a tenth of a boss's) plus a heavy hit, so it matters even when you can't spam it
+    const m = mobOf(r)
+    const smash = Math.round((m?.hp ?? 0) * (m?.boss ? 0.1 : 1 / 3)) + damage(r) * 4
     return strike({ ...r, maceCd: MACE_COOLDOWN }, smash, true, 'mace')
   }
   if (!r.items[it] || it === 'totem' || r.foodCd > 0) return { run: r, events: [] }

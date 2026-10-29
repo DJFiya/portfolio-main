@@ -2,11 +2,11 @@ import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } f
 import { useMediaQuery } from '../../../hooks/useMediaQuery'
 import type { AppProps } from '../../os-context'
 import {
-  ARMOR, FOOD_COOLDOWN, ITEMS, MACE_COOLDOWN, MAX_HP, buyArmor, buyItem, buyUpgrade, canBuy, click, fresh, load, mobOf,
-  consume, respawn, save, tick, winding, type GameEvent, type Item, type Run, type Upgrade,
+  ARMOR, BOOM_CHARGE, CAGE_HP, FOOD_COOLDOWN, ITEMS, MACE_COOLDOWN, MAX_HP, buyArmor, buyItem, buyUpgrade, canBuy, charging, click,
+  consume, fresh, hitCrystal, load, mobOf, respawn, save, shielded, tick, winding, type GameEvent, type Item, type Run, type Upgrade,
 } from './game'
 import { DIMENSIONS, drawMob } from './mobs'
-import { Chestplate, Heart, ItemIcon } from './Pixel'
+import { Chestplate, Crystal, Heart, ItemIcon } from './Pixel'
 import './boss-rush.css'
 
 type Float = { id: number; text: string; cls: string; x: number }
@@ -14,6 +14,8 @@ type Step = { run: Run; events: GameEvent[] }
 
 const UPGRADES: [Upgrade, string, string][] = [['sharp', 'Sharpness', '+1 damage'], ['auto', 'Auto-swing', '+1 damage a second'], ['loot', 'Looting', 'more gold per kill']]
 const HOTBAR: Item[] = ['steak', 'gapple', 'totem', 'mace']
+// Where the Dragon's crystals stand, as percentages of the fight area
+const PILLARS = [[13, 24], [87, 24], [87, 52]]
 
 export default function BossRush({ active }: AppProps) {
   const reduce = useMediaQuery('(prefers-reduced-motion: reduce)')
@@ -22,18 +24,24 @@ export default function BossRush({ active }: AppProps) {
   const [floats, setFloats] = useState<Float[]>([])
   const [hurtKey, setHurtKey] = useState(0)
   const [totemKey, setTotemKey] = useState(0)
+  const [crackKey, setCrackKey] = useState(0)
   const [banner, setBanner] = useState<{ key: number; text: string } | null>(null)
   const cv = useRef<HTMLCanvasElement>(null)
   const stage = useRef<HTMLDivElement>(null)
   const app = useRef<HTMLDivElement>(null)
   const mob = mobOf(run)
 
+  const addFloat = (text: string, cls: string) => {
+    const w = stage.current?.clientWidth ?? 400
+    setFloats(fs => [...fs.slice(-12), { id: performance.now() + Math.random(), text, cls, x: w / 2 - 20 + (Math.random() * 80 - 40) }])
+  }
+
   const onEvent = (e: GameEvent, r: Run) => {
-    if (e.kind === 'hit') {
-      const w = stage.current?.clientWidth ?? 400
-      const f = { id: performance.now() + Math.random(), text: e.by === 'auto' ? `-${e.amount}` : `-${e.amount}${e.crit && e.by === 'click' ? '!' : ''}`, cls: e.by === 'mace' ? 'mace' : e.crit ? 'crit' : e.by, x: w / 2 - 20 + (Math.random() * 80 - 40) }
-      setFloats(fs => [...fs.slice(-12), f])
-    }
+    if (e.kind === 'hit') addFloat(e.by === 'auto' ? `-${e.amount}` : `-${e.amount}${e.crit && e.by === 'click' ? '!' : ''}`, e.by === 'mace' ? 'mace' : e.crit ? 'crit' : e.by)
+    if (e.kind === 'deflect') addFloat('0', 'deflect')
+    if (e.kind === 'heal') addFloat(`+${e.amount}`, 'heal')
+    if (e.kind === 'boom') setCrackKey(k => k + 1)
+    if (e.kind === 'boss') setBanner(b => ({ key: (b?.key ?? 0) + 1, text: DIMENSIONS[r.dim].boss.name }))
     if (e.kind === 'hurt') setHurtKey(k => k + 1)
     if (e.kind === 'totem') setTotemKey(k => k + 1)
     if (e.kind === 'dimension') setBanner(b => ({ key: (b?.key ?? 0) + 1, text: DIMENSIONS[r.dim].name }))
@@ -76,15 +84,30 @@ export default function BossRush({ active }: AppProps) {
 
   return (
     <div ref={app} className="br-app" tabIndex={-1} onKeyDown={onKey}>
-      <div ref={stage} className={`br-stage dim-${dim}`}>
+      <div ref={stage} className={`br-stage dim-${dim}${mob?.boss ? ` boss-${mob.boss}` : ''}`}>
+        {mob?.boss === 'warden' && <div className="br-darkness" aria-hidden="true" />}
+        {mob?.boss === 'dragon' && (
+          <>
+            <svg className="br-beams" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              {run.crystals.map((c, k) => c >= 0 && <line key={k} x1={PILLARS[k][0]} y1={PILLARS[k][1] + 6} x2="50" y2="40" />)}
+            </svg>
+            {run.crystals.map((c, k) => c >= 0 && (
+              <button key={k} type="button" className="br-crystal" style={{ left: `${PILLARS[k][0]}%`, top: `${PILLARS[k][1]}%` }} aria-label={c > 0 ? 'Break the cage' : 'Destroy the crystal'} onClick={() => apply(r => hitCrystal(r, k))} disabled={!running}>
+                <Crystal caged={c > 0} />
+                {c > 0 && <span className="br-cage-bar"><i style={{ transform: `scaleX(${c / CAGE_HP})` }} /></span>}
+              </button>
+            ))}
+          </>
+        )}
         <div className="br-top">
-          <div className="br-name">{run.done ? 'Every dimension cleared' : mob?.name}</div>
+          <div className={`br-name${mob?.boss ? ' boss' : ''}`}>{run.done ? 'Every dimension cleared' : mob?.name}</div>
           <div className="br-bar" role="img" aria-label={`Mob health ${run.hp} of ${max}`}><i style={{ transform: `scaleX(${Math.max(0, run.hp / max)})` }} /></div>
-          <div className="br-hp">{run.done ? 'Run complete.' : `${run.hp} / ${max}`}</div>
+          <div className="br-hp">{run.done ? 'Run complete.' : `${Math.ceil(run.hp)} / ${max}`}</div>
         </div>
 
-        <button type="button" className={['br-mob', run.dying && 'dead', winding(run) && 'winding'].filter(Boolean).join(' ')} aria-label={`Strike the ${mob?.name ?? 'mob'}`} onClick={() => apply(click)} disabled={!running}>
+        <button type="button" className={['br-mob', mob?.boss && 'boss', run.dying && 'dead', winding(run) && 'winding', shielded(run) && 'shielded'].filter(Boolean).join(' ')} aria-label={`Strike the ${mob?.name ?? 'mob'}`} onClick={() => apply(click)} disabled={!running}>
           <canvas ref={cv} width={144} height={144} />
+          {charging(run) && <span className="br-ring" style={{ animationDuration: `${BOOM_CHARGE}s` }} aria-hidden="true" />}
           <span className="br-charge" aria-hidden="true"><i style={{ transform: `scaleX(${run.dying ? 0 : charge})` }} /></span>
         </button>
         {floats.map(f => <span key={f.id} className={`br-float ${f.cls}`} style={{ left: f.x }} onAnimationEnd={() => setFloats(fs => fs.filter(x => x.id !== f.id))}>{f.text}</span>)}
@@ -92,7 +115,7 @@ export default function BossRush({ active }: AppProps) {
         <div className="br-hud">
           <div className="br-status">
             {run.armor > 0 && (
-              <span className="br-armor" aria-label={`${ARMOR[run.armor].name} armour`}>
+              <span key={crackKey} className={`br-armor${crackKey ? ' cracked' : ''}`} aria-label={`${ARMOR[run.armor].name} armour`}>
                 {Array.from({ length: 10 }, (_, k) => { const b = ARMOR[run.armor].bar; return <Chestplate key={k} col={ARMOR[run.armor].col} fill={b >= k * 2 + 2 ? 2 : b === k * 2 + 1 ? 1 : 0} /> })}
               </span>
             )}
