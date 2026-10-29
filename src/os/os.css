@@ -66,6 +66,8 @@ a { color: var(--accent); text-underline-offset: 3px; }
 .item.entering { animation: item-in 360ms var(--ease) both; }
 @keyframes item-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .icon { width: 92px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px; border-radius: 8px; color: #F1F5F2; font-size: 13.5px; font-weight: 600; text-align: center; line-height: 1.2; transition: background-color 160ms ease; }
+/* Labels sit on whatever drifts behind them, so they carry their own shadow */
+.icon { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7), 0 0 10px rgba(0, 0, 0, 0.4); }
 .item:hover .icon, .item:focus-visible .icon { background: rgba(255, 255, 255, 0.09); }
 .icon .tile { width: 56px; height: 56px; border-radius: 13px; display: grid; place-items: center; background: color-mix(in srgb, var(--wall) 72%, #000); transition: transform 160ms var(--ease), background-color 400ms ease; }
 .icon.doc .tile { background: #F4F4EF; }
