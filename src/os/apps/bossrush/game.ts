@@ -15,10 +15,10 @@ export const ITEMS = {
   steak: { name: 'Steak', cost: 6 },
   gapple: { name: 'Golden apple', cost: 25 },
   totem: { name: 'Totem of Undying', cost: 50 },
-  mace: { name: 'Mace', cost: 80 },
+  mace: { name: 'Mace', cost: 120 },
 } as const
 export type Item = keyof typeof ITEMS
-export const MACE_COOLDOWN = 12
+export const MACE_COOLDOWN = 15
 // Shared by all food, so stacking steaks can't heal faster than the later mobs hit
 export const FOOD_COOLDOWN = 3
 const WINDUP = 0.6
@@ -181,8 +181,9 @@ export function consume(r: Run, it: Item): Step {
   if (r.dead || r.done) return { run: r, events: [] }
   if (it === 'mace') {
     if (!r.items.mace || r.maceCd > 0) return { run: r, events: [] }
-    const s = strike({ ...r, maceCd: MACE_COOLDOWN }, damage(r) * 8, true, 'mace')
-    return s
+    // A smash takes a third of the mob's health plus a heavy hit, so it matters even when you can't spam it
+    const smash = Math.round((mobOf(r)?.hp ?? 0) / 3) + damage(r) * 4
+    return strike({ ...r, maceCd: MACE_COOLDOWN }, smash, true, 'mace')
   }
   if (!r.items[it] || it === 'totem' || r.foodCd > 0) return { run: r, events: [] }
   const items = { ...r.items, [it]: r.items[it] - 1 }
