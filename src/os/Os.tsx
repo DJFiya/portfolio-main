@@ -179,6 +179,7 @@ export default function Os() {
           {ctx && (
             <div id="ctx" className="on" role="menu" aria-label="Desktop menu" style={{ left: ctx.x, top: ctx.y }}>
               <button type="button" role="menuitem" autoFocus onClick={() => { api.newNote(); setCtx(null) }}>New sticky note</button>
+              <button type="button" role="menuitem" onClick={() => { open('terminal'); setCtx(null) }}>Open Terminal</button>
               <button type="button" role="menuitem" onClick={() => { api.resetDesk(); setCtx(null) }}>Clean up desktop</button>
               <p className="lbl">Wallpaper</p>
               <div className="swatches">

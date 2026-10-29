@@ -68,7 +68,7 @@ export default function Projects({ arg, argKey }: AppProps) {
   const [orbit, setOrbit] = useState(false)
   const [shown, setShown] = useState<Shown>('brief')
   const [count, setCount] = useState(3)
-  const [seenArg, setSeenArg] = useState(argKey)
+  const [seenArg, setSeenArg] = useState<number | null>(null)
   const cv = useRef<HTMLCanvasElement>(null)
   const flight = useRef<{ p: Project; u: number } | null>(null)
   const p = PROJECTS[sel]
@@ -92,7 +92,7 @@ export default function Projects({ arg, argKey }: AppProps) {
   }
 
   // Reopened from the terminal: select the project, and fly it if asked
-  if (argKey !== seenArg) {
+  if (arg !== undefined && argKey !== seenArg) {
     setSeenArg(argKey)
     const a = arg as LaunchArg | undefined
     const i = PROJECTS.findIndex(x => x.id === a?.id)
