@@ -35,7 +35,7 @@ export function useDesktopState() {
 export function defaultPos(id: string, W: number, H: number): Point {
   const right = W - 112
   const map: Record<string, [number, number]> = {
-    resume: [right, 18], projects: [right, 122], career: [right, 226], sword: [right, 330],
+    resume: [right, 18], projects: [right, 122], career: [right, 226], games: [right, 330],
     mug: [right - 104, 18], trash: [right, Math.max(434, H - 210)], note: [Math.max(24, W * 0.5 - 115), 24],
   }
   const [x, y] = map[id] ?? [80, 80]
@@ -48,7 +48,7 @@ export const ITEMS: ItemDef[] = [
   { id: 'resume', label: 'Résumé', icon: 'resume', doc: true, app: 'resume', trashable: true },
   { id: 'projects', label: 'Projects', icon: 'projects', app: 'projects', trashable: true },
   { id: 'career', label: 'Career', icon: 'career', app: 'career', trashable: true },
-  { id: 'sword', label: 'Sword', icon: 'sword', app: 'sword', trashable: true },
+  { id: 'games', label: 'Games', icon: 'folder', app: 'games', trashable: true },
   { id: 'mug', label: 'Coffee mug', trashable: true },
   { id: 'trash', label: 'Trash', icon: 'trash', app: 'trash', trashable: false },
 ]
