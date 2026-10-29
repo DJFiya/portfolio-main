@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react'
-import { CloseGlyph, Icon } from './icons'
+import { CloseGlyph } from './icons'
+import { MugObject, ObjectIcon } from './objects'
 import { defaultPos, ITEMS, MUG_SIPS, type DesktopState, type Point } from './desktop-state'
 
 const overlaps = (a: DOMRect, b: DOMRect) => !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom)
@@ -102,19 +103,11 @@ function Draggable({ id, pos, z, trashable, desk, disabled, trashEl, setHot, onD
   )
 }
 
-// Drawn as a regular desktop icon; the coffee level drops with each sip
 function Mug({ sips }: { sips: number }) {
   const left = MUG_SIPS - sips
   return (
     <span className="icon">
-      <span className="tile">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <defs><clipPath id="mugclip"><path d="M4.5 8h11v8.5a3.5 3.5 0 0 1-3.5 3.5H8a3.5 3.5 0 0 1-3.5-3.5z" /></clipPath></defs>
-          <rect x="4.5" y={9 + (sips / MUG_SIPS) * 11} width="11" height="12" fill="#B07A4E" clipPath="url(#mugclip)" />
-          <path d="M4.5 8h11v8.5a3.5 3.5 0 0 1-3.5 3.5H8a3.5 3.5 0 0 1-3.5-3.5zM15.5 10.5h1.5a2.5 2.5 0 0 1 0 5h-1.5" stroke="#F1F5F2" strokeWidth="1.6" strokeLinejoin="round" />
-          {left > 0 && <path className="steam" d="M8 5.5c0-1 1-1.2 1-2.2M11.5 5.5c0-1 1-1.2 1-2.2" stroke="#F1F5F2" strokeWidth="1.4" strokeLinecap="round" />}
-        </svg>
-      </span>
+      <span className="tile"><MugObject fill={left / MUG_SIPS} /></span>
       {left > 0 ? `${left} sip${left === 1 ? '' : 's'} left` : 'Refilling…'}
     </span>
   )
@@ -165,9 +158,9 @@ export default function DesktopItems({ state, setState, desk, mobile, sips, onSi
           {it.icon ? (
             <span
               ref={it.id === 'trash' ? (n => { trashRef.current = n }) : undefined}
-              className={['icon', it.doc && 'doc', it.id === 'trash' && 'trash', it.id === 'trash' && hot && 'hot'].filter(Boolean).join(' ')}
+              className={['icon', it.id === 'trash' && 'trash', it.id === 'trash' && hot && 'hot'].filter(Boolean).join(' ')}
             >
-              <span className="tile"><Icon name={it.icon} color={it.doc ? '#15191A' : '#F1F5F2'} /></span>
+              <span className="tile"><ObjectIcon id={it.id} /></span>
               {it.label}
             </span>
           ) : <Mug sips={sips} />}

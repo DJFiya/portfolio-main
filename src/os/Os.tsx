@@ -4,7 +4,7 @@ import { APPS, DOCK } from './apps'
 import { WALLS } from './content'
 import { MUG_SIPS, useDesktopState } from './desktop-state'
 import DesktopItems from './DesktopItems'
-import { Icon } from './icons'
+import { ObjectIcon } from './objects'
 import MenuStatus from './MenuStatus'
 import { OsContext, type OsApi } from './os-context'
 import Wallpaper from './Wallpaper'
@@ -167,7 +167,7 @@ export default function Os() {
                 const running = wins.some(w => w.id === id && !w.closing), active = top?.id === id
                 return (
                   <button key={id} type="button" className={['dk', running && 'running', active && 'active'].filter(Boolean).join(' ')} aria-label={APPS[id].title} aria-current={active || undefined} onClick={() => onDock(id)}>
-                    <Icon name={APPS[id].icon} size={26} />
+                    <ObjectIcon id={id} size={40} />
                     <span className="tip" aria-hidden="true">{APPS[id].title}</span>
                   </button>
                 )

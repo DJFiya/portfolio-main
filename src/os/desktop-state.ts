@@ -41,10 +41,10 @@ export function defaultPos(id: string, W: number, H: number): Point {
   return { x, y }
 }
 
-type ItemDef = { id: string; label?: string; icon?: IconName; app?: string; doc?: boolean; trashable: boolean }
+type ItemDef = { id: string; label?: string; icon?: IconName; app?: string; trashable: boolean }
 
 export const ITEMS: ItemDef[] = [
-  { id: 'resume', label: 'Résumé', icon: 'resume', doc: true, app: 'resume', trashable: true },
+  { id: 'resume', label: 'Résumé', icon: 'resume', app: 'resume', trashable: true },
   { id: 'projects', label: 'Projects', icon: 'projects', app: 'projects', trashable: true },
   { id: 'career', label: 'Career', icon: 'career', app: 'career', trashable: true },
   { id: 'games', label: 'Games', icon: 'folder', app: 'games', trashable: true },

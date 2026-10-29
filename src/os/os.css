@@ -69,10 +69,10 @@ a { color: var(--accent); text-underline-offset: 3px; }
 /* Labels sit on whatever drifts behind them, so they carry their own shadow */
 .icon { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7), 0 0 10px rgba(0, 0, 0, 0.4); }
 .item:hover .icon, .item:focus-visible .icon { background: rgba(255, 255, 255, 0.09); }
-.icon .tile { width: 56px; height: 56px; border-radius: 13px; display: grid; place-items: center; background: color-mix(in srgb, var(--wall) 72%, #000); transition: transform 160ms var(--ease), background-color 400ms ease; }
-.icon.doc .tile { background: #F4F4EF; }
+.icon .tile { width: 56px; height: 56px; display: grid; place-items: center; transition: transform 160ms var(--ease); }
 .item:active .icon .tile { transform: scale(0.95); }
-.icon.trash.hot .tile { background: #7A2E26; transform: scale(1.08); }
+.icon.trash.hot { background: rgba(255, 255, 255, 0.16); }
+.icon.trash.hot .tile { transform: scale(1.1); }
 .icon .steam { animation: steam 2.2s ease-in-out infinite; }
 @keyframes steam { 0%, 100% { opacity: 0.35; transform: translateY(1px); } 50% { opacity: 1; transform: translateY(-1px); } }
 .sticky { width: 230px; min-height: 140px; background: #F6E58D; color: #2B2A1E; border-radius: 3px; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25); display: flex; flex-direction: column; text-align: left; }
@@ -117,14 +117,13 @@ a { color: var(--accent); text-underline-offset: 3px; }
 
 /* ---------- dock ---------- */
 #dock { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; gap: 6px; padding: 8px; background: color-mix(in srgb, var(--wall) 45%, rgb(0 0 0 / 0.74)); border-radius: 18px; z-index: 4000; }
-.dk { position: relative; width: 52px; height: 52px; border: 0; border-radius: 12px; background: color-mix(in srgb, var(--wall) 85%, #000); cursor: pointer; display: grid; place-items: center; transition: transform 180ms var(--ease), background-color 160ms ease; }
-.dk:hover { background: color-mix(in srgb, var(--wall) 85%, #FFF); transform: translateY(-3px); }
+.dk { position: relative; width: 52px; height: 52px; border: 0; border-radius: 12px; background: transparent; cursor: pointer; display: grid; place-items: center; transition: transform 180ms var(--ease), background-color 160ms ease; }
+.dk:hover { transform: translateY(-3px); }
 .dk:active { transform: translateY(-1px) scale(0.95); }
 .dk .tip { position: absolute; bottom: 62px; left: 50%; transform: translate(-50%, 4px); white-space: nowrap; padding: 5px 9px; border-radius: 6px; background: #F4F4EF; color: var(--ink); font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 120ms ease, transform 120ms var(--ease); }
 .dk:hover .tip, .dk:focus-visible .tip { opacity: 1; transform: translate(-50%, 0); }
 .dk.running::after { content: ""; position: absolute; bottom: -5px; left: 50%; width: 5px; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.55); transform: translateX(-50%); transition: width 180ms var(--ease), background-color 180ms ease; }
 /* The app in front gets a longer, brighter bar than the others that are open */
-.dk.active { background: color-mix(in srgb, var(--wall) 78%, #FFF); }
 .dk.active::after { width: 16px; background: #FFF; }
 .dk-sep { width: 1px; margin: 8px 2px; background: rgba(255, 255, 255, 0.16); }
 
@@ -180,7 +179,7 @@ a { color: var(--accent); text-underline-offset: 3px; }
   .win { left: 8px !important; top: 8px !important; width: calc(100% - 16px) !important; height: calc(100% - 96px) !important; }
   .wresize { display: none; } .wtitle { cursor: default; }
   #dock { gap: 4px; padding: 6px; max-width: calc(100% - 16px); overflow-x: auto; }
-  .dk { width: 44px; height: 44px; } .dk-sep { display: none; }
+  .dk { width: 44px; height: 44px; } .dk svg { width: 34px; height: 34px; } .dk-sep { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
