@@ -19,6 +19,8 @@ export const ITEMS = {
 } as const
 export type Item = keyof typeof ITEMS
 export const MACE_COOLDOWN = 12
+// Shared by all food, so stacking steaks can't heal faster than the later mobs hit
+export const FOOD_COOLDOWN = 3
 const WINDUP = 0.6
 const DEATH_ANIM = 0.42
 
@@ -38,6 +40,7 @@ export type Run = {
   absorb: number
   items: { steak: number; gapple: number; totem: number; mace: boolean }
   maceCd: number
+  foodCd: number
   swing: number
   autoT: number
   dying: number
@@ -64,7 +67,7 @@ export function fresh(): Run {
   return {
     v: 2, dim: 0, i: 0, hp: DIMENSIONS[0].mobs[0].hp, gold: 0, sharp: 0, auto: 0, loot: 0,
     cost: { sharp: 8, auto: 20, loot: 15 }, armor: 0, php: MAX_HP, absorb: 0,
-    items: { steak: 0, gapple: 0, totem: 0, mace: false }, maceCd: 0, swing: 0, autoT: 0, dying: 0,
+    items: { steak: 0, gapple: 0, totem: 0, mace: false }, maceCd: 0, foodCd: 0, swing: 0, autoT: 0, dying: 0,
     dead: false, done: false, msg: 'Click the mob to strike. It hits back, so watch your hearts.',
   }
 }
@@ -119,7 +122,7 @@ function hurt(r: Run, atk: number): Step {
 // Advances the fight by dt seconds: mob attacks, auto-swing, the mace cooldown and the death animation
 export function tick(r: Run, dt: number): Step {
   if (r.dead || r.done) return { run: r, events: [] }
-  let run = { ...r, maceCd: Math.max(0, r.maceCd - dt) }
+  let run = { ...r, maceCd: Math.max(0, r.maceCd - dt), foodCd: Math.max(0, r.foodCd - dt) }
   const events: GameEvent[] = []
   if (run.dying) {
     run.dying = Math.max(0, run.dying - dt)
@@ -147,7 +150,7 @@ export function tick(r: Run, dt: number): Step {
 // You died: back to the start of this dimension with your gear, half your gold dropped
 export function respawn(r: Run): Run {
   const dim = DIMENSIONS[r.dim]
-  return { ...r, dead: false, i: 0, hp: dim.mobs[0].hp, gold: Math.floor(r.gold / 2), php: MAX_HP, absorb: 0, swing: 0, autoT: 0, dying: 0, maceCd: 0, msg: `You dropped ${Math.ceil(r.gold / 2)} gold.` }
+  return { ...r, dead: false, i: 0, hp: dim.mobs[0].hp, gold: Math.floor(r.gold / 2), php: MAX_HP, absorb: 0, swing: 0, autoT: 0, dying: 0, maceCd: 0, foodCd: 0, msg: `You dropped ${Math.ceil(r.gold / 2)} gold.` }
 }
 
 export function buyUpgrade(r: Run, u: Upgrade): Run {
@@ -181,11 +184,11 @@ export function consume(r: Run, it: Item): Step {
     const s = strike({ ...r, maceCd: MACE_COOLDOWN }, damage(r) * 8, true, 'mace')
     return s
   }
-  if (!r.items[it] || (it === 'totem')) return { run: r, events: [] }
+  if (!r.items[it] || it === 'totem' || r.foodCd > 0) return { run: r, events: [] }
   const items = { ...r.items, [it]: r.items[it] - 1 }
-  if (it === 'steak') return { run: { ...r, items, php: Math.min(MAX_HP, r.php + 6) }, events: [] }
+  if (it === 'steak') return { run: { ...r, items, foodCd: FOOD_COOLDOWN, php: Math.min(MAX_HP, r.php + 6) }, events: [] }
   // Absorption refreshes to its cap rather than stacking
-  return { run: { ...r, items, php: Math.min(MAX_HP, r.php + 4), absorb: Math.max(r.absorb, 4) }, events: [] }
+  return { run: { ...r, items, foodCd: FOOD_COOLDOWN, php: Math.min(MAX_HP, r.php + 4), absorb: Math.max(r.absorb, 4) }, events: [] }
 }
 
 const KEY = 'daevikos:bossrush'

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } f
 import { useMediaQuery } from '../../../hooks/useMediaQuery'
 import type { AppProps } from '../../os-context'
 import {
-  ARMOR, ITEMS, MACE_COOLDOWN, MAX_HP, buyArmor, buyItem, buyUpgrade, canBuy, click, fresh, load, mobOf,
+  ARMOR, FOOD_COOLDOWN, ITEMS, MACE_COOLDOWN, MAX_HP, buyArmor, buyItem, buyUpgrade, canBuy, click, fresh, load, mobOf,
   consume, respawn, save, tick, winding, type GameEvent, type Item, type Run, type Upgrade,
 } from './game'
 import { DIMENSIONS, drawMob } from './mobs'
@@ -104,7 +104,7 @@ export default function BossRush({ active }: AppProps) {
           <div className="br-hotbar">
             {HOTBAR.map((it, k) => {
               const have = it === 'mace' ? run.items.mace : run.items[it] > 0
-              const cd = it === 'mace' && run.maceCd > 0 ? run.maceCd / MACE_COOLDOWN : 0
+              const cd = it === 'mace' ? run.maceCd / MACE_COOLDOWN : it === 'steak' || it === 'gapple' ? run.foodCd / FOOD_COOLDOWN : 0
               return (
                 <button key={it} type="button" className={`br-slot${have ? '' : ' empty'}${it === 'totem' && have ? ' passive' : ''}`} aria-label={`${ITEMS[it].name}${it === 'mace' || it === 'totem' ? '' : `, ${run.items[it]} left`} (key ${k + 1})`} onClick={() => apply(r => consume(r, it))} disabled={!have || !running}>
                   <ItemIcon item={it} size={34} />
