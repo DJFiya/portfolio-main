@@ -9,7 +9,7 @@ export default function Resume() {
     <div className="cv">
       <article className="cv-page">
         <h3>Daevik Jain</h3>
-        <p className="contact">{EMAIL} · linkedin.com/in/daevik-jain · daevik.vercel.app · github.com/DJFiya</p>
+        <p className="contact">{EMAIL} · linkedin.com/in/daevik-jain · daevik.ca · github.com/DJFiya</p>
         <h4>Education</h4>
         <div className="cv-role"><span>University of Waterloo</span><span>Sep 2024 – Present</span></div>
         <div className="cv-org">BASc in Biomedical Eng, Option in Software Eng, President Scholarship of Distinction, 3.9 GPA</div>
