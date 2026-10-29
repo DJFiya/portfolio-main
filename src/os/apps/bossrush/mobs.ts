@@ -23,7 +23,7 @@ export const DIMENSIONS: { name: string; mobs: Mob[] }[] = [
   {
     name: 'Nether',
     mobs: [
-      { name: 'Magma Cube', hp: 140, atk: 3, every: 3, col: '#4A1C12' },
+      { name: 'Magma Cube', hp: 140, atk: 3, every: 3, col: '#1A0A06' },
       { name: 'Blaze', hp: 230, atk: 5, every: 2.6, col: '#E9B83A' },
       { name: 'Ghast', hp: 210, atk: 9, every: 4.5, col: '#EDEDE8' },
       { name: 'Hoglin', hp: 280, atk: 7, every: 3, col: '#A8705A' },
@@ -77,8 +77,10 @@ export function drawMob(cv: HTMLCanvasElement, mob: Mob) {
     px(3, 3, 6, 1, name === 'Vindicator' ? '#111' : '#3B3B36')
     px(3, 4, 2, 1, '#F2F2EC'); px(7, 4, 2, 1, '#F2F2EC'); px(4, 4, 1, 1, '#2F5A3A'); px(7, 4, 1, 1, '#2F5A3A')
   } else if (name === 'Magma Cube') {
-    px(2, 4, 8, 1, '#F28A2E'); px(2, 7, 8, 1, '#C2451E')
-    px(3, 3, 2, 1, EYES[name]); px(7, 3, 2, 1, EYES[name])
+    // Dark layers with lava glowing through the seams, and orange eyes with red centres
+    px(2, 3, 8, 1, '#5E2416'); px(2, 7, 8, 1, '#2A100A')
+    px(3, 4, 2, 2, '#F2B02E'); px(7, 4, 2, 2, '#F2B02E'); px(4, 4, 1, 1, '#E2401C'); px(7, 4, 1, 1, '#E2401C')
+    px(2, 6, 2, 1, '#C2451E'); px(5, 6, 5, 1, '#F2862E'); px(2, 8, 4, 1, '#F2862E'); px(7, 8, 3, 1, '#C2451E')
   } else {
     const eye = EYES[name] ?? (name === 'Witch' ? '#3B7A3A' : '#111')
     px(3, 4, 2, snout ? 1 : 2, eye); px(7, 4, 2, snout ? 1 : 2, eye)

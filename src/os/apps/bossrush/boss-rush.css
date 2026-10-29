@@ -21,13 +21,12 @@
 .br-mob:disabled { cursor: default; }
 .br-mob:active:not(:disabled) canvas { transform: scale(0.94) rotate(-3deg); }
 .br-mob canvas { display: block; transition: transform 90ms ease-out; image-rendering: pixelated; }
-/* About to hit: the mob rears up and flushes red */
-.br-mob.winding { transform: translateY(-8px) scale(1.06); filter: drop-shadow(0 0 0 #000) sepia(0.4) saturate(2.2) hue-rotate(-20deg); }
+/* About to hit: the mob rears up */
+.br-mob.winding { transform: translateY(-8px) scale(1.06); }
 .br-mob.dead { animation: br-dead 420ms ease-out both; }
 @keyframes br-dead { to { opacity: 0; transform: translateY(14px) scale(0.85); } }
 .br-charge { width: 96px; height: 5px; background: rgba(0, 0, 0, 0.3); }
 .br-charge i { display: block; height: 100%; transform-origin: left; background: #F3F1E6; }
-.br-mob.winding .br-charge i { background: #FF5A4A; }
 
 .br-float { position: absolute; top: 38%; font-size: 22px; font-weight: 700; pointer-events: none; color: #FFFFFF; text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.45); animation: br-float 700ms var(--ease) both; z-index: 3; }
 .br-float.auto { font-size: 16px; opacity: 0.85; }
@@ -77,7 +76,8 @@
 .br-buy small { display: block; font-size: 12px; opacity: 0.7; }
 .br-buy em { font-style: normal; color: #FFD15C; }
 .br-buy-icon { display: inline-flex; align-items: center; gap: 8px; }
-.br-note { margin: 0; font-size: 13px; color: #8EA497; }
+.br-buy.worn { opacity: 1; background: #3A4D34; box-shadow: inset 3px 0 0 #FFD15C; }
+.br-buy.past { opacity: 0.3; }
 .br-msg { margin: 6px 0 0; font-size: 13.5px; color: #C9C4AE; min-height: 36px; line-height: 1.4; }
 .br-new { align-self: flex-start; border: 0; background: transparent; color: #8EA497; font-family: var(--pixel); font-size: 13px; cursor: pointer; padding: 4px 0; text-decoration: underline; text-underline-offset: 3px; }
 

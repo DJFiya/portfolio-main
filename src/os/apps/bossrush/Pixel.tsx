@@ -1,7 +1,9 @@
 // Small pixel sprites for the HUD, drawn from character maps so they share Boss Rush's look
 const PAL: Record<string, string> = {
-  r: '#D9332B', R: '#FF8A80', e: '#3B1E1A', y: '#F2C94C', Y: '#FFF2A8', o: '#E8C14A', G: '#3E8E3E', l: '#5FB04C',
-  n: '#6B3A22', N: '#A0582E', w: '#E8C9A8', d: '#5A5E66', D: '#8E959B', b: '#8A6A44', s: '#6B4428',
+  r: '#D9332B', R: '#FF8A80', e: '#3B1E1A', y: '#F2C94C', Y: '#FFF2A8', l: '#5FB04C', s: '#6B4428',
+  k: '#2B2118', N: '#7A4422', n: '#5A2E16', w: '#A86A3E',
+  o: '#F2C94C', O: '#B8862A', G: '#3EAE5E',
+  D: '#9AA0A8', d: '#5E646C', b: '#B8D0DE', B: '#7F9AAC',
 }
 
 function Sprite({ map, size, tint }: { map: string[]; size: number; tint?: string }) {
@@ -33,10 +35,24 @@ export function Heart({ fill, gold }: { fill: 0 | 1 | 2; gold?: boolean }) {
 const CHEST = ['cc...cc', 'ccc.ccc', 'ccccccc', '.ccccc.', '.ccccc.', '.ccccc.']
 export const Chestplate = ({ col }: { col: string }) => <Sprite map={CHEST} size={16} tint={col} />
 
+// Items on Minecraft's 16×16 grid; the golden apple is drawn at 8×8 and doubled
+const double = (rows: string[]) => rows.flatMap(r => { const d = [...r].map(c => c + c).join(''); return [d, d] })
 const ICONS: Record<string, string[]> = {
-  steak: ['..nnnn..', '.nNNNNn.', 'nNNNNNNn', 'nNNwwNNn', 'nNNNNNNn', '.nNNNNn.', '..nnnn..', '........'],
-  gapple: ['...s....', '...sl...', '.yyyyyy.', 'yYyyyyyy', 'yYyyyyyy', 'yyyyyyyy', '.yyyyyy.', '..yyyy..'],
-  totem: ['..oooo..', '..oGGo..', '..oooo..', 'oooooooo', '..oooo..', '..oooo..', '..o..o..', '..o..o..'],
-  mace: ['....ddd.', '...dDDDd', '...dDDDd', '....ddd.', '...b....', '..b.....', '.b......', 'b.......'],
+  steak: [
+    '................', '................', '................', '....kkkkkk......', '..kkwwwwwwkkk...', '.kwNNNNNNNNNwk..',
+    '.kNNnNNNNnNNNNk.', 'kNNNNNNnNNNNNNk.', 'kNnNNNNNNNNnNNNk', 'kNNNNnNNNNNNNNk.', '.kNNNNNNNnNNNk..', '..kkNNNNNNNkk...',
+    '....kkkkkkk.....', '................', '................', '................',
+  ],
+  gapple: double(['...s....', '...sl...', '.yyyyyy.', 'yYyyyyyy', 'yYyyyyyy', 'yyyyyyyy', '.yyyyyy.', '..yyyy..']),
+  totem: [
+    '......kkkk......', '.....kooook.....', '.....kGooGk.....', '.....kooook.....', '......kOOk......', '.kkkkkooookkkkk.',
+    'kooooooooooooook', 'kOOOOooOOooOOOOk', '.kkkkkooookkkkk.', '.....koOOok.....', '.....kooook.....', '.....kOooOk.....',
+    '......koOk......', '......kkkk......', '................', '................',
+  ],
+  mace: [
+    '.........kkkkkk.', '........kDDDDDDk', '........kDdDDdDk', '........kDDDDDDk', '........kDdDDdDk', '........kDDDDDDk',
+    '.........kkbkkk.', '.........kbk....', '........kbk.....', '.......kBk......', '......kbk.......', '.....kbk........',
+    '....kBk.........', '...kbk..........', '..kbk...........', '...k............',
+  ],
 }
 export const ItemIcon = ({ item, size = 28 }: { item: string; size?: number }) => <Sprite map={ICONS[item]} size={size} />

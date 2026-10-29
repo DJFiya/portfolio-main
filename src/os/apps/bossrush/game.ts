@@ -4,10 +4,14 @@ import { DIMENSIONS } from './mobs'
 export const MAX_HP = 20
 export const ARMOR = [
   { name: 'None', points: 0, cost: 0, col: '' },
-  { name: 'Iron', points: 50, cost: 40, col: '#D8D8D8' },
-  { name: 'Diamond', points: 120, cost: 160, col: '#5FD8D0' },
-  { name: 'Netherite', points: 200, cost: 320, col: '#4A4246' },
+  { name: 'Leather', points: 15, cost: 15, col: '#8A5A33' },
+  { name: 'Chainmail', points: 30, cost: 30, col: '#9AA3AE' },
+  { name: 'Iron', points: 50, cost: 60, col: '#D8D8D8' },
+  { name: 'Diamond', points: 90, cost: 150, col: '#5FD8D0' },
+  { name: 'Netherite', points: 150, cost: 300, col: '#4A4246' },
 ]
+// How much less damage a tier takes, as a whole percent, for the shop to show
+export const armorCut = (tier: number) => Math.round(100 - 10000 / (100 + ARMOR[tier].points))
 export const ITEMS = {
   steak: { name: 'Steak', cost: 6 },
   gapple: { name: 'Golden apple', cost: 25 },
@@ -21,7 +25,7 @@ const DEATH_ANIM = 0.42
 
 export type Upgrade = 'sharp' | 'auto' | 'loot'
 export type Run = {
-  v: 1
+  v: 2
   dim: number
   i: number
   hp: number
@@ -59,7 +63,7 @@ export const winding = (r: Run) => { const m = mobOf(r); return !!m && !r.dying 
 
 export function fresh(): Run {
   return {
-    v: 1, dim: 0, i: 0, hp: DIMENSIONS[0].mobs[0].hp, gold: 0, sharp: 0, auto: 0, loot: 0,
+    v: 2, dim: 0, i: 0, hp: DIMENSIONS[0].mobs[0].hp, gold: 0, sharp: 0, auto: 0, loot: 0,
     cost: { sharp: 8, auto: 20, loot: 15 }, armor: 0, php: MAX_HP, absorb: 0,
     items: { steak: 0, gapple: 0, totem: 0, mace: false }, maceCd: 0, swing: 0, autoT: 0, dying: 0,
     dead: false, done: false, msg: 'Click the mob to strike. It hits back, so watch your hearts.',
@@ -144,7 +148,7 @@ export function tick(r: Run, dt: number): Step {
 // You died: back to the start of this dimension with your gear, half your gold dropped
 export function respawn(r: Run): Run {
   const dim = DIMENSIONS[r.dim]
-  return { ...r, dead: false, i: 0, hp: dim.mobs[0].hp, gold: Math.floor(r.gold / 2), php: MAX_HP, absorb: 0, swing: 0, autoT: 0, dying: 0, msg: `You dropped ${Math.ceil(r.gold / 2)} gold.` }
+  return { ...r, dead: false, i: 0, hp: dim.mobs[0].hp, gold: Math.floor(r.gold / 2), php: MAX_HP, absorb: 0, swing: 0, autoT: 0, dying: 0, maceCd: 0, msg: `You dropped ${Math.ceil(r.gold / 2)} gold.` }
 }
 
 export function buyUpgrade(r: Run, u: Upgrade): Run {
@@ -189,7 +193,7 @@ const KEY = 'daevikos:bossrush'
 export function load(): Run {
   try {
     const s = JSON.parse(localStorage.getItem(KEY) ?? 'null')
-    if (s?.v === 1) return { ...fresh(), ...s, dying: 0 }
+    if (s?.v === 2) return { ...fresh(), ...s, dying: 0 }
   } catch { /* no saved run */ }
   return fresh()
 }

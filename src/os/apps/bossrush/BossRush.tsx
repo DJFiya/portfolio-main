@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } f
 import { useMediaQuery } from '../../../hooks/useMediaQuery'
 import type { AppProps } from '../../os-context'
 import {
-  ARMOR, ITEMS, MACE_COOLDOWN, MAX_HP, buyArmor, buyItem, buyUpgrade, canBuy, click, fresh, load, mobOf,
+  ARMOR, ITEMS, armorCut, MACE_COOLDOWN, MAX_HP, buyArmor, buyItem, buyUpgrade, canBuy, click, fresh, load, mobOf,
   consume, respawn, save, tick, winding, type GameEvent, type Item, type Run, type Upgrade,
 } from './game'
 import { DIMENSIONS, drawMob } from './mobs'
@@ -95,7 +95,7 @@ export default function BossRush({ active }: AppProps) {
               {Array.from({ length: MAX_HP / 2 }, (_, k) => <Heart key={k} fill={full >= k * 2 + 2 ? 2 : full === k * 2 + 1 ? 1 : 0} />)}
               {Array.from({ length: Math.ceil(gold / 2) }, (_, k) => <Heart key={`g${k}`} gold fill={gold >= k * 2 + 2 ? 2 : 1} />)}
             </span>
-            {run.armor > 0 && <span className="br-armor" title={`${ARMOR[run.armor].name} armour`}><Chestplate col={ARMOR[run.armor].col} /></span>}
+            {run.armor > 0 && <span className="br-armor" title={`${ARMOR[run.armor].name} armour: ${armorCut(run.armor)}% less damage`}><Chestplate col={ARMOR[run.armor].col} /></span>}
           </div>
           <div className="br-hotbar">
             {HOTBAR.map((it, k) => {
@@ -103,7 +103,7 @@ export default function BossRush({ active }: AppProps) {
               const cd = it === 'mace' && run.maceCd > 0 ? run.maceCd / MACE_COOLDOWN : 0
               return (
                 <button key={it} type="button" className={`br-slot${have ? '' : ' empty'}${it === 'totem' && have ? ' passive' : ''}`} aria-label={`${ITEMS[it].name}${it === 'mace' || it === 'totem' ? '' : `, ${run.items[it]} left`} (key ${k + 1})`} onClick={() => apply(r => consume(r, it))} disabled={!have || !running}>
-                  <ItemIcon item={it} />
+                  <ItemIcon item={it} size={34} />
                   {it !== 'mace' && it !== 'totem' && run.items[it] > 0 && <b>{run.items[it]}</b>}
                   {cd > 0 && <span className="br-cd" style={{ '--cd': cd } as CSSProperties} />}
                 </button>
@@ -134,11 +134,15 @@ export default function BossRush({ active }: AppProps) {
           </button>
         ))}
         <h3>Armour</h3>
-        {ARMOR[run.armor + 1] ? (
-          <button type="button" className="br-buy" disabled={run.gold < ARMOR[run.armor + 1].cost} onClick={() => apply(buyArmor)}>
-            <span className="br-buy-icon"><Chestplate col={ARMOR[run.armor + 1].col} />{ARMOR[run.armor + 1].name}</span><span>{ARMOR[run.armor + 1].cost}g</span>
-          </button>
-        ) : <p className="br-note">Netherite. Nothing better.</p>}
+        {ARMOR.slice(1).map((a, k) => {
+          const tier = k + 1, worn = tier === run.armor, past = tier < run.armor, next = tier === run.armor + 1
+          return (
+            <button key={a.name} type="button" className={`br-buy${worn ? ' worn' : ''}${past ? ' past' : ''}`} disabled={!next || run.gold < a.cost} onClick={() => apply(buyArmor)}>
+              <span className="br-buy-icon"><Chestplate col={a.col} /><span>{a.name}<small>{armorCut(tier)}% less damage</small></span></span>
+              <span>{worn ? 'Worn' : past ? '' : `${a.cost}g`}</span>
+            </button>
+          )
+        })}
         <h3>Items</h3>
         {HOTBAR.map(it => (
           <button key={it} type="button" className="br-buy" disabled={!canBuy(run, it)} onClick={() => apply(r => buyItem(r, it))}>
