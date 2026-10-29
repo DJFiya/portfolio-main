@@ -1,10 +1,12 @@
 import { createElement } from 'react'
 import type { AppDef } from '../os-context'
+import Projects from './Projects'
 import Resume, { ResumeTools } from './Resume'
 import Settings from './Settings'
 import Trash from './Trash'
 
 export const APPS: Record<string, AppDef> = {
+  projects: { title: 'Projects', icon: 'projects', family: 'instrument', w: 1000, h: 620, Component: Projects },
   resume: { title: 'Résumé', icon: 'resume', family: 'doc', w: 840, h: 640, tools: createElement(ResumeTools), Component: Resume },
   settings: { title: 'Settings', icon: 'settings', w: 560, h: 420, Component: Settings },
   trash: { title: 'Trash', icon: 'trash', w: 520, h: 360, Component: Trash },
