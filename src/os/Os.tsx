@@ -101,8 +101,6 @@ export default function Os() {
     }),
   }), [open, sip, state.wall, state.trashed, setState])
 
-  useEffect(() => { open('projects') }, [open])
-
   useEffect(() => {
     if (!ctx) return
     const off = (e: Event) => { if (!(e.target as HTMLElement).closest('#ctx')) setCtx(null) }
@@ -143,7 +141,7 @@ export default function Os() {
         <main id="desk" ref={deskRef} aria-label="Desktop" onContextMenu={onContext}>
           <div id="wallname">
             <h1>Daevik Jain</h1>
-            <p>Software engineer building AI agent infrastructure at Courtyard AI. Biomedical Engineering with the Software Engineering option at the University of Waterloo.</p>
+            <p>BME / SE @ University of Waterloo | 3x Hackathon Winner / Finalist</p>
           </div>
           {desk.w > 0 && (
             <DesktopItems state={state} setState={setState} desk={desk} mobile={mobile} sips={sips} onSip={sip} onOpen={open} />
