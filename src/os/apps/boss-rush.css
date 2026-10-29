@@ -1,4 +1,4 @@
-/* ---------- sword ---------- */
+/* ---------- boss rush ---------- */
 .sw-app { height: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 230px; background: #1E2A1C; color: #F3F1E6; font-family: var(--pixel); }
 .sw-stage { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 18px; }
 .sw-name { font-size: 24px; font-weight: 700; }

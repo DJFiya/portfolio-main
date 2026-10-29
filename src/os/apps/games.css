@@ -1,0 +1,11 @@
+/* ---------- games folder ---------- */
+.folder { min-height: 100%; background: var(--win); }
+.folder-count { margin-left: auto; font-size: 13.5px; color: var(--ink2); }
+.folder-grid { display: grid; grid-template-columns: repeat(auto-fill, 136px); gap: 14px; padding: 22px; }
+.folder-item { border: 0; background: transparent; padding: 14px 8px 12px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; text-align: center; transition: background-color 140ms ease; }
+.folder-item:hover, .folder-item:focus-visible { background: var(--sel); }
+.cart { display: block; margin-bottom: 6px; border-radius: 6px; overflow: hidden; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12); transition: transform 160ms var(--ease); }
+.cart svg { display: block; }
+.folder-item:hover .cart { transform: translateY(-2px); }
+.folder-item:active .cart { transform: scale(0.95); }
+.fi-name { font-weight: 700; font-size: 14.5px; }
