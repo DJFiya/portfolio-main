@@ -11,10 +11,9 @@ export type DesktopState = {
 }
 
 const KEY = 'daevikos'
-const SEED_NOTE = 'Start here: Projects launches like a mission, Career slides along the timeline, and the Résumé is one click from the top bar. Right-click the desktop for more.'
 
 function load(): DesktopState {
-  const fresh: DesktopState = { wall: 0, pos: {}, notes: [{ id: 1, text: SEED_NOTE }], trashed: [] }
+  const fresh: DesktopState = { wall: 0, pos: {}, notes: [], trashed: [] }
   try {
     const raw = localStorage.getItem(KEY)
     return raw ? { ...fresh, ...JSON.parse(raw) } : fresh
