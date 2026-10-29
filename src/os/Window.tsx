@@ -83,7 +83,7 @@ export default function Window({ win, def, focused, mobile, desk, onFocus, onClo
         </div>
       </header>
       <div className="wbody">
-        <def.Component arg={win.arg} argKey={win.argKey} />
+        <def.Component arg={win.arg} argKey={win.argKey} active={focused && !win.min && !win.closing} />
       </div>
       <div
         className="wresize"

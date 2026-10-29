@@ -4,8 +4,9 @@ import type { IconName } from './icons'
 export type Family = 'light' | 'doc' | 'instrument' | 'media' | 'terminal'
 
 // arg is whatever open() was last called with; argKey bumps each time so an
-// already-open app can react to being reopened with a new target
-export type AppProps = { arg?: unknown; argKey: number }
+// already-open app can react to being reopened with a new target. active is true while the
+// window is in front and not minimized.
+export type AppProps = { arg?: unknown; argKey: number; active: boolean }
 
 export type AppDef = {
   title: string

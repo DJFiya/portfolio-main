@@ -1,6 +1,6 @@
 import { createElement } from 'react'
 import type { AppDef } from '../os-context'
-import BossRush from './BossRush'
+import BossRush from './bossrush/BossRush'
 import Career from './Career'
 import Cinema from './Cinema'
 import Contact from './Contact'
@@ -14,7 +14,7 @@ import Terminal from './Terminal'
 import Trash from './Trash'
 
 export const APPS: Record<string, AppDef> = {
-  bossrush: { title: 'Boss Rush', icon: 'sword', family: 'media', hidden: true, w: 700, h: 440, Component: BossRush },
+  bossrush: { title: 'Boss Rush', icon: 'sword', family: 'media', hidden: true, w: 820, h: 560, Component: BossRush },
   games: { title: 'Games', icon: 'folder', w: 520, h: 300, Component: Games },
   music: { title: 'Music', icon: 'music', family: 'media', w: 760, h: 420, Component: Music },
   projects: { title: 'Projects', icon: 'projects', family: 'instrument', w: 1000, h: 620, Component: Projects },
