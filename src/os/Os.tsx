@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
 import { useMediaQuery } from '../hooks/useMediaQuery'
 import { APPS, DOCK } from './apps'
 import { WALLS } from './content'
@@ -6,6 +6,7 @@ import { MUG_SIPS, useDesktopState } from './desktop-state'
 import DesktopItems from './DesktopItems'
 import { Icon } from './icons'
 import { OsContext, type OsApi } from './os-context'
+import Wallpaper from './Wallpaper'
 import Window, { type Rect, type Win } from './Window'
 import './os.css'
 
@@ -125,7 +126,7 @@ export default function Os() {
 
   return (
     <OsContext.Provider value={api}>
-      <div id="os" style={{ backgroundColor: wallColor }}>
+      <div id="os" style={{ '--wall': wallColor } as CSSProperties}>
         <header id="menubar">
           <div className="left">
             <button className="mb brand" type="button" onClick={() => open('settings')}>DaevikOS</button>
@@ -139,6 +140,7 @@ export default function Os() {
           </nav>
         </header>
         <main id="desk" ref={deskRef} aria-label="Desktop" onContextMenu={onContext}>
+          <Wallpaper />
           <div id="wallname">
             <h1>Daevik Jain</h1>
             <p>BME / SE @ University of Waterloo | 3x Hackathon Winner / Finalist</p>

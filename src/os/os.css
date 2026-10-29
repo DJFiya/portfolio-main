@@ -45,6 +45,15 @@ a { color: var(--accent); text-underline-offset: 3px; }
 
 /* ---------- desktop ---------- */
 #desk { position: relative; flex: 1 1 auto; overflow: hidden; }
+#wallpaper { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+#wallpaper .ridges { position: absolute; left: 0; bottom: 0; width: 100%; height: 58%; }
+#wallpaper polygon { transition: fill 400ms ease; }
+#wallpaper .far .lit { fill: color-mix(in srgb, var(--wall) 88%, #000); }
+#wallpaper .far .shade { fill: color-mix(in srgb, var(--wall) 78%, #000); }
+#wallpaper .near .lit { fill: color-mix(in srgb, var(--wall) 70%, #000); }
+#wallpaper .near .shade { fill: color-mix(in srgb, var(--wall) 60%, #000); }
+.cloud { position: absolute; left: 0; opacity: 0.9; animation: drift linear infinite; }
+@keyframes drift { from { transform: translateX(-240px); } to { transform: translateX(calc(100vw + 20px)); } }
 #wallname { position: absolute; left: 32px; bottom: 104px; max-width: 640px; pointer-events: none; user-select: none; }
 #wallname h1 { margin: 0; font-size: clamp(56px, 8vw, 104px); line-height: 0.9; letter-spacing: -0.045em; font-weight: 800; color: #EEF3EF; }
 #wallname p { margin: 16px 0 0; font-size: 19px; line-height: 1.45; color: #CFDCD5; max-width: 52ch; }
@@ -56,7 +65,7 @@ a { color: var(--accent); text-underline-offset: 3px; }
 @keyframes item-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .icon { width: 92px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px; border-radius: 8px; color: #F1F5F2; font-size: 13.5px; font-weight: 600; text-align: center; line-height: 1.2; transition: background-color 160ms ease; }
 .item:hover .icon, .item:focus-visible .icon { background: rgba(255, 255, 255, 0.09); }
-.icon .tile { width: 56px; height: 56px; border-radius: 13px; display: grid; place-items: center; background: #1F3429; transition: transform 160ms var(--ease); }
+.icon .tile { width: 56px; height: 56px; border-radius: 13px; display: grid; place-items: center; background: color-mix(in srgb, var(--wall) 72%, #000); transition: transform 160ms var(--ease), background-color 400ms ease; }
 .icon.doc .tile { background: #F4F4EF; }
 .item:active .icon .tile { transform: scale(0.95); }
 .icon.trash.hot .tile { background: #7A2E26; transform: scale(1.08); }
@@ -103,9 +112,9 @@ a { color: var(--accent); text-underline-offset: 3px; }
 .win.f-terminal { background: #121615; }
 
 /* ---------- dock ---------- */
-#dock { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; gap: 6px; padding: 8px; background: rgba(14, 26, 21, 0.74); border-radius: 18px; z-index: 4000; }
-.dk { position: relative; width: 52px; height: 52px; border: 0; border-radius: 12px; background: #24392F; cursor: pointer; display: grid; place-items: center; transition: transform 180ms var(--ease), background-color 160ms ease; }
-.dk:hover { background: #2D473B; transform: translateY(-3px); }
+#dock { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; gap: 6px; padding: 8px; background: color-mix(in srgb, var(--wall) 45%, rgb(0 0 0 / 0.74)); border-radius: 18px; z-index: 4000; }
+.dk { position: relative; width: 52px; height: 52px; border: 0; border-radius: 12px; background: color-mix(in srgb, var(--wall) 85%, #000); cursor: pointer; display: grid; place-items: center; transition: transform 180ms var(--ease), background-color 160ms ease; }
+.dk:hover { background: color-mix(in srgb, var(--wall) 85%, #FFF); transform: translateY(-3px); }
 .dk:active { transform: translateY(-1px) scale(0.95); }
 .dk .tip { position: absolute; bottom: 62px; left: 50%; transform: translate(-50%, 4px); white-space: nowrap; padding: 5px 9px; border-radius: 6px; background: #F4F4EF; color: var(--ink); font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 120ms ease, transform 120ms var(--ease); }
 .dk:hover .tip, .dk:focus-visible .tip { opacity: 1; transform: translate(-50%, 0); }
@@ -167,4 +176,6 @@ a { color: var(--accent); text-underline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
   .icon .steam { animation: none; }
+  /* Clouds hold still at their spread-out starting points */
+  .cloud { animation-duration: 160s !important; animation-play-state: paused; }
 }
