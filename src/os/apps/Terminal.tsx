@@ -30,7 +30,7 @@ export default function Terminal() {
     else if (verb === 'clear') { setLines([]); return }
     else if (verb === 'help') say('about · ls · open <app> · projects · career · contact · launch <project> · sip · wallpaper <name> · clear\napps: ' + os.appIds.join(', '))
     else if (verb === 'about') say('Daevik Jain\nrole       Software Engineer, Courtyard AI\nschool     University of Waterloo, BME with the SE option\nstanding   3.9 GPA\nfocus      AI agents, evals, infrastructure')
-    else if (verb === 'ls') say('Projects/  Career/  Games/  resume.pdf')
+    else if (verb === 'ls') say('Projects/  Career/  Sword/  resume.pdf')
     else if (verb === 'open') {
       if (os.appIds.includes(arg)) { os.open(arg); say('opened ' + arg, 'ok') }
       else say(`open: no app called "${arg}". Type help.`, 'warn')

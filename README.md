@@ -1,6 +1,6 @@
 # Daevik Jain — Portfolio
 
-DaevikOS: a small desktop in the browser. Work is shown through console hardware (Projects launch console, Career fader, Contact comms panel), with a Résumé document, a Terminal, media players and a Games folder alongside. Built with Vite, React and TypeScript.
+DaevikOS: a small desktop in the browser. Work is shown through console hardware (Projects launch console, Career fader, Contact comms panel), with a Résumé document, a Terminal, media players and a Sword boss rush alongside. Built with Vite, React and TypeScript.
 
 ## Local development
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
-import './games.css'
+import './sword.css'
 
 // [name, hp, body colour]
 const BOSSES: [string, number, string][] = [['Baby Slime', 24, '#7FC46A'], ['Zombie', 28, '#4F8A4B'], ['Spider', 32, '#3A3236'], ['Skeleton', 36, '#D8D6CC'], ['Creeper', 40, '#5FB04C'], ['Husk', 44, '#B79B62'], ['Stray', 49, '#9FB3B8'], ['Drowned', 54, '#3E8C88'], ['Pillager', 59, '#6E6E70'], ['Vindicator', 65, '#5B5F66'], ['Witch', 72, '#5B3F73'], ['Enderman', 79, '#1C1820']]
