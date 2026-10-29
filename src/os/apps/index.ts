@@ -2,6 +2,7 @@ import { createElement } from 'react'
 import type { AppDef } from '../os-context'
 import Career from './Career'
 import Contact from './Contact'
+import Music from './Music'
 import Projects from './Projects'
 import Resume, { ResumeTools } from './Resume'
 import Settings from './Settings'
@@ -9,6 +10,7 @@ import Terminal from './Terminal'
 import Trash from './Trash'
 
 export const APPS: Record<string, AppDef> = {
+  music: { title: 'Music', icon: 'music', family: 'media', w: 760, h: 420, Component: Music },
   projects: { title: 'Projects', icon: 'projects', family: 'instrument', w: 1000, h: 620, Component: Projects },
   career: { title: 'Career', icon: 'career', family: 'instrument', w: 980, h: 600, Component: Career },
   contact: { title: 'Contact', icon: 'contact', family: 'instrument', w: 640, h: 470, Component: Contact },
