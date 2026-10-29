@@ -102,18 +102,20 @@ function Draggable({ id, pos, z, trashable, desk, disabled, trashEl, setHot, onD
   )
 }
 
+// Drawn as a regular desktop icon; the coffee level drops with each sip
 function Mug({ sips }: { sips: number }) {
   const left = MUG_SIPS - sips
   return (
-    <span className={`w-mug${left <= 0 ? ' empty' : ''}`}>
-      <span className="steam" aria-hidden="true"><span /><span /><span /></span>
-      <svg width="96" height="96" viewBox="0 0 100 100" aria-hidden="true" style={{ marginTop: 22 }}>
-        <defs><clipPath id="mugclip"><path d="M18 30h52v40a14 14 0 0 1-14 14H32a14 14 0 0 1-14-14z" /></clipPath></defs>
-        <rect x="18" y={34 + (sips / MUG_SIPS) * 50} width="52" height="50" fill="#5A3A22" clipPath="url(#mugclip)" />
-        <path d="M18 30h52v40a14 14 0 0 1-14 14H32a14 14 0 0 1-14-14z" fill="none" stroke="#F1F5F2" strokeWidth="3" />
-        <path d="M70 40h6a10 10 0 0 1 0 20h-6" fill="none" stroke="#F1F5F2" strokeWidth="3" />
-      </svg>
-      <span className="w-label">{left > 0 ? `${left} sip${left === 1 ? '' : 's'} left` : 'Refilling…'}</span>
+    <span className="icon">
+      <span className="tile">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <defs><clipPath id="mugclip"><path d="M4.5 8h11v8.5a3.5 3.5 0 0 1-3.5 3.5H8a3.5 3.5 0 0 1-3.5-3.5z" /></clipPath></defs>
+          <rect x="4.5" y={9 + (sips / MUG_SIPS) * 11} width="11" height="12" fill="#B07A4E" clipPath="url(#mugclip)" />
+          <path d="M4.5 8h11v8.5a3.5 3.5 0 0 1-3.5 3.5H8a3.5 3.5 0 0 1-3.5-3.5zM15.5 10.5h1.5a2.5 2.5 0 0 1 0 5h-1.5" stroke="#F1F5F2" strokeWidth="1.6" strokeLinejoin="round" />
+          {left > 0 && <path className="steam" d="M8 5.5c0-1 1-1.2 1-2.2M11.5 5.5c0-1 1-1.2 1-2.2" stroke="#F1F5F2" strokeWidth="1.4" strokeLinecap="round" />}
+        </svg>
+      </span>
+      {left > 0 ? `${left} sip${left === 1 ? '' : 's'} left` : 'Refilling…'}
     </span>
   )
 }

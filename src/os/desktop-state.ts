@@ -36,7 +36,7 @@ export function defaultPos(id: string, W: number, H: number): Point {
   const right = W - 112
   const map: Record<string, [number, number]> = {
     resume: [right, 18], projects: [right, 122], career: [right, 226], sword: [right, 330],
-    mug: [right - 130, 26], trash: [right, Math.max(434, H - 210)], note: [Math.max(24, W * 0.5 - 115), 24],
+    mug: [right - 104, 18], trash: [right, Math.max(434, H - 210)], note: [Math.max(24, W * 0.5 - 115), 24],
   }
   const [x, y] = map[id] ?? [80, 80]
   return { x, y }
