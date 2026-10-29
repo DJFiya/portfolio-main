@@ -7,7 +7,7 @@ export default function Settings() {
     <div className="set">
       <section>
         <h3>Wallpaper</h3>
-        <div className="row">
+        <div className="row walls">
           {WALLS.map(([n, c], i) => (
             <button key={n} type="button" className="sw" style={{ background: c }} aria-label={n} aria-pressed={os.wall === i} onClick={() => os.setWall(i)} />
           ))}
