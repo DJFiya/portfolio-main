@@ -58,16 +58,13 @@ const ICONS: Record<string, string[]> = {
     '......koOk......', '......kkkk......', '................', '................',
   ],
 }
-// The Mace matches Minecraft's own inventory sprite pixel for pixel, with its colours
+// The Mace keeps Minecraft's inventory sprite shape, flattened to a few colours like the other items
 const MACE = [
-  '.........aa.....', '........abca.da.', '.......abdbcefe.', '......abdfgbce..',
-  '.....abdagbcade.', '.....ahgggcaaade', '......ahgbaaefae', '.......ehaaefae.',
-  '......ijefafae..', '.....ijk.efae...', '....ilk...ee....', '...ilk..........',
-  '..ilk...........', 'aajk............', 'ahe.............', 'eee.............',
+  '.........kk.....', '........kLLk.kk.', '.......kLSLLkSk.', '......kLSSMLLk..',
+  '.....kLSSMLLSSk.', '.....kSMMMLSSSSk', '......kSMLSSSSSk', '.......kSSSSSSk.',
+  '......HHkSSSSk..', '.....HHD.kSSk...', '....HHD...kk....', '...HHD..........',
+  '..HHD...........', 'kkHD............', 'kSk.............', 'kkk.............',
 ]
-const MACE_PAL: Record<string, string> = {
-  a: '#424752', b: '#99A1AE', c: '#BFCEE7', d: '#555C69', e: '#1E2229', f: '#2E333B',
-  g: '#7C8491', h: '#666C7A', i: '#506390', j: '#7A82C4', k: '#234269', l: '#B5A5CA',
-}
+const MACE_PAL: Record<string, string> = { k: '#2A2E33', L: '#AEB6C2', M: '#7C8491', S: '#565C68', H: '#7F8CC4', D: '#3A4A78' }
 export const ItemIcon = ({ item, size = 28 }: { item: string; size?: number }) =>
   item === 'mace' ? <Sprite map={MACE} size={size} pal={MACE_PAL} /> : <Sprite map={ICONS[item]} size={size} />
