@@ -108,6 +108,11 @@ export default function Os() {
     setCtx({ x: Math.min(e.clientX - r.left, r.width - 230), y: Math.min(e.clientY - r.top, r.height - 200) })
   }
 
+  // Pinned apps, then anything open that has no pinned slot (games, Trash) so it can always be brought back
+  const pinned = DOCK.map(g => g.filter(id => APPS[id] && !APPS[id].hidden))
+  const extra = wins.filter(w => !w.closing && !pinned.flat().includes(w.id)).map(w => w.id)
+  const dockGroups = extra.length ? [...pinned, extra] : pinned
+
   const onDock = (id: string) => {
     const w = wins.find(x => x.id === id && !x.closing)
     if (w && !w.min && w === top) patch(id, () => ({ min: true }))
@@ -156,14 +161,17 @@ export default function Os() {
             ))}
           </div>
           <nav id="dock" aria-label="Apps">
-            {DOCK.map((group, gi) => [
+            {dockGroups.map((group, gi) => [
               gi > 0 && <span key={`sep${gi}`} className="dk-sep" aria-hidden="true" />,
-              ...group.filter(id => APPS[id] && !APPS[id].hidden).map(id => (
-                <button key={id} type="button" className={`dk${wins.some(w => w.id === id && !w.closing) ? ' running' : ''}`} aria-label={APPS[id].title} onClick={() => onDock(id)}>
-                  <Icon name={APPS[id].icon} size={26} />
-                  <span className="tip" aria-hidden="true">{APPS[id].title}</span>
-                </button>
-              )),
+              ...group.map(id => {
+                const running = wins.some(w => w.id === id && !w.closing), active = top?.id === id
+                return (
+                  <button key={id} type="button" className={['dk', running && 'running', active && 'active'].filter(Boolean).join(' ')} aria-label={APPS[id].title} aria-current={active || undefined} onClick={() => onDock(id)}>
+                    <Icon name={APPS[id].icon} size={26} />
+                    <span className="tip" aria-hidden="true">{APPS[id].title}</span>
+                  </button>
+                )
+              }),
             ])}
           </nav>
           {ctx && (

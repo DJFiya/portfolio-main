@@ -122,7 +122,10 @@ a { color: var(--accent); text-underline-offset: 3px; }
 .dk:active { transform: translateY(-1px) scale(0.95); }
 .dk .tip { position: absolute; bottom: 62px; left: 50%; transform: translate(-50%, 4px); white-space: nowrap; padding: 5px 9px; border-radius: 6px; background: #F4F4EF; color: var(--ink); font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 120ms ease, transform 120ms var(--ease); }
 .dk:hover .tip, .dk:focus-visible .tip { opacity: 1; transform: translate(-50%, 0); }
-.dk.running::after { content: ""; position: absolute; bottom: -5px; left: 50%; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: #D6E0F2; }
+.dk.running::after { content: ""; position: absolute; bottom: -5px; left: 50%; width: 5px; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.55); transform: translateX(-50%); transition: width 180ms var(--ease), background-color 180ms ease; }
+/* The app in front gets a longer, brighter bar than the others that are open */
+.dk.active { background: color-mix(in srgb, var(--wall) 78%, #FFF); }
+.dk.active::after { width: 16px; background: #FFF; }
 .dk-sep { width: 1px; margin: 8px 2px; background: rgba(255, 255, 255, 0.16); }
 
 /* ---------- context menu ---------- */
