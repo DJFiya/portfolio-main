@@ -3,7 +3,7 @@ import { useMediaQuery } from '../../hooks/useMediaQuery'
 import './sword.css'
 
 // [name, hp, body colour]
-const BOSSES: [string, number, string][] = [['Baby Slime', 24, '#7FC46A'], ['Zombie', 28, '#4F8A4B'], ['Spider', 32, '#3A3236'], ['Skeleton', 36, '#D8D6CC'], ['Creeper', 40, '#5FB04C'], ['Husk', 44, '#B79B62'], ['Stray', 49, '#9FB3B8'], ['Drowned', 54, '#3E8C88'], ['Pillager', 59, '#6E6E70'], ['Vindicator', 65, '#5B5F66'], ['Witch', 72, '#5B3F73'], ['Enderman', 79, '#1C1820']]
+const BOSSES: [string, number, string][] = [['Baby Slime', 24, '#7FC46A'], ['Zombie', 28, '#4F8A4B'], ['Spider', 32, '#3A3236'], ['Skeleton', 36, '#D8D6CC'], ['Creeper', 40, '#5FB04C'], ['Husk', 44, '#B79B62'], ['Stray', 49, '#D8D6CC'], ['Drowned', 54, '#7D8A8C'], ['Pillager', 59, '#7F7F78'], ['Vindicator', 65, '#A7ACA8'], ['Witch', 72, '#9A6B4A'], ['Enderman', 79, '#1C1820']]
 const UPGRADES = { dmg: ['Sharpness', '+1 damage'], auto: ['Auto-swing', '+1 damage per second'], loot: ['Looting', '+1 gold per kill'] } as const
 type Upgrade = keyof typeof UPGRADES
 
@@ -18,11 +18,24 @@ function drawBoss(cv: HTMLCanvasElement, i: number) {
   c.clearRect(0, 0, 144, 144)
   const px = (x: number, y: number, a: number, b: number, f: string) => { c.fillStyle = f; c.fillRect(x * 12, y * 12, a * 12, b * 12) }
   px(2, 2, 8, 8, col); px(2, 2, 8, 1, 'rgba(255,255,255,0.18)'); px(2, 9, 8, 1, 'rgba(0,0,0,0.25)')
-  const eye = name === 'Enderman' ? '#B84DE0' : name === 'Spider' ? '#C0242A' : '#111'
-  px(3, 4, 2, 2, eye); px(7, 4, 2, 2, eye); px(5, 7, 2, 1, '#111')
+  const EYES: Record<string, string> = { Enderman: '#B84DE0', Spider: '#C0242A', Stray: '#8FE3F5', Drowned: '#47C4EC' }
+  const illager = name === 'Pillager' || name === 'Vindicator'
+  if (illager) {
+    px(3, 3, 6, 1, name === 'Vindicator' ? '#111' : '#3B3B36')
+    px(3, 4, 2, 1, '#F2F2EC'); px(7, 4, 2, 1, '#F2F2EC'); px(4, 4, 1, 1, '#2F5A3A'); px(7, 4, 1, 1, '#2F5A3A')
+  } else {
+    const eye = EYES[name] ?? (name === 'Witch' ? '#3B7A3A' : '#111')
+    px(3, 4, 2, 2, eye); px(7, 4, 2, 2, eye)
+  }
+  // Illagers and the witch have a long nose where the mouth would be
+  if (illager || name === 'Witch') { px(5, 5, 2, 3, 'rgba(0,0,0,0.22)'); px(4, 8, 4, 1, 'rgba(0,0,0,0.35)') }
+  else px(5, 7, 2, 1, '#111')
   if (name === 'Creeper') { px(4, 6, 4, 2, '#111'); px(4, 8, 1, 1, '#111'); px(7, 8, 1, 1, '#111') }
   if (name === 'Spider') { px(0, 5, 2, 1, col); px(10, 5, 2, 1, col); px(0, 7, 2, 1, col); px(10, 7, 2, 1, col) }
-  if (name === 'Witch') px(1, 0, 10, 2, '#2B1C33')
+  if (name === 'Husk') { px(2, 1, 8, 2, '#E4D58E'); px(3, 0, 6, 1, '#E4D58E'); px(2, 2, 8, 1, 'rgba(120,100,40,0.35)') }
+  if (name === 'Stray') { px(1, 1, 10, 2, '#2B6468'); px(3, 0, 6, 1, '#2B6468') }
+  if (name === 'Drowned') { const kelp = '#3E8E3E'; px(2, 2, 1, 5, kelp); px(3, 2, 2, 1, kelp); px(9, 2, 1, 3, kelp); px(8, 8, 1, 2, kelp); px(3, 8, 1, 1, kelp) }
+  if (name === 'Witch') { px(1, 2, 10, 1, '#4A2E5E'); px(3, 0, 6, 2, '#5B3F73'); px(3, 1, 6, 1, 'rgba(0,0,0,0.18)'); px(6, 7, 1, 1, '#3E8E3E') }
 }
 
 export default function Sword() {
