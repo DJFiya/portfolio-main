@@ -118,7 +118,7 @@ export default function BookCover({ onOpen }: BookCoverProps) {
             {/* Subtitle */}
             <p
               className="font-author text-center tracking-[0.18em] uppercase"
-              style={{ color: 'rgba(180, 162, 132, 0.65)', fontSize: '0.6rem' }}
+              style={{ color: 'rgba(180, 162, 132, 0.85)', fontSize: '0.6rem' }}
             >
               Waterloo BME / SE Student
             </p>

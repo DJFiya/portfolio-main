@@ -17,7 +17,7 @@ export default function BookRightPage({ children }: { children: ReactNode }) {
 
       {/* Page number */}
       <div className="relative pb-2 flex justify-center">
-        <span className="font-author text-ink-300" style={{ fontSize: '10px' }}>3</span>
+        <span className="font-author text-ink-500" style={{ fontSize: '10px' }}>3</span>
       </div>
     </div>
   )

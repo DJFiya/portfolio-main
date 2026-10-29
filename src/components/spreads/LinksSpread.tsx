@@ -66,7 +66,7 @@ export default function LinksSpread({ onResumeClick }: LinksSpreadProps) {
             <Icon type={link.icon} />
           </div>
           <div className="flex flex-col">
-            <span className="font-author text-xs text-ink-400">{link.label}</span>
+            <span className="font-author text-xs text-ink-500">{link.label}</span>
             <span className="font-author font-medium text-ink-800 text-sm group-hover:text-azure-700 transition-colors">
               {link.handle} ↗
             </span>
@@ -90,7 +90,7 @@ export default function LinksSpread({ onResumeClick }: LinksSpreadProps) {
           <ResumeIcon />
         </div>
         <div className="flex flex-col">
-          <span className="font-author text-xs text-ink-400">Resume</span>
+          <span className="font-author text-xs text-ink-500">Resume</span>
           <span className="font-author font-medium text-ink-800 text-sm group-hover:text-azure-700 transition-colors">
             swe_resume.pdf ↗
           </span>

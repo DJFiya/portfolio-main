@@ -309,7 +309,7 @@ export default function BookPortfolio() {
             ) : (
               <BookRightPage>
                 <div className="mb-6 pb-4 border-b border-ink-200/40">
-                  <p className="font-rosaline text-ink-400 tracking-widest text-base">
+                  <p className="font-rosaline text-ink-500 tracking-widest text-base">
                     {activeSpread?.chapterNum}
                   </p>
                   <h2 className="font-rosaline text-ink-900 text-[2rem] leading-tight">
@@ -414,7 +414,7 @@ export default function BookPortfolio() {
           type="button"
           onClick={flipPrev}
           disabled={currentPage === 0}
-          className="font-author text-ink-400 hover:text-ink-200 disabled:opacity-20 disabled:cursor-default transition-colors text-sm tracking-wide"
+          className="font-author text-ink-300 hover:text-ink-100 disabled:opacity-20 disabled:cursor-default transition-colors text-sm tracking-wide"
         >
           ← Prev
         </button>
@@ -442,7 +442,7 @@ export default function BookPortfolio() {
           type="button"
           onClick={flipNext}
           disabled={currentPage >= TOTAL - 1}
-          className="font-author text-ink-400 hover:text-ink-200 disabled:opacity-20 disabled:cursor-default transition-colors text-sm tracking-wide"
+          className="font-author text-ink-300 hover:text-ink-100 disabled:opacity-20 disabled:cursor-default transition-colors text-sm tracking-wide"
         >
           Next →
         </button>

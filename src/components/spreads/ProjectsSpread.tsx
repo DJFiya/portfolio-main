@@ -50,7 +50,7 @@ export default function ProjectsSpread() {
               </p>
 
               <p
-                className="font-author text-ink-400 leading-snug"
+                className="font-author text-ink-500 leading-snug"
                 style={{ fontSize: '0.67rem', letterSpacing: '0.01em' }}
               >
                 {project.awardLabel}

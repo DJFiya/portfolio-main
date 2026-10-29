@@ -24,7 +24,7 @@ export default function BookLeftPage({ chapterNum, chapterTitle }: BookLeftPageP
             background: 'linear-gradient(to right, transparent, rgba(30,79,160,0.35), transparent)',
           }}
         />
-        <span className="font-rosaline text-ink-400 tracking-widest" style={{ fontSize: '1rem' }}>
+        <span className="font-rosaline text-ink-500 tracking-widest" style={{ fontSize: '1rem' }}>
           {chapterNum}
         </span>
         <h2
@@ -42,7 +42,7 @@ export default function BookLeftPage({ chapterNum, chapterTitle }: BookLeftPageP
 
       {/* Page number */}
       <div className="relative pb-2 flex justify-center">
-        <span className="font-author text-ink-300" style={{ fontSize: '10px' }}>2</span>
+        <span className="font-author text-ink-500" style={{ fontSize: '10px' }}>2</span>
       </div>
     </div>
   )
