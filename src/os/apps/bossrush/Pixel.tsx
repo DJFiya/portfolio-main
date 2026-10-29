@@ -3,15 +3,14 @@ const PAL: Record<string, string> = {
   r: '#D9332B', R: '#FF8A80', e: '#3B1E1A', y: '#F2C94C', Y: '#FFF2A8', l: '#5FB04C', s: '#6B4428',
   k: '#2B2118', N: '#7A4422', n: '#5A2E16', w: '#A86A3E',
   o: '#F2C94C', O: '#B8862A', G: '#3EAE5E',
-  D: '#9AA0A8', d: '#5E646C', b: '#B8D0DE', B: '#7F9AAC', L: '#D3D8DE', S: '#6A7078', K: '#2A2E33', h: '#B8D0DE', H: '#6F8A9C',
 }
 
-function Sprite({ map, size, tint }: { map: string[]; size: number; tint?: string }) {
+function Sprite({ map, size, tint, pal = PAL }: { map: string[]; size: number; tint?: string; pal?: Record<string, string> }) {
   const w = map[0].length, h = map.length
   return (
     <svg width={size * w / h} height={size} viewBox={`0 0 ${w} ${h}`} shapeRendering="crispEdges" aria-hidden="true">
       {map.flatMap((row, y) => [...row].map((ch, x) => {
-        const f = ch === 'c' ? tint : PAL[ch]
+        const f = ch === 'c' && tint ? tint : pal[ch]
         return f ? <rect key={`${x},${y}`} x={x} y={y} width="1" height="1" fill={f} /> : null
       }))}
     </svg>
@@ -58,11 +57,17 @@ const ICONS: Record<string, string[]> = {
     'kooooooooooooook', 'kOOOOooOOooOOOOk', '.kkkkkooookkkkk.', '.....koOOok.....', '.....kooook.....', '.....kOooOk.....',
     '......koOk......', '......kkkk......', '................', '................',
   ],
-  // The head is a flat rectangle turned 45° across the handle: left half lit, right half shaded
-  mace: [
-    '........K.......', '.......KSK......', '......KSSSK.....', '.....KLSSSSK....', '....KLLLSSSSK...', '....KLLLLSSSSK..',
-    '.....KLLLLSSSSK.', '......KLLLLSSSSK', '.......KLLLLSSSK', '.....KhKKLLLLSK.', '....KHK..KLLLK..', '...KhK....KLK...',
-    '..KHK......K....', '.KhK............', 'KHK.............', 'hK..............',
-  ],
 }
-export const ItemIcon = ({ item, size = 28 }: { item: string; size?: number }) => <Sprite map={ICONS[item]} size={size} />
+// The Mace matches Minecraft's own inventory sprite pixel for pixel, with its colours
+const MACE = [
+  '.........aa.....', '........abca.da.', '.......abdbcefe.', '......abdfgbce..',
+  '.....abdagbcade.', '.....ahgggcaaade', '......ahgbaaefae', '.......ehaaefae.',
+  '......ijefafae..', '.....ijk.efae...', '....ilk...ee....', '...ilk..........',
+  '..ilk...........', 'aajk............', 'ahe.............', 'eee.............',
+]
+const MACE_PAL: Record<string, string> = {
+  a: '#424752', b: '#99A1AE', c: '#BFCEE7', d: '#555C69', e: '#1E2229', f: '#2E333B',
+  g: '#7C8491', h: '#666C7A', i: '#506390', j: '#7A82C4', k: '#234269', l: '#B5A5CA',
+}
+export const ItemIcon = ({ item, size = 28 }: { item: string; size?: number }) =>
+  item === 'mace' ? <Sprite map={MACE} size={size} pal={MACE_PAL} /> : <Sprite map={ICONS[item]} size={size} />
