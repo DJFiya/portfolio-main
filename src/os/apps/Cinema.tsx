@@ -121,6 +121,8 @@ export default function Cinema() {
   const clock = useRef({ raf: 0, t: 0 })
 
   useEffect(() => () => cancelAnimationFrame(clock.current.raf), [])
+  // Fetch the title card up front so it is decoded before its scene plays
+  useEffect(() => { new Image().src = invincibleCard }, [])
 
   const play = (i: number) => {
     let last = performance.now()
