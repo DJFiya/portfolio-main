@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 
 const PATHS = {
-  projects: 'M12 3l2.6 6.2 3.4 2.3-3.4 2.3L12 20l-2.6-6.2L6 11.5l3.4-2.3z',
+  // A planet with an orbit ring and a satellite, for the launch console
+  projects: 'M16.5 12a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0zM4.2 15.5c-1.3-1.9 2-5 7.3-7s10.3-2.3 11.4-.4M19.8 8.5c1.3 1.9-2 5-7.3 7s-10.3 2.3-11.4.4M20.5 6.2h.01',
   career: 'M3 17.5c3-6 6-6 9-2.5s6 3.5 9-3M5 17.5a1.6 1.6 0 1 1-3.2 0 1.6 1.6 0 0 1 3.2 0zM22.2 12a1.6 1.6 0 1 1-3.2 0 1.6 1.6 0 0 1 3.2 0z',
   resume: 'M7 3h7l4 4v14H7zM14 3v4h4M9.8 12h5.4M9.8 15.5h5.4',
   contact: 'M5 18V9.5a7 7 0 0 1 14 0V18M5 14h3v5H5zM16 14h3v5h-3z',

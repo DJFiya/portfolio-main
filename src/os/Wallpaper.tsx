@@ -20,7 +20,7 @@ const CLOUDS: [number, number, number, number][] = [[8, 1, 140, 0.1], [18, 0.7, 
 
 function Cloud() {
   return (
-    <svg width="220" height="70" viewBox="0 0 220 70" aria-hidden="true">
+    <svg width="220" height="86" viewBox="0 -16 220 86" aria-hidden="true">
       <path d="M30 60h160a24 24 0 0 0 0-48 30 30 0 0 0-52-4 34 34 0 0 0-58 10A22 22 0 0 0 30 60z" fill="#FFF" />
     </svg>
   )
