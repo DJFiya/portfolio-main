@@ -35,7 +35,8 @@ const BLAST_DRAGON = 110
 const BLAST_PLAYER = 1.5
 // Crossbow: fires a bolt on its own every reload; each Quick Charge level reloads 20% faster
 export const reloadTime = (level: number) => 2.4 * Math.pow(0.8, Math.max(0, level - 1))
-export const boltDamage = (r: { dim: number; perks: Perk[] }) => (3 + r.dim * 3) * (r.perks.includes('multishot') ? 2 : 1)
+// A bolt hits for twice your click damage, so the crossbow's share of your damage only grows with Quick Charge
+export const boltDamage = (r: Run) => 2 * damage(r) * (r.perks.includes('multishot') ? 2 : 1)
 // Sweeping Edge (up to III): every third click sweeps, landing one extra hit per level.
 // Fire Aspect (up to II): a click sets the mob burning for a few seconds; fireproof mobs ignore it.
 export const MAX_LEVEL: Partial<Record<Upgrade, number>> = { sweep: 3, fire: 2 }
