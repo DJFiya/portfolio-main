@@ -85,9 +85,8 @@
 @keyframes br-bolt { from { transform: translateY(180px); opacity: 1; } to { transform: translateY(-40px); opacity: 0.9; } }
 .br-bolt.bounce { animation: br-bounce 600ms ease-out both; }
 @keyframes br-bounce { 0% { transform: translateY(180px); } 40% { transform: translateY(-30px) rotate(0); } 100% { transform: translate(90px, 60px) rotate(140deg); opacity: 0; } }
-.br-xbow { position: relative; display: grid; place-items: center; width: 44px; height: 44px; margin-right: 6px; border: 2px solid #8B8B8B; background: rgba(60, 60, 60, 0.75); }
-.br-reload { position: absolute; right: -8px; bottom: 0; width: 4px; height: 100%; background: rgba(0, 0, 0, 0.5); }
-.br-reload i { position: absolute; inset: 0; transform-origin: bottom; background: #E8C14A; }
+.br-reload { position: absolute; left: 3px; right: 3px; bottom: 3px; height: 4px; background: rgba(0, 0, 0, 0.5); }
+.br-reload i { position: absolute; inset: 0; transform-origin: left; background: #E8C14A; }
 
 /* Bosses: bigger sprite and a gold name */
 .br-mob.boss canvas { transform: scale(1.35); margin: 22px 0; }

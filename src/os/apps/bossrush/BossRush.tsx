@@ -12,7 +12,7 @@ import './boss-rush.css'
 type Float = { id: number; text: string; cls: string; x: number }
 type Step = { run: Run; events: GameEvent[] }
 
-const UPGRADES: Upgrade[] = ['sharp', 'xbow', 'loot']
+const UPGRADES: [Upgrade, string, string][] = [['sharp', 'Sharpness', '+1 damage per click'], ['loot', 'Looting', 'more gold per kill']]
 const HOTBAR: Item[] = ['steak', 'gapple', 'totem', 'mace']
 // Where the Dragon's crystals stand, as percentages of the fight area
 const PILLARS = [[8, 12], [8, 34], [8, 56], [22, 60], [78, 60], [92, 56], [92, 34], [92, 12]]
@@ -87,7 +87,8 @@ export default function BossRush({ active }: AppProps) {
 
   const onKey = (e: KeyboardEvent) => {
     const n = Number(e.key)
-    if (n >= 1 && n <= HOTBAR.length) { apply(r => consume(r, HOTBAR[n - 1])); e.preventDefault() }
+    // Slot 1 is the crossbow, which fires on its own; the items follow from slot 2
+    if (n >= 2 && n <= HOTBAR.length + 1) { apply(r => consume(r, HOTBAR[n - 2])); e.preventDefault() }
   }
 
   const dim = run.dim, max = mob?.hp ?? 1
@@ -139,17 +140,15 @@ export default function BossRush({ active }: AppProps) {
             </span>
           </div>
           <div className="br-hotbar">
-            {run.xbow > 0 && (
-              <span className="br-xbow" title={`Crossbow: ${boltDamage(run)} damage every ${reloadTime(run.xbow).toFixed(1)}s`}>
-                <Crossbow />
-                <span className="br-reload"><i style={{ transform: `scaleY(${Math.min(1, run.reload / reloadTime(run.xbow))})` }} /></span>
-              </span>
-            )}
+            <span className={`br-slot${run.xbow ? ' passive' : ' empty'}`} title={run.xbow ? `Crossbow: ${boltDamage(run)} damage every ${reloadTime(run.xbow).toFixed(1)}s` : 'Crossbow'}>
+              <Crossbow size={34} />
+              {run.xbow > 0 && <span className="br-reload"><i style={{ transform: `scaleX(${Math.min(1, run.reload / reloadTime(run.xbow))})` }} /></span>}
+            </span>
             {HOTBAR.map((it, k) => {
               const have = it === 'mace' ? run.items.mace : run.items[it] > 0
               const cd = it === 'mace' ? run.maceCd / MACE_COOLDOWN : it === 'steak' || it === 'gapple' ? run.foodCd / FOOD_COOLDOWN : 0
               return (
-                <button key={it} type="button" className={`br-slot${have ? '' : ' empty'}${it === 'totem' && have ? ' passive' : ''}`} aria-label={`${ITEMS[it].name}${it === 'mace' || it === 'totem' ? '' : `, ${run.items[it]} left`} (key ${k + 1})`} onClick={() => apply(r => consume(r, it))} disabled={!have || !running}>
+                <button key={it} type="button" className={`br-slot${have ? '' : ' empty'}${it === 'totem' && have ? ' passive' : ''}`} aria-label={`${ITEMS[it].name}${it === 'mace' || it === 'totem' ? '' : `, ${run.items[it]} left`} (key ${k + 2})`} onClick={() => apply(r => consume(r, it))} disabled={!have || !running}>
                   <ItemIcon item={it} size={34} />
                   {it !== 'mace' && it !== 'totem' && run.items[it] > 0 && <b>{run.items[it]}</b>}
                   {cd > 0 && <span className="br-cd" style={{ '--cd': cd } as CSSProperties} />}
@@ -175,15 +174,11 @@ export default function BossRush({ active }: AppProps) {
       <aside className="br-shop">
         <div className="br-gold"><span>Gold</span><b>{run.gold}</b></div>
         <h3>Sword</h3>
-        {UPGRADES.map(u => {
-          // The crossbow is bought once; after that the same slot sells Quick Charge levels
-          const [name, level, what] = u === 'sharp' ? ['Sharpness', run.sharp, '+1 damage per click'] : u === 'loot' ? ['Looting', run.loot, 'more gold per kill'] : run.xbow ? ['Quick Charge', run.xbow - 1, 'reloads faster'] : ['Crossbow', 0, 'fires bolts on its own']
-          return (
-            <button key={u} type="button" className="br-buy" disabled={run.gold < run.cost[u] || run.done} onClick={() => apply(r => buyUpgrade(r, u))}>
-              <span className="br-buy-icon">{u === 'xbow' && <Crossbow size={18} />}<span>{name} {level > 0 && <em>{level}</em>}<small>{what}</small></span></span><span>{run.cost[u]}g</span>
-            </button>
-          )
-        })}
+        {UPGRADES.map(([u, name, what]) => (
+          <button key={u} type="button" className="br-buy" disabled={run.gold < run.cost[u] || run.done} onClick={() => apply(r => buyUpgrade(r, u))}>
+            <span>{name} {run[u] > 0 && <em>{run[u]}</em>}<small>{what}</small></span><span>{run.cost[u]}g</span>
+          </button>
+        ))}
         <h3>Armour</h3>
         {ARMOR[run.armor + 1] ? (
           <button type="button" className="br-buy" disabled={run.gold < ARMOR[run.armor + 1].cost} onClick={() => apply(buyArmor)}>
@@ -195,6 +190,10 @@ export default function BossRush({ active }: AppProps) {
           </button>
         )}
         <h3>Items</h3>
+        {/* The crossbow is bought once; after that its row sells Quick Charge levels */}
+        <button type="button" className="br-buy" disabled={run.gold < run.cost.xbow || run.done} onClick={() => apply(r => buyUpgrade(r, 'xbow'))}>
+          <span className="br-buy-icon"><Crossbow size={18} /><span>{run.xbow ? <>Quick Charge {run.xbow > 1 && <em>{run.xbow - 1}</em>}<small>reloads faster</small></> : 'Crossbow'}</span></span><span>{run.cost.xbow}g</span>
+        </button>
         {HOTBAR.map(it => (
           <button key={it} type="button" className="br-buy" disabled={!canBuy(run, it)} onClick={() => apply(r => buyItem(r, it))}>
             <span className="br-buy-icon"><ItemIcon item={it} size={18} />{ITEMS[it].name}</span><span>{it === 'mace' && run.items.mace ? 'Owned' : `${ITEMS[it].cost}g`}</span>

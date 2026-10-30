@@ -82,13 +82,14 @@ export function Crystal({ caged }: { caged: boolean }) {
   )
 }
 
-// Crossbow seen front-on: limbs and string across the top, stock running down; and its bolt
+// Crossbow keeps Minecraft's inventory sprite shape (curved bow, straight string), flattened to a few colours; and its bolt
 const XBOW = [
-  '................', '................', '.kkkk......kkkk.', 'kWWWWkkkkkkWWWWk', 'kwk..kWWWWk..kwk', '.s.k..kWWk..k.s.',
-  '..s.k.kWWk.k.s..', '...s.kkggkk.s...', '....sskggkss....', '......kWWk......', '......kWWk......', '......kwwk......',
-  '......kWWk......', '......kwwk......', '.......kk.......', '................',
+  '............W...', '........WWWkWW..', '...gg.WLLWWWWW..', '..g..gLkkkk.g...',
+  '..g.WLkk...g....', '...gLkWWk.g.....', '..WLkWWWWg......', '..WWkWWWgWk.....',
+  '.WLk.kWgWWWk....', '.WLk..gWWWWWk...', '.WW..g.kWWWWk...', '.kL.g...kWWWWk..',
+  'WWWg.....kkWWkk.', '.kk........kkWWk', '............kWkk', '.............kk.',
 ]
 const BOLT = ['.g.', 'ggg', '.w.', '.w.', '.w.', '.w.', '.w.', '.w.', 'fwf', 'f.f']
-const XBOW_PAL: Record<string, string> = { k: '#2B2118', W: '#9C6A3C', w: '#6E4826', g: '#9AA0A8', s: '#D9D4C7', f: '#EDEAE2' }
+const XBOW_PAL: Record<string, string> = { k: '#2B1D10', W: '#6E4220', L: '#A0662A', g: '#8A8A8A', w: '#6E4220', f: '#EDEAE2' }
 export const Crossbow = ({ size = 30 }: { size?: number }) => <Sprite map={XBOW} size={size} pal={XBOW_PAL} />
 export const Bolt = () => <Sprite map={BOLT} size={30} pal={XBOW_PAL} />
