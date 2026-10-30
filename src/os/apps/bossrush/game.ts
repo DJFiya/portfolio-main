@@ -72,8 +72,10 @@ export type Run = {
   flame: number
   perks: Perk[]
   choosing: boolean
-  // Runs cleared, kept across new runs
+  // Runs cleared and the fastest clear in seconds (0 = none yet), kept across new runs; time is this run's play time
   wins: number
+  best: number
+  time: number
   cost: Record<Upgrade, number>
   armor: number
   php: number
@@ -118,10 +120,10 @@ export const charging = (r: Run) => mobOf(r)?.boss === 'warden' && !r.dying && r
 export const damage = (r: Run) => 1 + r.sharp
 export const winding = (r: Run) => { const m = mobOf(r); return !!m && !r.dying && r.swing > m.every - WINDUP }
 
-export function fresh(wins = 0): Run {
+export function fresh(wins = 0, best = 0): Run {
   return {
     v: 3, dim: 0, i: 0, hp: DIMENSIONS[0].mobs[0].hp, gold: startGold(wins), sharp: 0, xbow: 0, loot: 0, sweep: 0, fire: 0,
-    combo: 0, burn: 0, flame: 0, perks: [], choosing: false, wins,
+    combo: 0, burn: 0, flame: 0, perks: [], choosing: false, wins, best, time: 0,
     cost: { sharp: 8, xbow: 12, loot: 15, sweep: 60, fire: 80 }, armor: 0, php: MAX_HP, absorb: 0,
     items: { steak: 0, gapple: 0, totem: 0, mace: false }, maceCd: 0, foodCd: 0, swing: 0, reload: 0, dying: 0,
     sp: 0, crystals: [], dead: false, done: false, msg: 'Click the mob to strike. It hits back, so watch your hearts.',
@@ -172,7 +174,7 @@ function nextMob(r: Run): Step {
     // The dimension banner waits until a perk is chosen
     return { run: { ...healed, dim: r.dim + 1, i: 0, hp: nd.mobs[0].hp, choosing: true, msg: `You enter the ${nd.name}.` }, events: [] }
   }
-  return { run: { ...healed, done: true, wins: r.wins + 1, msg: 'Every dimension cleared.' }, events: [] }
+  return { run: { ...healed, done: true, wins: r.wins + 1, best: r.best ? Math.min(r.best, r.time) : r.time, msg: 'Every dimension cleared.' }, events: [] }
 }
 
 function hurt(r: Run, atk: number, pierce = false): Step {
@@ -193,7 +195,7 @@ function hurt(r: Run, atk: number, pierce = false): Step {
 // Advances the fight by dt seconds: mob attacks, crossbow bolts, cooldowns and the death animation
 export function tick(r: Run, dt: number): Step {
   if (r.dead || r.done || r.choosing) return { run: r, events: [] }
-  let run = { ...r, maceCd: Math.max(0, r.maceCd - dt), foodCd: Math.max(0, r.foodCd - dt) }
+  let run = { ...r, time: r.time + dt, maceCd: Math.max(0, r.maceCd - dt), foodCd: Math.max(0, r.foodCd - dt) }
   const events: GameEvent[] = []
   if (run.dying) {
     run.dying = Math.max(0, run.dying - dt)

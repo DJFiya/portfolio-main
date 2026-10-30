@@ -79,6 +79,7 @@
 .br-buy.worn { opacity: 1; background: #3A4D34; box-shadow: inset 3px 0 0 #FFD15C; }
 .br-msg { margin: 6px 0 0; font-size: 13.5px; color: #C9C4AE; min-height: 36px; line-height: 1.4; }
 .br-new { align-self: flex-start; border: 0; background: transparent; color: #8EA497; font-family: var(--pixel); font-size: 13px; cursor: pointer; padding: 4px 0; text-decoration: underline; text-underline-offset: 3px; }
+.br-foot { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #8EA497; }
 
 /* Crossbow: bolts fly up into the mob; against the armoured Wither they glance off */
 .br-bolt { position: absolute; left: 50%; bottom: -40px; margin-left: -15px; pointer-events: none; z-index: 2; animation: br-bolt 260ms ease-in both; }

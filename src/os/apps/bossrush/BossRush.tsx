@@ -16,6 +16,7 @@ const UPGRADES: [Upgrade, string, string][] = [
   ['sharp', 'Sharpness', '+1 damage per click'], ['sweep', 'Sweeping Edge', 'every third click sweeps'],
   ['fire', 'Fire Aspect', 'sets mobs on fire'], ['loot', 'Looting', 'more gold per kill'],
 ]
+const clock = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`
 const HOTBAR: Item[] = ['steak', 'gapple', 'totem', 'mace']
 // Where the Dragon's crystals stand, as percentages of the fight area
 const PILLARS = [[8, 12], [8, 34], [8, 56], [22, 60], [78, 60], [92, 56], [92, 34], [92, 12]]
@@ -183,8 +184,9 @@ export default function BossRush({ active }: AppProps) {
         {run.done && (
           <div className="br-dead br-won">
             <b>The End</b>
-            <span>Runs cleared: {run.wins}</span>
-            <button type="button" onClick={() => apply(r => fresh(r.wins))}>Play again</button>
+            <span>Time {clock(run.time)}{run.time <= run.best ? ', a new best' : ''}</span>
+            <span>Best {clock(run.best)} · Runs cleared: {run.wins}</span>
+            <button type="button" onClick={() => apply(r => fresh(r.wins, r.best))}>Play again</button>
             <span>Starting gold: {startGold(run.wins)}</span>
           </div>
         )}
@@ -229,7 +231,10 @@ export default function BossRush({ active }: AppProps) {
           </button>
         ))}
         <p className="br-msg" aria-live="polite">{run.msg}</p>
-        <button type="button" className="br-new" onClick={() => apply(r => fresh(r.wins))}>New run</button>
+        <div className="br-foot">
+          <button type="button" className="br-new" onClick={() => apply(r => fresh(r.wins, r.best))}>New run</button>
+          {run.best > 0 && <span>Best {clock(run.best)}</span>}
+        </div>
       </aside>
     </div>
   )
