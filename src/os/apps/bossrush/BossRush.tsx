@@ -2,20 +2,20 @@ import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } f
 import { useMediaQuery } from '../../../hooks/useMediaQuery'
 import type { AppProps } from '../../os-context'
 import {
-  ARMOR, BOOM_CHARGE, CAGE_HP, FOOD_COOLDOWN, ITEMS, MACE_COOLDOWN, MAX_HP, buyArmor, buyItem, buyUpgrade, canBuy, charging, click,
+  ARMOR, BOOM_CHARGE, CAGE_HP, boltDamage, reloadTime, FOOD_COOLDOWN, ITEMS, MACE_COOLDOWN, MAX_HP, buyArmor, buyItem, buyUpgrade, canBuy, charging, click,
   consume, fresh, hitCrystal, load, mobOf, respawn, save, shielded, tick, winding, type GameEvent, type Item, type Run, type Upgrade,
 } from './game'
 import { DIMENSIONS, drawMob } from './mobs'
-import { Chestplate, Crystal, Heart, ItemIcon } from './Pixel'
+import { Bolt, Chestplate, Crossbow, Crystal, Heart, ItemIcon } from './Pixel'
 import './boss-rush.css'
 
 type Float = { id: number; text: string; cls: string; x: number }
 type Step = { run: Run; events: GameEvent[] }
 
-const UPGRADES: [Upgrade, string, string][] = [['sharp', 'Sharpness', '+1 damage'], ['auto', 'Auto-swing', '+1 damage a second'], ['loot', 'Looting', 'more gold per kill']]
+const UPGRADES: Upgrade[] = ['sharp', 'xbow', 'loot']
 const HOTBAR: Item[] = ['steak', 'gapple', 'totem', 'mace']
 // Where the Dragon's crystals stand, as percentages of the fight area
-const PILLARS = [[13, 24], [87, 24], [87, 52]]
+const PILLARS = [[8, 12], [8, 34], [8, 56], [22, 60], [78, 60], [92, 56], [92, 34], [92, 12]]
 
 export default function BossRush({ active }: AppProps) {
   const reduce = useMediaQuery('(prefers-reduced-motion: reduce)')
@@ -25,6 +25,8 @@ export default function BossRush({ active }: AppProps) {
   const [hurtKey, setHurtKey] = useState(0)
   const [totemKey, setTotemKey] = useState(0)
   const [crackKey, setCrackKey] = useState(0)
+  const [bolts, setBolts] = useState<{ id: number; bounce: boolean }[]>([])
+  const [blasts, setBlasts] = useState<{ id: number; k: number }[]>([])
   const [banner, setBanner] = useState<{ key: number; text: string } | null>(null)
   const cv = useRef<HTMLCanvasElement>(null)
   const stage = useRef<HTMLDivElement>(null)
@@ -37,8 +39,9 @@ export default function BossRush({ active }: AppProps) {
   }
 
   const onEvent = (e: GameEvent, r: Run) => {
-    if (e.kind === 'hit') addFloat(e.by === 'auto' ? `-${e.amount}` : `-${e.amount}${e.crit && e.by === 'click' ? '!' : ''}`, e.by === 'mace' ? 'mace' : e.crit ? 'crit' : e.by)
-    if (e.kind === 'deflect') addFloat('0', 'deflect')
+    if (e.kind === 'hit') addFloat(`-${e.amount}${e.crit && e.by === 'click' ? '!' : ''}`, e.by === 'mace' || e.by === 'blast' ? e.by : e.crit ? 'crit' : e.by)
+    if (e.kind === 'shot') setBolts(bs => [...bs.slice(-6), { id: performance.now() + Math.random(), bounce: shielded(r) }])
+    if (e.kind === 'crystal') setBlasts(bs => [...bs.slice(-4), { id: performance.now() + Math.random(), k: e.k }])
     if (e.kind === 'heal') addFloat(`+${e.amount}`, 'heal')
     if (e.kind === 'boom') setCrackKey(k => k + 1)
     if (e.kind === 'boss') setBanner(b => ({ key: (b?.key ?? 0) + 1, text: DIMENSIONS[r.dim].boss.name }))
@@ -57,7 +60,16 @@ export default function BossRush({ active }: AppProps) {
   }
 
   useEffect(() => { save(run) }, [run])
-  useEffect(() => { if (cv.current && mob) drawMob(cv.current, mob) }, [mob])
+  const armored = shielded(run)
+  useEffect(() => {
+    const canvas = cv.current
+    if (!canvas || !mob) return
+    if (!armored) { drawMob(canvas, mob); return }
+    let phase = 0
+    drawMob(canvas, mob, phase)
+    const t = setInterval(() => drawMob(canvas, mob, ++phase), 160)
+    return () => clearInterval(t)
+  }, [mob, armored])
   useEffect(() => { if (active) app.current?.focus({ preventScroll: true }) }, [active])
 
   // The fight only runs while this window is in front
@@ -97,6 +109,7 @@ export default function BossRush({ active }: AppProps) {
                 {c > 0 && <span className="br-cage-bar"><i style={{ transform: `scaleX(${c / CAGE_HP})` }} /></span>}
               </button>
             ))}
+            {blasts.map(b => <span key={b.id} className="br-blast" style={{ left: `${PILLARS[b.k][0]}%`, top: `${PILLARS[b.k][1]}%` }} onAnimationEnd={() => setBlasts(bs => bs.filter(x => x.id !== b.id))} aria-hidden="true" />)}
           </>
         )}
         <div className="br-top">
@@ -105,8 +118,9 @@ export default function BossRush({ active }: AppProps) {
           <div className="br-hp">{run.done ? 'Run complete.' : `${Math.ceil(run.hp)} / ${max}`}</div>
         </div>
 
-        <button type="button" className={['br-mob', mob?.boss && 'boss', run.dying && 'dead', winding(run) && 'winding', shielded(run) && 'shielded'].filter(Boolean).join(' ')} aria-label={`Strike the ${mob?.name ?? 'mob'}`} onClick={() => apply(click)} disabled={!running}>
+        <button type="button" className={['br-mob', mob?.boss && 'boss', run.dying && 'dead', winding(run) && 'winding'].filter(Boolean).join(' ')} aria-label={`Strike the ${mob?.name ?? 'mob'}`} onClick={() => apply(click)} disabled={!running}>
           <canvas ref={cv} width={144} height={144} />
+          {bolts.map(b => <span key={b.id} className={`br-bolt${b.bounce ? ' bounce' : ''}`} onAnimationEnd={() => setBolts(bs => bs.filter(x => x.id !== b.id))}><Bolt /></span>)}
           {charging(run) && <span className="br-ring" style={{ animationDuration: `${BOOM_CHARGE}s` }} aria-hidden="true" />}
           <span className="br-charge" aria-hidden="true"><i style={{ transform: `scaleX(${run.dying ? 0 : charge})` }} /></span>
         </button>
@@ -125,6 +139,12 @@ export default function BossRush({ active }: AppProps) {
             </span>
           </div>
           <div className="br-hotbar">
+            {run.xbow > 0 && (
+              <span className="br-xbow" title={`Crossbow: ${boltDamage(run)} damage every ${reloadTime(run.xbow).toFixed(1)}s`}>
+                <Crossbow />
+                <span className="br-reload"><i style={{ transform: `scaleY(${Math.min(1, run.reload / reloadTime(run.xbow))})` }} /></span>
+              </span>
+            )}
             {HOTBAR.map((it, k) => {
               const have = it === 'mace' ? run.items.mace : run.items[it] > 0
               const cd = it === 'mace' ? run.maceCd / MACE_COOLDOWN : it === 'steak' || it === 'gapple' ? run.foodCd / FOOD_COOLDOWN : 0
@@ -155,11 +175,15 @@ export default function BossRush({ active }: AppProps) {
       <aside className="br-shop">
         <div className="br-gold"><span>Gold</span><b>{run.gold}</b></div>
         <h3>Sword</h3>
-        {UPGRADES.map(([u, name, what]) => (
-          <button key={u} type="button" className="br-buy" disabled={run.gold < run.cost[u] || run.done} onClick={() => apply(r => buyUpgrade(r, u))}>
-            <span>{name} {run[u] > 0 && <em>{run[u]}</em>}<small>{what}</small></span><span>{run.cost[u]}g</span>
-          </button>
-        ))}
+        {UPGRADES.map(u => {
+          // The crossbow is bought once; after that the same slot sells Quick Charge levels
+          const [name, level, what] = u === 'sharp' ? ['Sharpness', run.sharp, '+1 damage per click'] : u === 'loot' ? ['Looting', run.loot, 'more gold per kill'] : run.xbow ? ['Quick Charge', run.xbow - 1, 'reloads faster'] : ['Crossbow', 0, 'fires bolts on its own']
+          return (
+            <button key={u} type="button" className="br-buy" disabled={run.gold < run.cost[u] || run.done} onClick={() => apply(r => buyUpgrade(r, u))}>
+              <span className="br-buy-icon">{u === 'xbow' && <Crossbow size={18} />}<span>{name} {level > 0 && <em>{level}</em>}<small>{what}</small></span></span><span>{run.cost[u]}g</span>
+            </button>
+          )
+        })}
         <h3>Armour</h3>
         {ARMOR[run.armor + 1] ? (
           <button type="button" className="br-buy" disabled={run.gold < ARMOR[run.armor + 1].cost} onClick={() => apply(buyArmor)}>

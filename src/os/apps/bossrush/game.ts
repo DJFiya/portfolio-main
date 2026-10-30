@@ -26,20 +26,28 @@ const WINDUP = 0.6
 export const BOOM_EVERY = 9
 export const BOOM_CHARGE = 1.6
 const BOOM_ATK = 6
-// Ender Dragon: each standing crystal heals it every second until its cage is broken and it is tapped
-export const CAGE_HP = 60
-const DRAGON_HEAL = 14
+// Ender Dragon: each standing crystal heals it every second until its cage is broken and it is tapped.
+// A destroyed crystal explodes, hurting the Dragon badly and you a little.
+export const CRYSTALS = 8
+export const CAGE_HP = 30
+const DRAGON_HEAL = 6
+const BLAST_DRAGON = 110
+const BLAST_PLAYER = 1.5
+// Crossbow: fires a bolt on its own every reload; each Quick Charge level reloads 20% faster
+export const reloadTime = (level: number) => 2.4 * Math.pow(0.8, Math.max(0, level - 1))
+export const boltDamage = (r: { dim: number }) => 3 + r.dim * 3
 const DEATH_ANIM = 0.42
 
-export type Upgrade = 'sharp' | 'auto' | 'loot'
+export type Upgrade = 'sharp' | 'xbow' | 'loot'
 export type Run = {
-  v: 2
+  v: 3
   dim: number
   i: number
   hp: number
   gold: number
   sharp: number
-  auto: number
+  // 0 = no crossbow; 1 = crossbow; each level above is a Quick Charge level
+  xbow: number
   loot: number
   cost: Record<Upgrade, number>
   armor: number
@@ -49,7 +57,7 @@ export type Run = {
   maceCd: number
   foodCd: number
   swing: number
-  autoT: number
+  reload: number
   dying: number
   // Boss timer: the Warden's boom charge, or the Dragon's heal tick
   sp: number
@@ -61,7 +69,7 @@ export type Run = {
 }
 
 export type GameEvent =
-  | { kind: 'hit'; amount: number; crit: boolean; by: 'click' | 'auto' | 'mace' }
+  | { kind: 'hit'; amount: number; crit: boolean; by: 'click' | 'bolt' | 'mace' | 'blast' }
   | { kind: 'hurt'; amount: number }
   | { kind: 'kill' }
   | { kind: 'totem' }
@@ -69,14 +77,14 @@ export type GameEvent =
   | { kind: 'dimension' }
   | { kind: 'boss' }
   | { kind: 'boom' }
-  | { kind: 'deflect' }
   | { kind: 'heal'; amount: number }
-  | { kind: 'crystal' }
+  | { kind: 'crystal'; k: number }
+  | { kind: 'shot' }
 
 type Step = { run: Run; events: GameEvent[] }
 
 export const mobOf = (r: Run) => { const d = DIMENSIONS[r.dim]; return d && (r.i < d.mobs.length ? d.mobs[r.i] : d.boss) }
-// The Wither shrugs off auto-swing once it is below half health, like the real one does arrows
+// The Wither shrugs off bolts once it is below half health, like the real one does arrows
 export const shielded = (r: Run) => { const m = mobOf(r); return m?.boss === 'wither' && r.hp <= m.hp / 2 }
 export const charging = (r: Run) => mobOf(r)?.boss === 'warden' && !r.dying && r.sp > BOOM_EVERY - BOOM_CHARGE
 export const damage = (r: Run) => 1 + r.sharp
@@ -84,9 +92,9 @@ export const winding = (r: Run) => { const m = mobOf(r); return !!m && !r.dying 
 
 export function fresh(): Run {
   return {
-    v: 2, dim: 0, i: 0, hp: DIMENSIONS[0].mobs[0].hp, gold: 0, sharp: 0, auto: 0, loot: 0,
-    cost: { sharp: 8, auto: 20, loot: 15 }, armor: 0, php: MAX_HP, absorb: 0,
-    items: { steak: 0, gapple: 0, totem: 0, mace: false }, maceCd: 0, foodCd: 0, swing: 0, autoT: 0, dying: 0,
+    v: 3, dim: 0, i: 0, hp: DIMENSIONS[0].mobs[0].hp, gold: 0, sharp: 0, xbow: 0, loot: 0,
+    cost: { sharp: 8, xbow: 20, loot: 15 }, armor: 0, php: MAX_HP, absorb: 0,
+    items: { steak: 0, gapple: 0, totem: 0, mace: false }, maceCd: 0, foodCd: 0, swing: 0, reload: 0, dying: 0,
     sp: 0, crystals: [], dead: false, done: false, msg: 'Click the mob to strike. It hits back, so watch your hearts.',
   }
 }
@@ -96,10 +104,10 @@ export function fresh(): Run {
 const taken = (atk: number, armor: number) => atk * 100 / (100 + ARMOR[armor].points)
 // The sonic boom goes straight through armour
 
-function strike(r: Run, amount: number, crit: boolean, by: 'click' | 'auto' | 'mace'): Step {
+function strike(r: Run, amount: number, crit: boolean, by: 'click' | 'bolt' | 'mace' | 'blast'): Step {
   const m = mobOf(r)
   if (!m || r.dying || r.dead || r.done) return { run: r, events: [] }
-  if (by === 'auto' && shielded(r)) return { run: r, events: [{ kind: 'deflect' }] }
+  if (by === 'bolt' && shielded(r)) return { run: r, events: [] }
   const hp = Math.max(0, r.hp - amount)
   const events: GameEvent[] = [{ kind: 'hit', amount, crit, by }]
   if (hp > 0) return { run: { ...r, hp }, events }
@@ -120,7 +128,7 @@ function nextMob(r: Run): Step {
   if (r.i + 1 < dim.mobs.length) return { run: { ...healed, i: r.i + 1, hp: dim.mobs[r.i + 1].hp }, events: [] }
   if (r.i + 1 === dim.mobs.length) {
     const b = dim.boss
-    return { run: { ...healed, i: r.i + 1, hp: b.hp, sp: 0, crystals: b.boss === 'dragon' ? [CAGE_HP, CAGE_HP, CAGE_HP] : [], msg: `The ${b.name} appears.` }, events: [{ kind: 'boss' }] }
+    return { run: { ...healed, i: r.i + 1, hp: b.hp, sp: 0, crystals: b.boss === 'dragon' ? Array(CRYSTALS).fill(CAGE_HP) : [], msg: `The ${b.name} appears.` }, events: [{ kind: 'boss' }] }
   }
   if (r.dim + 1 < DIMENSIONS.length) {
     const nd = DIMENSIONS[r.dim + 1]
@@ -144,7 +152,7 @@ function hurt(r: Run, atk: number, pierce = false): Step {
   return { run: { ...run, php: 0, dead: true }, events }
 }
 
-// Advances the fight by dt seconds: mob attacks, auto-swing, the mace cooldown and the death animation
+// Advances the fight by dt seconds: mob attacks, crossbow bolts, cooldowns and the death animation
 export function tick(r: Run, dt: number): Step {
   if (r.dead || r.done) return { run: r, events: [] }
   let run = { ...r, maceCd: Math.max(0, r.maceCd - dt), foodCd: Math.max(0, r.foodCd - dt) }
@@ -154,11 +162,12 @@ export function tick(r: Run, dt: number): Step {
     if (!run.dying) { const n = nextMob(run); run = n.run; events.push(...n.events) }
     return { run, events }
   }
-  if (run.auto) {
-    run.autoT += dt
-    if (run.autoT >= 1) {
-      run.autoT -= 1
-      const s = strike(run, run.auto, false, 'auto'); run = s.run; events.push(...s.events)
+  if (run.xbow) {
+    run.reload += dt
+    if (run.reload >= reloadTime(run.xbow)) {
+      run.reload = 0
+      events.push({ kind: 'shot' })
+      const s = strike(run, boltDamage(run), false, 'bolt'); run = s.run; events.push(...s.events)
       if (run.dying) return { run, events }
     }
   }
@@ -197,20 +206,22 @@ export function hitCrystal(r: Run, k: number): Step {
   const crystals = [...r.crystals]
   if (c > 0) { crystals[k] = Math.max(0, c - damage(r)); return { run: { ...r, crystals }, events: [] } }
   crystals[k] = -1
-  return { run: { ...r, crystals }, events: [{ kind: 'crystal' }] }
+  const blast = strike({ ...r, crystals }, BLAST_DRAGON, false, 'blast')
+  const h = hurt(blast.run, BLAST_PLAYER)
+  return { run: h.run, events: [{ kind: 'crystal', k }, ...blast.events, ...h.events] }
 }
 
 // You died: back to the start of this dimension with your gear, half your gold dropped
 export function respawn(r: Run): Run {
   const dim = DIMENSIONS[r.dim]
-  return { ...r, dead: false, i: 0, hp: dim.mobs[0].hp, gold: Math.floor(r.gold / 2), php: MAX_HP, absorb: 0, swing: 0, autoT: 0, dying: 0, maceCd: 0, foodCd: 0, sp: 0, crystals: [], msg: `You dropped ${Math.ceil(r.gold / 2)} gold.` }
+  return { ...r, dead: false, i: 0, hp: dim.mobs[0].hp, gold: Math.floor(r.gold / 2), php: MAX_HP, absorb: 0, swing: 0, reload: 0, dying: 0, maceCd: 0, foodCd: 0, sp: 0, crystals: [], msg: `You dropped ${Math.ceil(r.gold / 2)} gold.` }
 }
 
 export function buyUpgrade(r: Run, u: Upgrade): Run {
   if (r.gold < r.cost[u]) return r
   const n = { ...r, gold: r.gold - r.cost[u], cost: { ...r.cost, [u]: Math.ceil(r.cost[u] * 1.6) } }
   if (u === 'sharp') return { ...n, sharp: r.sharp + 1, msg: `Sharpness ${r.sharp + 1}. ${damage(n) + 1} damage per hit.` }
-  if (u === 'auto') return { ...n, auto: r.auto + 1, msg: `Auto-swing ${r.auto + 1} per second.` }
+  if (u === 'xbow') return { ...n, xbow: r.xbow + 1, msg: r.xbow ? `Quick Charge ${r.xbow}. The crossbow reloads faster.` : 'Crossbow loaded. It fires on its own.' }
   return { ...n, loot: r.loot + 1, msg: `Looting ${r.loot + 1}.` }
 }
 
@@ -250,7 +261,7 @@ const KEY = 'daevikos:bossrush'
 export function load(): Run {
   try {
     const s = JSON.parse(localStorage.getItem(KEY) ?? 'null')
-    if (s?.v === 2) return { ...fresh(), ...s, dying: 0 }
+    if (s?.v === 3) return { ...fresh(), ...s, dying: 0 }
   } catch { /* no saved run */ }
   return fresh()
 }

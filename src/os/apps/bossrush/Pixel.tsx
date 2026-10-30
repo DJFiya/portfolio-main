@@ -76,8 +76,19 @@ const CRYSTAL_PAL: Record<string, string> = { p: '#9E4A9A', P: '#E68AD8', W: '#F
 export function Crystal({ caged }: { caged: boolean }) {
   return (
     <span className="br-crystal-art">
-      <Sprite map={CRYSTAL} size={44} pal={CRYSTAL_PAL} />
-      {caged && <span className="br-heart-fill"><Sprite map={CAGE} size={44} pal={CRYSTAL_PAL} /></span>}
+      <Sprite map={CRYSTAL} size={34} pal={CRYSTAL_PAL} />
+      {caged && <span className="br-heart-fill"><Sprite map={CAGE} size={34} pal={CRYSTAL_PAL} /></span>}
     </span>
   )
 }
+
+// Crossbow seen front-on: limbs and string across the top, stock running down; and its bolt
+const XBOW = [
+  '................', '................', '.kkkk......kkkk.', 'kWWWWkkkkkkWWWWk', 'kwk..kWWWWk..kwk', '.s.k..kWWk..k.s.',
+  '..s.k.kWWk.k.s..', '...s.kkggkk.s...', '....sskggkss....', '......kWWk......', '......kWWk......', '......kwwk......',
+  '......kWWk......', '......kwwk......', '.......kk.......', '................',
+]
+const BOLT = ['.g.', 'ggg', '.w.', '.w.', '.w.', '.w.', '.w.', '.w.', 'fwf', 'f.f']
+const XBOW_PAL: Record<string, string> = { k: '#2B2118', W: '#9C6A3C', w: '#6E4826', g: '#9AA0A8', s: '#D9D4C7', f: '#EDEAE2' }
+export const Crossbow = ({ size = 30 }: { size?: number }) => <Sprite map={XBOW} size={size} pal={XBOW_PAL} />
+export const Bolt = () => <Sprite map={BOLT} size={30} pal={XBOW_PAL} />

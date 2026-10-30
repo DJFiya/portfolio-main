@@ -47,7 +47,8 @@ export const DIMENSIONS: { name: string; mobs: Mob[]; boss: Mob }[] = [
 ]
 
 // 8×8 faces on a 12-unit grid (12px per unit on a 144px canvas), with room above for hats
-export function drawMob(cv: HTMLCanvasElement, mob: Mob) {
+// armor is the Wither's armour phase: when set, blue diagonal bands slide across its sprite
+export function drawMob(cv: HTMLCanvasElement, mob: Mob, armor?: number) {
   const { name, col } = mob
   const c = cv.getContext('2d')!
   c.clearRect(0, 0, 144, 144)
@@ -68,6 +69,13 @@ export function drawMob(cv: HTMLCanvasElement, mob: Mob) {
     px(3, 2, 6, 6, col); px(3, 2, 6, 1, '#4A474F')
     px(4, 4, 1.5, 1.5, hole); px(6.5, 4, 1.5, 1.5, hole); px(4.5, 6.5, 3, 0.8, hole)
     px(5, 8, 2, 3, bone); px(4, 9, 4, 0.6, bone); px(4, 10.2, 4, 0.6, bone)
+    if (armor !== undefined) {
+      // Paint only over the Wither's own pixels
+      c.globalCompositeOperation = 'source-atop'
+      c.fillStyle = 'rgba(120, 185, 255, 0.6)'
+      for (let y = 0; y < 12; y++) for (let x = 0; x < 12; x++) if ((x + y + armor) % 4 === 0) c.fillRect(x * 12, y * 12, 12, 12)
+      c.globalCompositeOperation = 'source-over'
+    }
     return
   }
   if (name === 'Ender Dragon') {
