@@ -93,3 +93,13 @@ const BOLT = ['.g.', 'ggg', '.w.', '.w.', '.w.', '.w.', '.w.', '.w.', 'fwf', 'f.
 const XBOW_PAL: Record<string, string> = { k: '#2B1D10', W: '#6E4220', L: '#A0662A', g: '#8A8A8A', w: '#6E4220', f: '#EDEAE2' }
 export const Crossbow = ({ size = 30 }: { size?: number }) => <Sprite map={XBOW} size={size} pal={XBOW_PAL} />
 export const Bolt = () => <Sprite map={BOLT} size={30} pal={XBOW_PAL} />
+
+// Fire on a burning mob, in two frames that swap to flicker; and the sweep's white crescent
+const FLAME = [
+  ['...o....', '..oo..o.', '..oYo.o.', '.oYYooo.', '.oYYYYo.', 'ooYwwYoo', 'oYwwwwYo', '.oYwwYo.'],
+  ['.....o..', '.o..oo..', '.o.oYo..', '.oooYYo.', '.oYYYYo.', 'ooYwwYoo', 'oYwwwwYo', '.oYwwYo.'],
+]
+const FLAME_PAL: Record<string, string> = { o: '#E2591E', Y: '#F6A82A', w: '#FFE27A' }
+export const Flame = ({ frame }: { frame: 0 | 1 }) => <Sprite map={FLAME[frame]} size={40} pal={FLAME_PAL} />
+const SWEEP = ['....wwww....', '..ww....ww..', '.w........w.', 'w..........w', 'w..........w']
+export const Sweep = () => <Sprite map={SWEEP} size={34} pal={{ w: '#F3F1E6' }} />

@@ -35,10 +35,24 @@ const BLAST_DRAGON = 110
 const BLAST_PLAYER = 1.5
 // Crossbow: fires a bolt on its own every reload; each Quick Charge level reloads 20% faster
 export const reloadTime = (level: number) => 2.4 * Math.pow(0.8, Math.max(0, level - 1))
-export const boltDamage = (r: { dim: number }) => 3 + r.dim * 3
+export const boltDamage = (r: { dim: number; perks: Perk[] }) => (3 + r.dim * 3) * (r.perks.includes('multishot') ? 2 : 1)
+// Sweeping Edge (up to III): every third click sweeps, landing one extra hit per level.
+// Fire Aspect (up to II): a click sets the mob burning for a few seconds; fireproof mobs ignore it.
+export const MAX_LEVEL: Partial<Record<Upgrade, number>> = { sweep: 3, fire: 2 }
+const BURN_TIME = 4
+export const fireDamage = (r: { dim: number; fire: number }) => 2 * r.fire * (1 + r.dim)
+// After the Warden and the Wither you keep one of two perks
+export type Perk = 'keen' | 'heavy' | 'fortune' | 'multishot'
+export const PERKS: { id: Perk; name: string; what: string }[][] = [
+  [{ id: 'keen', name: 'Keen', what: 'Crits twice as often' }, { id: 'heavy', name: 'Heavy', what: 'Crits hit three times as hard' }],
+  [{ id: 'fortune', name: 'Fortune', what: 'Half again as much gold' }, { id: 'multishot', name: 'Multishot', what: 'The crossbow fires two bolts' }],
+]
+// Each cleared run starts the next with more gold, up to five clears
+const CLEAR_GOLD = 30
+export const startGold = (wins: number) => CLEAR_GOLD * Math.min(5, wins)
 const DEATH_ANIM = 0.42
 
-export type Upgrade = 'sharp' | 'xbow' | 'loot'
+export type Upgrade = 'sharp' | 'xbow' | 'loot' | 'sweep' | 'fire'
 export type Run = {
   v: 3
   dim: number
@@ -49,6 +63,16 @@ export type Run = {
   // 0 = no crossbow; 1 = crossbow; each level above is a Quick Charge level
   xbow: number
   loot: number
+  sweep: number
+  fire: number
+  // Clicks since the last sweep, and how long the mob has left to burn
+  combo: number
+  burn: number
+  flame: number
+  perks: Perk[]
+  choosing: boolean
+  // Runs cleared, kept across new runs
+  wins: number
   cost: Record<Upgrade, number>
   armor: number
   php: number
@@ -69,7 +93,7 @@ export type Run = {
 }
 
 export type GameEvent =
-  | { kind: 'hit'; amount: number; crit: boolean; by: 'click' | 'bolt' | 'mace' | 'blast' }
+  | { kind: 'hit'; amount: number; crit: boolean; by: Source }
   | { kind: 'hurt'; amount: number }
   | { kind: 'kill' }
   | { kind: 'totem' }
@@ -80,6 +104,9 @@ export type GameEvent =
   | { kind: 'heal'; amount: number }
   | { kind: 'crystal'; k: number }
   | { kind: 'shot' }
+  | { kind: 'sweep' }
+
+type Source = 'click' | 'bolt' | 'mace' | 'blast' | 'sweep' | 'fire'
 
 type Step = { run: Run; events: GameEvent[] }
 
@@ -90,10 +117,11 @@ export const charging = (r: Run) => mobOf(r)?.boss === 'warden' && !r.dying && r
 export const damage = (r: Run) => 1 + r.sharp
 export const winding = (r: Run) => { const m = mobOf(r); return !!m && !r.dying && r.swing > m.every - WINDUP }
 
-export function fresh(): Run {
+export function fresh(wins = 0): Run {
   return {
-    v: 3, dim: 0, i: 0, hp: DIMENSIONS[0].mobs[0].hp, gold: 0, sharp: 0, xbow: 0, loot: 0,
-    cost: { sharp: 8, xbow: 12, loot: 15 }, armor: 0, php: MAX_HP, absorb: 0,
+    v: 3, dim: 0, i: 0, hp: DIMENSIONS[0].mobs[0].hp, gold: startGold(wins), sharp: 0, xbow: 0, loot: 0, sweep: 0, fire: 0,
+    combo: 0, burn: 0, flame: 0, perks: [], choosing: false, wins,
+    cost: { sharp: 8, xbow: 12, loot: 15, sweep: 60, fire: 80 }, armor: 0, php: MAX_HP, absorb: 0,
     items: { steak: 0, gapple: 0, totem: 0, mace: false }, maceCd: 0, foodCd: 0, swing: 0, reload: 0, dying: 0,
     sp: 0, crystals: [], dead: false, done: false, msg: 'Click the mob to strike. It hits back, so watch your hearts.',
   }
@@ -104,27 +132,35 @@ export function fresh(): Run {
 const taken = (atk: number, armor: number) => atk * 100 / (100 + ARMOR[armor].points)
 // The sonic boom goes straight through armour
 
-function strike(r: Run, amount: number, crit: boolean, by: 'click' | 'bolt' | 'mace' | 'blast'): Step {
+function strike(r: Run, amount: number, crit: boolean, by: Source): Step {
   const m = mobOf(r)
-  if (!m || r.dying || r.dead || r.done) return { run: r, events: [] }
+  if (!m || r.dying || r.dead || r.done || r.choosing) return { run: r, events: [] }
   if (by === 'bolt' && shielded(r)) return { run: r, events: [] }
   const hp = Math.max(0, r.hp - amount)
   const events: GameEvent[] = [{ kind: 'hit', amount, crit, by }]
   if (hp > 0) return { run: { ...r, hp }, events }
-  const reward = m.boss ? 50 * (1 + r.dim) : (4 + r.dim * 11 + r.i + r.loot) * (1 + r.dim)
+  const base = m.boss ? 50 * (1 + r.dim) : (4 + r.dim * 11 + r.i + r.loot) * (1 + r.dim)
+  const reward = r.perks.includes('fortune') ? Math.round(base * 1.5) : base
   events.push({ kind: 'kill' })
   return { run: { ...r, hp, gold: r.gold + reward, dying: DEATH_ANIM, msg: `${m.name} defeated. +${reward} gold.` }, events }
 }
 
 export function click(r: Run): Step {
-  const crit = Math.random() < 0.12
-  return strike(r, crit ? damage(r) * 2 : damage(r), crit, 'click')
+  const m = mobOf(r)
+  if (!m || r.dying || r.dead || r.done || r.choosing) return { run: r, events: [] }
+  const crit = Math.random() < (r.perks.includes('keen') ? 0.24 : 0.12)
+  const combo = r.sweep ? (r.combo + 1) % 3 : 0
+  const burn = r.fire && !m.fireproof ? BURN_TIME : r.burn
+  const s = strike({ ...r, combo, burn }, crit ? damage(r) * (r.perks.includes('heavy') ? 3 : 2) : damage(r), crit, 'click')
+  if (!r.sweep || combo || s.run.dying) return s
+  const w = strike(s.run, damage(r) * r.sweep, false, 'sweep')
+  return { run: w.run, events: [...s.events, { kind: 'sweep' }, ...w.events] }
 }
 
 function nextMob(r: Run): Step {
   const dim = DIMENSIONS[r.dim]
   // A little health back between fights
-  const healed = { ...r, dying: 0, swing: 0, php: Math.min(MAX_HP, r.php + 2) }
+  const healed = { ...r, dying: 0, swing: 0, burn: 0, flame: 0, combo: 0, php: Math.min(MAX_HP, r.php + 2) }
   if (r.i + 1 < dim.mobs.length) return { run: { ...healed, i: r.i + 1, hp: dim.mobs[r.i + 1].hp }, events: [] }
   if (r.i + 1 === dim.mobs.length) {
     const b = dim.boss
@@ -132,9 +168,10 @@ function nextMob(r: Run): Step {
   }
   if (r.dim + 1 < DIMENSIONS.length) {
     const nd = DIMENSIONS[r.dim + 1]
-    return { run: { ...healed, dim: r.dim + 1, i: 0, hp: nd.mobs[0].hp, msg: `You enter the ${nd.name}.` }, events: [{ kind: 'dimension' }] }
+    // The dimension banner waits until a perk is chosen
+    return { run: { ...healed, dim: r.dim + 1, i: 0, hp: nd.mobs[0].hp, choosing: true, msg: `You enter the ${nd.name}.` }, events: [] }
   }
-  return { run: { ...healed, done: true, msg: 'Every dimension cleared.' }, events: [] }
+  return { run: { ...healed, done: true, wins: r.wins + 1, msg: 'Every dimension cleared.' }, events: [] }
 }
 
 function hurt(r: Run, atk: number, pierce = false): Step {
@@ -154,7 +191,7 @@ function hurt(r: Run, atk: number, pierce = false): Step {
 
 // Advances the fight by dt seconds: mob attacks, crossbow bolts, cooldowns and the death animation
 export function tick(r: Run, dt: number): Step {
-  if (r.dead || r.done) return { run: r, events: [] }
+  if (r.dead || r.done || r.choosing) return { run: r, events: [] }
   let run = { ...r, maceCd: Math.max(0, r.maceCd - dt), foodCd: Math.max(0, r.foodCd - dt) }
   const events: GameEvent[] = []
   if (run.dying) {
@@ -168,6 +205,15 @@ export function tick(r: Run, dt: number): Step {
       run.reload = 0
       events.push({ kind: 'shot' })
       const s = strike(run, boltDamage(run), false, 'bolt'); run = s.run; events.push(...s.events)
+      if (run.dying) return { run, events }
+    }
+  }
+  if (run.burn) {
+    run.burn = Math.max(0, run.burn - dt)
+    run.flame = run.burn ? run.flame + dt : 0
+    if (run.flame >= 1) {
+      run.flame -= 1
+      const s = strike(run, fireDamage(run), false, 'fire'); run = s.run; events.push(...s.events)
       if (run.dying) return { run, events }
     }
   }
@@ -214,15 +260,25 @@ export function hitCrystal(r: Run, k: number): Step {
 // You died: back to the start of this dimension with your gear, half your gold dropped
 export function respawn(r: Run): Run {
   const dim = DIMENSIONS[r.dim]
-  return { ...r, dead: false, i: 0, hp: dim.mobs[0].hp, gold: Math.floor(r.gold / 2), php: MAX_HP, absorb: 0, swing: 0, reload: 0, dying: 0, maceCd: 0, foodCd: 0, sp: 0, crystals: [], msg: `You dropped ${Math.ceil(r.gold / 2)} gold.` }
+  return { ...r, dead: false, i: 0, hp: dim.mobs[0].hp, gold: Math.floor(r.gold / 2), php: MAX_HP, absorb: 0, swing: 0, reload: 0, dying: 0, maceCd: 0, foodCd: 0, sp: 0, crystals: [], burn: 0, flame: 0, combo: 0, msg: `You dropped ${Math.ceil(r.gold / 2)} gold.` }
 }
 
 export function buyUpgrade(r: Run, u: Upgrade): Run {
-  if (r.gold < r.cost[u]) return r
+  if (r.gold < r.cost[u] || r[u] >= (MAX_LEVEL[u] ?? Infinity)) return r
   const n = { ...r, gold: r.gold - r.cost[u], cost: { ...r.cost, [u]: Math.ceil(r.cost[u] * (u === 'xbow' ? 1.3 : 1.6)) } }
   if (u === 'sharp') return { ...n, sharp: r.sharp + 1, msg: `Sharpness ${r.sharp + 1}. ${damage(n) + 1} damage per hit.` }
   if (u === 'xbow') return { ...n, xbow: r.xbow + 1, msg: r.xbow ? `Quick Charge ${r.xbow}. The crossbow reloads faster.` : 'Crossbow loaded. It fires on its own.' }
+  if (u === 'sweep') return { ...n, sweep: r.sweep + 1, msg: `Sweeping Edge ${r.sweep + 1}.` }
+  if (u === 'fire') return { ...n, fire: r.fire + 1, msg: `Fire Aspect ${r.fire + 1}.` }
   return { ...n, loot: r.loot + 1, msg: `Looting ${r.loot + 1}.` }
+}
+
+// Multishot hands you a crossbow if you don't have one yet
+export function choosePerk(r: Run, p: Perk): Step {
+  if (!r.choosing) return { run: r, events: [] }
+  const run = { ...r, choosing: false, perks: [...r.perks, p] }
+  if (p === 'multishot' && !r.xbow) { run.xbow = 1; run.cost = { ...r.cost, xbow: Math.ceil(r.cost.xbow * 1.3) } }
+  return { run, events: [{ kind: 'dimension' }] }
 }
 
 export function buyArmor(r: Run): Run {
@@ -242,7 +298,7 @@ export function buyItem(r: Run, it: Item): Run {
 }
 
 export function consume(r: Run, it: Item): Step {
-  if (r.dead || r.done) return { run: r, events: [] }
+  if (r.dead || r.done || r.choosing) return { run: r, events: [] }
   if (it === 'mace') {
     if (!r.items.mace || r.maceCd > 0) return { run: r, events: [] }
     // A smash takes a third of a mob's health (a tenth of a boss's) plus a heavy hit, so it matters even when you can't spam it
@@ -261,7 +317,8 @@ const KEY = 'daevikos:bossrush'
 export function load(): Run {
   try {
     const s = JSON.parse(localStorage.getItem(KEY) ?? 'null')
-    if (s?.v === 3) return { ...fresh(), ...s, dying: 0 }
+    // Saves from before a price was added keep their prices and gain the new ones
+    if (s?.v === 3) { const f = fresh(); return { ...f, ...s, cost: { ...f.cost, ...s.cost }, dying: 0 } }
   } catch { /* no saved run */ }
   return fresh()
 }

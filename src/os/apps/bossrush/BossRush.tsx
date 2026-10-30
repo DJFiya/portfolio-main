@@ -2,17 +2,20 @@ import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } f
 import { useMediaQuery } from '../../../hooks/useMediaQuery'
 import type { AppProps } from '../../os-context'
 import {
-  ARMOR, BOOM_CHARGE, CAGE_HP, boltDamage, reloadTime, FOOD_COOLDOWN, ITEMS, MACE_COOLDOWN, MAX_HP, buyArmor, buyItem, buyUpgrade, canBuy, charging, click,
+  ARMOR, BOOM_CHARGE, CAGE_HP, MAX_LEVEL, PERKS, boltDamage, choosePerk, startGold, reloadTime, FOOD_COOLDOWN, ITEMS, MACE_COOLDOWN, MAX_HP, buyArmor, buyItem, buyUpgrade, canBuy, charging, click,
   consume, fresh, hitCrystal, load, mobOf, respawn, save, shielded, tick, winding, type GameEvent, type Item, type Run, type Upgrade,
 } from './game'
 import { DIMENSIONS, drawMob } from './mobs'
-import { Bolt, Chestplate, Crossbow, Crystal, Heart, ItemIcon } from './Pixel'
+import { Bolt, Chestplate, Crossbow, Crystal, Flame, Heart, ItemIcon, Sweep } from './Pixel'
 import './boss-rush.css'
 
 type Float = { id: number; text: string; cls: string; x: number }
 type Step = { run: Run; events: GameEvent[] }
 
-const UPGRADES: [Upgrade, string, string][] = [['sharp', 'Sharpness', '+1 damage per click'], ['loot', 'Looting', 'more gold per kill']]
+const UPGRADES: [Upgrade, string, string][] = [
+  ['sharp', 'Sharpness', '+1 damage per click'], ['sweep', 'Sweeping Edge', 'every third click sweeps'],
+  ['fire', 'Fire Aspect', 'sets mobs on fire'], ['loot', 'Looting', 'more gold per kill'],
+]
 const HOTBAR: Item[] = ['steak', 'gapple', 'totem', 'mace']
 // Where the Dragon's crystals stand, as percentages of the fight area
 const PILLARS = [[8, 12], [8, 34], [8, 56], [22, 60], [78, 60], [92, 56], [92, 34], [92, 12]]
@@ -25,7 +28,8 @@ export default function BossRush({ active }: AppProps) {
   const [hurtKey, setHurtKey] = useState(0)
   const [totemKey, setTotemKey] = useState(0)
   const [crackKey, setCrackKey] = useState(0)
-  const [bolts, setBolts] = useState<{ id: number; bounce: boolean }[]>([])
+  const [bolts, setBolts] = useState<{ id: number; bounce: boolean; x: number }[]>([])
+  const [sweepKey, setSweepKey] = useState(0)
   const [blasts, setBlasts] = useState<{ id: number; k: number }[]>([])
   const [banner, setBanner] = useState<{ key: number; text: string } | null>(null)
   const cv = useRef<HTMLCanvasElement>(null)
@@ -39,8 +43,12 @@ export default function BossRush({ active }: AppProps) {
   }
 
   const onEvent = (e: GameEvent, r: Run) => {
-    if (e.kind === 'hit') addFloat(`-${e.amount}${e.crit && e.by === 'click' ? '!' : ''}`, e.by === 'mace' || e.by === 'blast' ? e.by : e.crit ? 'crit' : e.by)
-    if (e.kind === 'shot') setBolts(bs => [...bs.slice(-6), { id: performance.now() + Math.random(), bounce: shielded(r) }])
+    if (e.kind === 'hit') addFloat(`-${e.amount}${e.crit && e.by === 'click' ? '!' : ''}`, e.by === 'click' && e.crit ? 'crit' : e.by)
+    if (e.kind === 'shot') {
+      const xs = r.perks.includes('multishot') ? [-14, 14] : [0]
+      setBolts(bs => [...bs.slice(-6), ...xs.map(x => ({ id: performance.now() + Math.random(), bounce: shielded(r), x }))])
+    }
+    if (e.kind === 'sweep') setSweepKey(k => k + 1)
     if (e.kind === 'crystal') setBlasts(bs => [...bs.slice(-4), { id: performance.now() + Math.random(), k: e.k }])
     if (e.kind === 'heal') addFloat(`+${e.amount}`, 'heal')
     if (e.kind === 'boom') setCrackKey(k => k + 1)
@@ -73,7 +81,7 @@ export default function BossRush({ active }: AppProps) {
   useEffect(() => { if (active) app.current?.focus({ preventScroll: true }) }, [active])
 
   // The fight only runs while this window is in front
-  const running = active && !run.dead && !run.done
+  const running = active && !run.dead && !run.done && !run.choosing
   useEffect(() => {
     if (!running) return
     let last = performance.now()
@@ -121,7 +129,9 @@ export default function BossRush({ active }: AppProps) {
 
         <button type="button" className={['br-mob', mob?.boss && 'boss', run.dying && 'dead', winding(run) && 'winding'].filter(Boolean).join(' ')} aria-label={`Strike the ${mob?.name ?? 'mob'}`} onClick={() => apply(click)} disabled={!running}>
           <canvas ref={cv} width={144} height={144} />
-          {bolts.map(b => <span key={b.id} className={`br-bolt${b.bounce ? ' bounce' : ''}`} onAnimationEnd={() => setBolts(bs => bs.filter(x => x.id !== b.id))}><Bolt /></span>)}
+          {run.burn > 0 && !run.dying && <span className="br-flames" aria-hidden="true"><Flame frame={0} /><Flame frame={1} /><Flame frame={0} /></span>}
+          {sweepKey > 0 && <span key={sweepKey} className="br-sweep" aria-hidden="true"><Sweep /></span>}
+          {bolts.map(b => <span key={b.id} className={`br-bolt${b.bounce ? ' bounce' : ''}`} style={{ translate: `${b.x}px 0` }} onAnimationEnd={() => setBolts(bs => bs.filter(x => x.id !== b.id))}><Bolt /></span>)}
           {charging(run) && <span className="br-ring" style={{ animationDuration: `${BOOM_CHARGE}s` }} aria-hidden="true" />}
           <span className="br-charge" aria-hidden="true"><i style={{ transform: `scaleX(${run.dying ? 0 : charge})` }} /></span>
         </button>
@@ -162,6 +172,22 @@ export default function BossRush({ active }: AppProps) {
         {totemKey > 0 && <div key={`t${totemKey}`} className="br-totem" aria-hidden="true"><ItemIcon item="totem" size={120} /></div>}
         {banner && <div key={banner.key} className="br-banner" onAnimationEnd={() => setBanner(null)}>{banner.text}</div>}
         {!active && !run.dead && <div className="br-paused">Paused</div>}
+        {run.choosing && (
+          <div className="br-dead br-choose">
+            <b>Choose a reward</b>
+            {PERKS[run.dim - 1].map(p => (
+              <button key={p.id} type="button" onClick={() => apply(r => choosePerk(r, p.id))}>{p.name}<small>{p.what}</small></button>
+            ))}
+          </div>
+        )}
+        {run.done && (
+          <div className="br-dead br-won">
+            <b>The End</b>
+            <span>Runs cleared: {run.wins}</span>
+            <button type="button" onClick={() => apply(r => fresh(r.wins))}>Play again</button>
+            <span>Starting gold: {startGold(run.wins)}</span>
+          </div>
+        )}
         {run.dead && (
           <div className="br-dead">
             <b>You died!</b>
@@ -174,11 +200,14 @@ export default function BossRush({ active }: AppProps) {
       <aside className="br-shop">
         <div className="br-gold"><span>Gold</span><b>{run.gold}</b></div>
         <h3>Sword</h3>
-        {UPGRADES.map(([u, name, what]) => (
-          <button key={u} type="button" className="br-buy" disabled={run.gold < run.cost[u] || run.done} onClick={() => apply(r => buyUpgrade(r, u))}>
-            <span>{name} {run[u] > 0 && <em>{run[u]}</em>}<small>{what}</small></span><span>{run.cost[u]}g</span>
-          </button>
-        ))}
+        {UPGRADES.map(([u, name, what]) => {
+          const maxed = run[u] >= (MAX_LEVEL[u] ?? Infinity)
+          return (
+            <button key={u} type="button" className="br-buy" disabled={run.gold < run.cost[u] || run.done || maxed} onClick={() => apply(r => buyUpgrade(r, u))}>
+              <span>{name} {run[u] > 0 && <em>{run[u]}</em>}<small>{what}</small></span><span>{maxed ? 'Max' : `${run.cost[u]}g`}</span>
+            </button>
+          )
+        })}
         <h3>Armour</h3>
         {ARMOR[run.armor + 1] ? (
           <button type="button" className="br-buy" disabled={run.gold < ARMOR[run.armor + 1].cost} onClick={() => apply(buyArmor)}>
@@ -200,7 +229,7 @@ export default function BossRush({ active }: AppProps) {
           </button>
         ))}
         <p className="br-msg" aria-live="polite">{run.msg}</p>
-        <button type="button" className="br-new" onClick={() => apply(() => fresh())}>New run</button>
+        <button type="button" className="br-new" onClick={() => apply(r => fresh(r.wins))}>New run</button>
       </aside>
     </div>
   )

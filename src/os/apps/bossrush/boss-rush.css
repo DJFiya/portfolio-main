@@ -122,3 +122,20 @@
 @media (prefers-reduced-motion: reduce) {
   .br-mob.winding { transform: none; }
 }
+
+/* Enchantments: fire licks the bottom of a burning mob; a sweep flashes a crescent across it */
+.br-flames { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); display: flex; gap: 2px; pointer-events: none; z-index: 1; opacity: 0.9; }
+.br-flames > svg { animation: br-flicker 360ms steps(1) infinite; }
+.br-flames > svg:nth-child(2) { animation-delay: -180ms; }
+@keyframes br-flicker { 50% { transform: scaleX(-1); } }
+.br-sweep { position: absolute; left: 50%; top: 34%; margin-left: -41px; pointer-events: none; z-index: 2; animation: br-sweep 260ms ease-out both; }
+@keyframes br-sweep { from { opacity: 1; transform: rotate(-30deg) scale(0.8); } to { opacity: 0; transform: rotate(20deg) scale(1.15); } }
+.br-float.sweep { color: #F3F1E6; font-size: 22px; }
+.br-float.fire { color: #F6A82A; font-size: 18px; }
+
+/* Perk choice after a boss, and the end screen after the Dragon */
+.br-choose { background: rgba(12, 14, 20, 0.72); animation: none; }
+.br-choose b, .br-won b { text-shadow: 3px 3px 0 #1A1A1A; }
+.br-choose button { height: auto; padding: 8px 12px; min-width: 260px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.br-choose button small { font-size: 13px; color: #E4E0D2; text-shadow: 1px 1px 0 #3A3A3A; }
+.br-won { background: rgba(20, 10, 30, 0.7); animation: none; }

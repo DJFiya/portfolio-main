@@ -2,7 +2,7 @@
 // can always win a fight and earn gold before the harder ones.
 // hp is health, atk is damage per hit in half-hearts, every is seconds between hits.
 export type Boss = 'warden' | 'wither' | 'dragon'
-export type Mob = { name: string; hp: number; atk: number; every: number; col: string; boss?: Boss }
+export type Mob = { name: string; hp: number; atk: number; every: number; col: string; boss?: Boss; fireproof?: boolean }
 
 // Each dimension ends with its boss
 export const DIMENSIONS: { name: string; mobs: Mob[]; boss: Mob }[] = [
@@ -26,14 +26,14 @@ export const DIMENSIONS: { name: string; mobs: Mob[]; boss: Mob }[] = [
   {
     name: 'Nether',
     mobs: [
-      { name: 'Magma Cube', hp: 140, atk: 3, every: 3, col: '#6A2A1C' },
-      { name: 'Blaze', hp: 230, atk: 5, every: 2.6, col: '#E9B83A' },
-      { name: 'Ghast', hp: 210, atk: 9, every: 4.5, col: '#EDEDE8' },
+      { name: 'Magma Cube', hp: 140, atk: 3, every: 3, col: '#6A2A1C', fireproof: true },
+      { name: 'Blaze', hp: 230, atk: 5, every: 2.6, col: '#E9B83A', fireproof: true },
+      { name: 'Ghast', hp: 210, atk: 9, every: 4.5, col: '#EDEDE8', fireproof: true },
       { name: 'Hoglin', hp: 280, atk: 7, every: 3, col: '#A8705A' },
-      { name: 'Wither Skeleton', hp: 320, atk: 8, every: 2.8, col: '#2E2E2E' },
+      { name: 'Wither Skeleton', hp: 320, atk: 8, every: 2.8, col: '#2E2E2E', fireproof: true },
       { name: 'Piglin Brute', hp: 380, atk: 9, every: 3, col: '#E3A08A' },
     ],
-    boss: { name: 'Wither', hp: 1700, atk: 8, every: 2.6, col: '#26242A', boss: 'wither' },
+    boss: { name: 'Wither', hp: 1700, atk: 8, every: 2.6, col: '#26242A', boss: 'wither', fireproof: true },
   },
   {
     name: 'End',
