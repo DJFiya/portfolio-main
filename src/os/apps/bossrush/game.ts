@@ -93,7 +93,7 @@ export const winding = (r: Run) => { const m = mobOf(r); return !!m && !r.dying 
 export function fresh(): Run {
   return {
     v: 3, dim: 0, i: 0, hp: DIMENSIONS[0].mobs[0].hp, gold: 0, sharp: 0, xbow: 0, loot: 0,
-    cost: { sharp: 8, xbow: 20, loot: 15 }, armor: 0, php: MAX_HP, absorb: 0,
+    cost: { sharp: 8, xbow: 12, loot: 15 }, armor: 0, php: MAX_HP, absorb: 0,
     items: { steak: 0, gapple: 0, totem: 0, mace: false }, maceCd: 0, foodCd: 0, swing: 0, reload: 0, dying: 0,
     sp: 0, crystals: [], dead: false, done: false, msg: 'Click the mob to strike. It hits back, so watch your hearts.',
   }
@@ -219,7 +219,7 @@ export function respawn(r: Run): Run {
 
 export function buyUpgrade(r: Run, u: Upgrade): Run {
   if (r.gold < r.cost[u]) return r
-  const n = { ...r, gold: r.gold - r.cost[u], cost: { ...r.cost, [u]: Math.ceil(r.cost[u] * 1.6) } }
+  const n = { ...r, gold: r.gold - r.cost[u], cost: { ...r.cost, [u]: Math.ceil(r.cost[u] * (u === 'xbow' ? 1.3 : 1.6)) } }
   if (u === 'sharp') return { ...n, sharp: r.sharp + 1, msg: `Sharpness ${r.sharp + 1}. ${damage(n) + 1} damage per hit.` }
   if (u === 'xbow') return { ...n, xbow: r.xbow + 1, msg: r.xbow ? `Quick Charge ${r.xbow}. The crossbow reloads faster.` : 'Crossbow loaded. It fires on its own.' }
   return { ...n, loot: r.loot + 1, msg: `Looting ${r.loot + 1}.` }
